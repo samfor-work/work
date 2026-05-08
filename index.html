@@ -171,15 +171,16 @@
   #printArea { display: none; }
 
   .label-sheet { width: 210mm; font-family: Arial, 'Noto Sans TC', sans-serif; }
-  .label-page { width: 210mm; padding-top: 7mm; page-break-after: always; }
+  .label-page { width: 210mm; padding-top: var(--offset-y, 7mm); margin-left: var(--offset-x, 0mm); page-break-after: always; }
   .label-page:last-child { page-break-after: auto; }
   .label-row-grid { display: flex; width: 210mm; height: 15mm; }
   .label-cell {
     position: relative;
-    width: 42mm; height: 15mm; border: 0.3px solid #aaa;
+    width: 42mm; height: 15mm;
     display: flex; flex-direction: column; justify-content: center;
     flex-shrink: 0; overflow: hidden; padding-top: 2mm;
   }
+  .label-cell.has-border { border: 0.3px solid #aaa; }
   .label-line { display: flex; justify-content: space-between; align-items: baseline; height: 50%; line-height: 1; }
   .label-cell .label-line:first-child { padding-top: 2mm; }
   .label-cell .label-line:first-child .label-left { font-size: 10pt; }
@@ -263,6 +264,36 @@
     </div>
   </div>
 
+  <div class="start-pos-wrap" id="offsetWrap" style="display:none">
+    <div class="start-pos-label">列印位置微調（mm）</div>
+    <div class="start-pos-row" style="gap:24px;flex-wrap:wrap;">
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span class="pos-hint">水平 ←→</span>
+        <input type="number" id="offsetX" value="0" min="-20" max="20" step="0.5"
+          style="width:72px;padding:6px 10px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--accent);font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:700;text-align:center;outline:none;"
+          oninput="updateOffset()" />
+        <span class="pos-hint">mm</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <span class="pos-hint">垂直 ↕</span>
+        <input type="number" id="offsetY" value="7" min="-10" max="30" step="0.5"
+          style="width:72px;padding:6px 10px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--accent);font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:700;text-align:center;outline:none;"
+          oninput="updateOffset()" />
+        <span class="pos-hint">mm（預設 7）</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="start-pos-wrap" id="borderWrap" style="display:none">
+    <div class="start-pos-label">框線設定</div>
+    <div class="start-pos-row" style="gap:16px;">
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+        <input type="checkbox" id="chkBorder" style="width:16px;height:16px;accent-color:var(--accent);cursor:pointer;" />
+        <span class="pos-hint">有內容的格子印框線</span>
+      </label>
+    </div>
+  </div>
+
   <div class="status" id="status">
     <div class="spinner" id="spinner"></div>
     <span id="statusText"></span>
@@ -327,10 +358,26 @@ function enColorToChinese(colorStr) {
 let parsedLabels = [];
 let startPos = 1; // 1-based
 
-let WEEK_LABEL = '';
+function getISOWeek(date) {
+  const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+  const day = d.getUTCDay() || 7;
+  d.setUTCDate(d.getUTCDate() + 4 - day);
+  const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+  return Math.ceil(((d - yearStart) / 86400000 + 1) / 7);
+}
+
+const currentWeek = getISOWeek(new Date());
+let WEEK_LABEL = 'W' + String(currentWeek).padStart(2, '0');
 
 function updateWeek() {
   WEEK_LABEL = document.getElementById('weekInput').value.trim();
+}
+
+function updateOffset() {
+  const x = parseFloat(document.getElementById('offsetX').value) || 0;
+  const y = parseFloat(document.getElementById('offsetY').value) ?? 7;
+  document.getElementById('printArea').style.setProperty('--offset-x', x + 'mm');
+  document.getElementById('printArea').style.setProperty('--offset-y', y + 'mm');
 }
 
 function changeStart() {
@@ -583,6 +630,9 @@ async function handleFile(file) {
     document.getElementById('btnGenerate').classList.add('show');
     document.getElementById('startPosWrap').style.display = 'block';
     document.getElementById('weekWrap').style.display = 'block';
+    document.getElementById('offsetWrap').style.display = 'block';
+    document.getElementById('borderWrap').style.display = 'block';
+    updateOffset();
   } catch(err) {
     setStatus('error', '✗ ' + err.message);
   }
@@ -607,6 +657,7 @@ function buildPrintHTML() {
         const cellDiv = document.createElement('div');
         cellDiv.className = 'label-cell';
         if (idx >= 0 && idx < parsedLabels.length) {
+          if (document.getElementById('chkBorder').checked) cellDiv.classList.add('has-border');
           const lbl = parsedLabels[idx];
           const watermark = lbl.brand === '905' ? '<div class="label-watermark">905</div>' : '';
           if (lbl.brand === '905') cellDiv.classList.add('brand-905');
@@ -634,6 +685,9 @@ function printLabels() {
   buildPrintHTML();
   setTimeout(() => window.print(), 150);
 }
+
+// Init week input
+document.getElementById('weekInput').value = WEEK_LABEL;
 
 // Drag and drop
 const dropZone = document.getElementById('dropZone');
