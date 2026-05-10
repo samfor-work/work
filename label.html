@@ -57,18 +57,17 @@
   }
   .home-link:hover { border-color: var(--ink); }
   .container {
-    width: min(1180px, calc(100vw - 32px));
+    width: min(980px, calc(100vw - 32px));
     margin: 0 auto;
-    padding: 28px 0 44px;
+    padding: 72px 0 44px;
   }
   .header {
-    display: grid;
-    grid-template-columns: 1fr auto;
-    gap: 20px;
-    align-items: end;
-    margin-bottom: 18px;
-    border-bottom: 2px solid var(--ink);
-    padding-bottom: 16px;
+    margin-bottom: 14px;
+    background: rgba(255,255,255,.88);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    box-shadow: var(--shadow);
+    padding: 20px 22px;
   }
   .header h1 {
     display: none;
@@ -88,41 +87,10 @@
     font-weight: 650;
   }
 
-  .label-preview {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 12px;
-    margin-bottom: 14px;
-  }
-  .preview-section {
-    background: var(--panel);
-    border: 1px solid var(--line);
-    border-radius: 8px;
-    box-shadow: var(--shadow);
-    padding: 14px 16px;
-    font-size: 13px;
-  }
-  .preview-title {
-    font-size: 12px;
-    color: var(--muted);
-    margin-bottom: 8px;
-    font-weight: 900;
-  }
-  .label-row {
-    display: flex;
-    justify-content: space-between;
-    gap: 12px;
-    padding: 4px 0;
-    font-weight: 800;
-  }
-  .label-row span:first-child { color: var(--accent); }
-  .label-row span:last-child { color: var(--ink); }
-  .divider { display: none; }
-
   .drop-zone {
     border: 2px dashed #9fb1c4;
     border-radius: 8px;
-    padding: 24px 18px;
+    padding: 38px 18px;
     text-align: center;
     cursor: pointer;
     transition: border-color .18s ease, transform .18s ease, background .18s ease;
@@ -136,8 +104,8 @@
     transform: translateY(-1px);
   }
   .drop-zone input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
-  .drop-icon { font-size: 32px; margin-bottom: 10px; display: block; }
-  .drop-zone h3 { font-size: 16px; font-weight: 900; margin-bottom: 6px; }
+  .drop-icon { font-size: 38px; margin-bottom: 12px; display: block; }
+  .drop-zone h3 { font-size: 22px; font-weight: 900; margin-bottom: 8px; }
   .drop-zone p { font-size: 13px; color: var(--muted); }
 
   .status {
@@ -278,7 +246,23 @@
     align-items: start;
   }
   .layout-panel.show {
+    display: block;
+  }
+  .layout-panel-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .layout-body {
     display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(230px, 300px);
+    gap: 14px;
+    align-items: start;
+    margin-top: 12px;
+  }
+  .layout-panel.collapsed .layout-body {
+    display: none;
   }
   .layout-controls {
     display: grid;
@@ -314,7 +298,8 @@
     justify-content: flex-end;
     margin-top: 12px;
   }
-  .btn-reset {
+  .btn-reset,
+  .btn-toggle {
     min-height: 36px;
     padding: 8px 12px;
     border: 0;
@@ -325,8 +310,18 @@
     font-weight: 900;
     cursor: pointer;
   }
+  .btn-toggle {
+    flex-shrink: 0;
+    background: var(--ink);
+    color: #fff;
+  }
   .btn-reset:hover {
     background: #dfe8f1;
+    color: var(--ink);
+  }
+  .btn-toggle:hover {
+    background: var(--accent);
+    color: #fff;
   }
   .layout-preview-wrap {
     display: grid;
@@ -350,8 +345,8 @@
 
   @media (max-width: 760px) {
     .header,
-    .label-preview,
     .layout-panel,
+    .layout-body,
     .layout-controls {
       grid-template-columns: 1fr;
     }
@@ -376,8 +371,12 @@
     --label-week-font: 5pt;
     --label-first-top: 2mm;
     --label-content-top: 2mm;
+    --label-week-top: 1mm;
+    --label-week-right: 1.5mm;
     --watermark-size: 13pt;
     --watermark-opacity: .35;
+    --watermark-x: 50%;
+    --watermark-y: 50%;
   }
   .label-sheet { width: 210mm; font-family: Arial, 'Noto Sans TC', sans-serif; }
   .label-page { width: 210mm; padding-top: var(--offset-y, 7mm); margin-left: var(--offset-x, 0mm); page-break-after: always; }
@@ -399,8 +398,8 @@
   .label-cell.brand-905 { padding-top: var(--label-content-top, 2mm); }
   .label-watermark {
     position: absolute;
-    top: 50%;
-    left: 50%;
+    top: var(--watermark-y, 50%);
+    left: var(--watermark-x, 50%);
     transform: translate(-50%, -50%);
     font-size: var(--watermark-size, 13pt);
     font-weight: bold;
@@ -412,8 +411,8 @@
   }
   .label-week {
     position: absolute;
-    top: 1mm;
-    right: 1.5mm;
+    top: var(--label-week-top, 1mm);
+    right: var(--label-week-right, 1.5mm);
     font-size: var(--label-week-font, 5pt);
     color: #000;
     font-weight: normal;
@@ -432,26 +431,6 @@
     <h1>// label generator</h1>
     <h2>標籤自動產生器</h2>
     <p>支援 iPad、iPhone、Apple Watch，上傳 Excel 自動產生標籤</p>
-  </div>
-
-  <div class="label-preview">
-    <div class="preview-section">
-      <div class="preview-title">iPad</div>
-      <div class="label-row"><span>iPad Air 13</span><span>256GB</span></div>
-      <div class="label-row"><span>銀色</span><span>YFJ</span></div>
-    </div>
-    <div class="divider"></div>
-    <div class="preview-section">
-      <div class="preview-title">Apple Watch</div>
-      <div class="label-row"><span>S11 42</span><span>U04</span></div>
-      <div class="label-row"><span>玫瑰金</span><span>S/M</span></div>
-    </div>
-    <div class="divider"></div>
-    <div class="preview-section">
-      <div class="preview-title">iPhone</div>
-      <div class="label-row"><span>17 Pro</span><span>256GB</span></div>
-      <div class="label-row"><span>Dee</span><span>G8J</span></div>
-    </div>
   </div>
 
   <div class="drop-zone" id="dropZone">
@@ -498,63 +477,87 @@
   </div>
 
   <div class="start-pos-wrap layout-panel" id="layoutPanel">
-    <div>
-      <div class="start-pos-label">排版調整</div>
-      <div class="layout-controls">
-        <div class="layout-field">
-          <label for="labelLeftPad">左側文字位置 mm</label>
-          <input type="number" id="labelLeftPad" value="5" min="0" max="15" step="0.5" oninput="updateLayout()" />
-        </div>
-        <div class="layout-field">
-          <label for="labelRightPad">右側文字位置 mm</label>
-          <input type="number" id="labelRightPad" value="6" min="0" max="15" step="0.5" oninput="updateLayout()" />
-        </div>
-        <div class="layout-field">
-          <label for="labelFirstFont">第一行字級 pt</label>
-          <input type="number" id="labelFirstFont" value="10" min="6" max="16" step="0.5" oninput="updateLayout()" />
-        </div>
-        <div class="layout-field">
-          <label for="labelSecondFont">第二行字級 pt</label>
-          <input type="number" id="labelSecondFont" value="10" min="6" max="16" step="0.5" oninput="updateLayout()" />
-        </div>
-        <div class="layout-field">
-          <label for="labelWeekFont">週數字級 pt</label>
-          <input type="number" id="labelWeekFont" value="5" min="3" max="10" step="0.5" oninput="updateLayout()" />
-        </div>
-        <div class="layout-field">
-          <label for="labelFirstTop">第一行上距 mm</label>
-          <input type="number" id="labelFirstTop" value="2" min="0" max="8" step="0.5" oninput="updateLayout()" />
-        </div>
-        <div class="layout-field">
-          <label for="labelContentTop">內容整體下移 mm</label>
-          <input type="number" id="labelContentTop" value="2" min="0" max="8" step="0.5" oninput="updateLayout()" />
-        </div>
-        <div class="layout-field">
-          <label for="watermarkSize">905 大小 pt</label>
-          <input type="number" id="watermarkSize" value="13" min="8" max="24" step="0.5" oninput="updateLayout()" />
-        </div>
-        <div class="layout-field">
-          <label for="watermarkOpacity">905 透明度</label>
-          <input type="number" id="watermarkOpacity" value="0.35" min="0" max="1" step="0.05" oninput="updateLayout()" />
-        </div>
+    <div class="layout-panel-head">
+      <div>
+        <div class="start-pos-label">排版調整</div>
+        <div class="pos-hint">設定會自動儲存在這台瀏覽器，下次開啟直接套用。</div>
       </div>
-      <div class="layout-actions">
-        <button class="btn-reset" type="button" onclick="resetLayout()">恢復預設</button>
-      </div>
+      <button class="btn-toggle" type="button" id="layoutToggleBtn" onclick="toggleLayoutPanel()">收合</button>
     </div>
-    <div class="layout-preview-wrap">
-      <div class="layout-preview-title">單格預覽</div>
-      <div class="single-label-preview" id="singleLabelPreview">
-        <div class="label-cell has-border brand-905">
-          <div class="label-watermark">905</div>
-          <div class="label-week" id="layoutPreviewWeek">W18</div>
-          <div class="label-line primary">
-            <span class="label-left">G8J</span>
-            <span class="label-right">17 Pro</span>
+    <div class="layout-body">
+      <div>
+        <div class="layout-controls">
+          <div class="layout-field">
+            <label for="labelLeftPad">左側文字位置 mm</label>
+            <input type="number" id="labelLeftPad" value="5" min="0" max="15" step="0.5" oninput="updateLayout()" />
           </div>
-          <div class="label-line secondary">
-            <span class="label-left">藏藍色</span>
-            <span class="label-right">256GB</span>
+          <div class="layout-field">
+            <label for="labelRightPad">右側文字位置 mm</label>
+            <input type="number" id="labelRightPad" value="6" min="0" max="15" step="0.5" oninput="updateLayout()" />
+          </div>
+          <div class="layout-field">
+            <label for="labelFirstFont">第一行字級 pt</label>
+            <input type="number" id="labelFirstFont" value="10" min="6" max="16" step="0.5" oninput="updateLayout()" />
+          </div>
+          <div class="layout-field">
+            <label for="labelSecondFont">第二行字級 pt</label>
+            <input type="number" id="labelSecondFont" value="10" min="6" max="16" step="0.5" oninput="updateLayout()" />
+          </div>
+          <div class="layout-field">
+            <label for="labelWeekFont">週數字級 pt</label>
+            <input type="number" id="labelWeekFont" value="5" min="3" max="10" step="0.5" oninput="updateLayout()" />
+          </div>
+          <div class="layout-field">
+            <label for="labelWeekTop">週數上距 mm</label>
+            <input type="number" id="labelWeekTop" value="1" min="0" max="8" step="0.5" oninput="updateLayout()" />
+          </div>
+          <div class="layout-field">
+            <label for="labelWeekRight">週數右距 mm</label>
+            <input type="number" id="labelWeekRight" value="1.5" min="0" max="8" step="0.5" oninput="updateLayout()" />
+          </div>
+          <div class="layout-field">
+            <label for="labelFirstTop">第一行上距 mm</label>
+            <input type="number" id="labelFirstTop" value="2" min="0" max="8" step="0.5" oninput="updateLayout()" />
+          </div>
+          <div class="layout-field">
+            <label for="labelContentTop">內容整體下移 mm</label>
+            <input type="number" id="labelContentTop" value="2" min="0" max="8" step="0.5" oninput="updateLayout()" />
+          </div>
+          <div class="layout-field">
+            <label for="watermarkSize">905 大小 pt</label>
+            <input type="number" id="watermarkSize" value="13" min="8" max="24" step="0.5" oninput="updateLayout()" />
+          </div>
+          <div class="layout-field">
+            <label for="watermarkOpacity">905 透明度</label>
+            <input type="number" id="watermarkOpacity" value="0.35" min="0" max="1" step="0.05" oninput="updateLayout()" />
+          </div>
+          <div class="layout-field">
+            <label for="watermarkX">905 水平位置 %</label>
+            <input type="number" id="watermarkX" value="50" min="0" max="100" step="1" oninput="updateLayout()" />
+          </div>
+          <div class="layout-field">
+            <label for="watermarkY">905 垂直位置 %</label>
+            <input type="number" id="watermarkY" value="50" min="0" max="100" step="1" oninput="updateLayout()" />
+          </div>
+        </div>
+        <div class="layout-actions">
+          <button class="btn-reset" type="button" onclick="resetLayout()">恢復預設</button>
+        </div>
+      </div>
+      <div class="layout-preview-wrap">
+        <div class="layout-preview-title">單格預覽</div>
+        <div class="single-label-preview" id="singleLabelPreview">
+          <div class="label-cell has-border brand-905">
+            <div class="label-watermark">905</div>
+            <div class="label-week" id="layoutPreviewWeek">W18</div>
+            <div class="label-line primary">
+              <span class="label-left">G8J</span>
+              <span class="label-right">17 Pro</span>
+            </div>
+            <div class="label-line secondary">
+              <span class="label-left">藏藍色</span>
+              <span class="label-right">256GB</span>
+            </div>
           </div>
         </div>
       </div>
@@ -636,6 +639,7 @@ let parsedLabels = [];
 let startPos = 1; // 1-based
 const OFFSET_STORAGE_KEY = 'labelGeneratorPrintOffset';
 const LAYOUT_STORAGE_KEY = 'labelGeneratorPrintLayout';
+const LAYOUT_PANEL_COLLAPSED_KEY = 'labelGeneratorLayoutPanelCollapsed';
 const DEFAULT_LAYOUT = {
   offsetX: 0,
   offsetY: 7,
@@ -644,10 +648,14 @@ const DEFAULT_LAYOUT = {
   labelFirstFont: 10,
   labelSecondFont: 10,
   labelWeekFont: 5,
+  labelWeekTop: 1,
+  labelWeekRight: 1.5,
   labelFirstTop: 2,
   labelContentTop: 2,
   watermarkSize: 13,
   watermarkOpacity: 0.35,
+  watermarkX: 50,
+  watermarkY: 50,
 };
 const LAYOUT_FIELDS = Object.keys(DEFAULT_LAYOUT);
 
@@ -688,10 +696,14 @@ function applyLayout(layout) {
     '--label-first-font': layout.labelFirstFont + 'pt',
     '--label-second-font': layout.labelSecondFont + 'pt',
     '--label-week-font': layout.labelWeekFont + 'pt',
+    '--label-week-top': layout.labelWeekTop + 'mm',
+    '--label-week-right': layout.labelWeekRight + 'mm',
     '--label-first-top': layout.labelFirstTop + 'mm',
     '--label-content-top': layout.labelContentTop + 'mm',
     '--watermark-size': layout.watermarkSize + 'pt',
     '--watermark-opacity': layout.watermarkOpacity,
+    '--watermark-x': layout.watermarkX + '%',
+    '--watermark-y': layout.watermarkY + '%',
   };
   for (const target of targets) {
     for (const [name, value] of Object.entries(vars)) {
@@ -743,6 +755,32 @@ function loadSavedLayout() {
 function resetLayout() {
   writeLayoutToInputs(DEFAULT_LAYOUT);
   updateLayout();
+}
+
+function applyLayoutPanelCollapsed(collapsed) {
+  const panel = document.getElementById('layoutPanel');
+  const btn = document.getElementById('layoutToggleBtn');
+  if (!panel || !btn) return;
+  panel.classList.toggle('collapsed', collapsed);
+  btn.textContent = collapsed ? '展開' : '收合';
+}
+
+function toggleLayoutPanel() {
+  const panel = document.getElementById('layoutPanel');
+  if (!panel) return;
+  const collapsed = !panel.classList.contains('collapsed');
+  applyLayoutPanelCollapsed(collapsed);
+  try {
+    localStorage.setItem(LAYOUT_PANEL_COLLAPSED_KEY, collapsed ? '1' : '0');
+  } catch {}
+}
+
+function loadLayoutPanelState() {
+  let collapsed = false;
+  try {
+    collapsed = localStorage.getItem(LAYOUT_PANEL_COLLAPSED_KEY) === '1';
+  } catch {}
+  applyLayoutPanelCollapsed(collapsed);
 }
 
 function changeStart() {
@@ -1055,6 +1093,7 @@ function printLabels() {
 // Init week input
 document.getElementById('weekInput').value = WEEK_LABEL;
 loadSavedLayout();
+loadLayoutPanelState();
 
 // Drag and drop
 const dropZone = document.getElementById('dropZone');
