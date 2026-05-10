@@ -1,0 +1,1074 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>門市調撥工具</title>
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <style>
+    :root {
+      --ink: #17212b;
+      --muted: #617083;
+      --line: #d8e0ea;
+      --paper: #fbfcfd;
+      --panel: #ffffff;
+      --blue: #1f5f99;
+      --blue-2: #e7f1fb;
+      --green: #18745b;
+      --green-2: #dff3ea;
+      --amber: #b65f00;
+      --amber-2: #ffe7c7;
+      --red: #b42318;
+      --red-2: #fde4e2;
+      --shadow: 0 18px 48px rgba(24, 39, 56, .10);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      color: var(--ink);
+      background:
+        linear-gradient(90deg, rgba(31, 95, 153, .05) 1px, transparent 1px),
+        linear-gradient(0deg, rgba(31, 95, 153, .04) 1px, transparent 1px),
+        #f5f7fa;
+      background-size: 34px 34px;
+      font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+    }
+
+    .home-link {
+      position: fixed;
+      top: 14px;
+      left: 14px;
+      z-index: 20;
+      display: inline-flex;
+      align-items: center;
+      min-height: 34px;
+      padding: 7px 11px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: var(--ink);
+      background: rgba(255, 255, 255, .92);
+      text-decoration: none;
+      font-size: 12px;
+      font-weight: 800;
+      box-shadow: 0 8px 24px rgba(24, 39, 56, .10);
+    }
+
+    .home-link:hover {
+      border-color: var(--ink);
+    }
+
+    .shell {
+      width: min(1180px, calc(100vw - 32px));
+      margin: 0 auto;
+      padding: 28px 0 44px;
+    }
+
+    header {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 20px;
+      align-items: end;
+      margin-bottom: 18px;
+      border-bottom: 2px solid var(--ink);
+      padding-bottom: 16px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(28px, 4vw, 46px);
+      line-height: 1;
+      letter-spacing: 0;
+      font-weight: 900;
+    }
+
+    .stamp {
+      border: 2px solid var(--ink);
+      padding: 10px 12px;
+      background: var(--panel);
+      min-width: 160px;
+      text-align: center;
+      box-shadow: 5px 5px 0 var(--ink);
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: minmax(240px, 300px) minmax(0, 1fr);
+      gap: 14px;
+      align-items: start;
+    }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      box-shadow: var(--shadow);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .panel-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 14px 16px;
+      background: #eef3f8;
+      border-bottom: 1px solid var(--line);
+      font-weight: 800;
+    }
+
+    .panel-body { padding: 12px; }
+
+    .dropzone {
+      display: grid;
+      place-items: center;
+      min-height: 112px;
+      border: 2px dashed #9fb1c4;
+      border-radius: 8px;
+      background: linear-gradient(180deg, #fff, #f7fafc);
+      cursor: pointer;
+      transition: border-color .18s ease, transform .18s ease, background .18s ease;
+      text-align: center;
+      padding: 14px;
+    }
+
+    .dropzone:hover,
+    .dropzone.dragover {
+      border-color: var(--blue);
+      transform: translateY(-1px);
+      background: #f1f7fd;
+    }
+
+    .dropzone input { display: none; }
+
+    .upload-icon {
+      width: 30px;
+      height: 30px;
+      margin: 0 auto 8px;
+      color: var(--blue);
+    }
+
+    .file-name {
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 13px;
+      word-break: break-all;
+    }
+
+    .store-picker {
+      display: grid;
+      gap: 6px;
+      margin-top: 10px;
+    }
+
+    .store-picker label {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .store-picker select {
+      width: 100%;
+      min-height: 38px;
+      padding: 8px 10px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      color: var(--ink);
+      background: #fff;
+      font: inherit;
+      font-size: 14px;
+      font-weight: 750;
+    }
+
+    .store-picker select:disabled {
+      color: var(--muted);
+      background: #f3f6f9;
+      cursor: not-allowed;
+    }
+
+    .actions {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    button {
+      border: 0;
+      border-radius: 6px;
+      padding: 9px 12px;
+      min-height: 38px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      background: var(--ink);
+      color: #fff;
+      font-weight: 800;
+      cursor: pointer;
+      transition: transform .14s ease, opacity .14s ease, background .14s ease;
+      font-family: inherit;
+      font-size: 15px;
+    }
+
+    button:hover:not(:disabled) { transform: translateY(-1px); }
+    button:disabled { opacity: .42; cursor: not-allowed; }
+    button.secondary { background: var(--blue); }
+    button.ghost {
+      color: var(--ink);
+      background: #edf2f7;
+    }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .metric {
+      min-height: 64px;
+      padding: 10px 12px;
+      border: 1px solid var(--line);
+      background: #fff;
+      border-radius: 8px;
+    }
+
+    .metric b {
+      display: block;
+      font-size: 24px;
+      line-height: 1;
+      margin-bottom: 5px;
+    }
+
+    .metric span {
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .status {
+      border-left: 4px solid var(--blue);
+      background: var(--blue-2);
+      padding: 9px 12px;
+      border-radius: 6px;
+      color: #173f67;
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .status.error {
+      border-left-color: var(--red);
+      background: var(--red-2);
+      color: var(--red);
+    }
+
+    .status.success {
+      border-left-color: var(--green);
+      background: var(--green-2);
+      color: var(--green);
+    }
+
+    .table-wrap {
+      overflow: auto;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      max-height: calc(100vh - 300px);
+      min-height: 430px;
+      background: #fff;
+    }
+
+    .tabs {
+      display: inline-flex;
+      gap: 6px;
+      padding: 4px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #f4f7fa;
+      margin-bottom: 8px;
+    }
+
+    .tab {
+      min-height: 36px;
+      padding: 8px 12px;
+      color: var(--muted);
+      background: transparent;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+
+    .tab.active {
+      color: #fff;
+      background: var(--ink);
+    }
+
+    .tab:disabled {
+      opacity: .7;
+      cursor: pointer;
+    }
+
+    .result-view {
+      display: none;
+    }
+
+    .result-view.active {
+      display: block;
+    }
+
+    .plan-stack {
+      display: grid;
+      gap: 10px;
+      max-height: calc(100vh - 300px);
+      min-height: 430px;
+      overflow: auto;
+      padding-right: 2px;
+    }
+
+    .plan-step {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+      overflow: hidden;
+    }
+
+    .step-head {
+      display: grid;
+      grid-template-columns: auto 1fr auto;
+      gap: 12px;
+      align-items: center;
+      padding: 12px;
+      border-bottom: 1px solid rgba(23, 33, 43, .08);
+    }
+
+    .step-no {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 34px;
+      height: 34px;
+      border-radius: 999px;
+      background: var(--ink);
+      color: #fff;
+      font-weight: 900;
+    }
+
+    .step-title {
+      font-weight: 900;
+      line-height: 1.35;
+    }
+
+    .step-title span {
+      display: block;
+      color: var(--muted);
+      font-weight: 700;
+      font-size: 12px;
+      margin-top: 3px;
+    }
+
+    .step-count {
+      color: var(--green);
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .step-items {
+      overflow: auto;
+    }
+
+    .step-items table {
+      min-width: 820px;
+      font-size: 12px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 900px;
+      font-size: 13px;
+    }
+
+    th {
+      position: sticky;
+      top: 0;
+      z-index: 1;
+      background: var(--ink);
+      color: #fff;
+      text-align: left;
+      padding: 10px;
+      white-space: nowrap;
+    }
+
+    td {
+      padding: 10px;
+      border-bottom: 1px solid #e8edf2;
+      vertical-align: top;
+    }
+
+    tr:nth-child(even) td { background: #fafbfd; }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 28px;
+      min-height: 24px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-weight: 800;
+      font-size: 12px;
+    }
+
+    .pill.zero { background: var(--red-2); color: var(--red); }
+    .pill.one { background: var(--amber-2); color: var(--amber); }
+
+    .empty {
+      display: grid;
+      place-items: center;
+      min-height: 260px;
+      color: var(--muted);
+      text-align: center;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+    }
+
+    @media (max-width: 860px) {
+      header,
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      .metrics {
+        grid-template-columns: repeat(3, 1fr);
+      }
+
+      .step-head {
+        grid-template-columns: auto 1fr;
+      }
+
+      .step-count {
+        grid-column: 2;
+      }
+    }
+  </style>
+</head>
+<body>
+  <a class="home-link" href="index.html">← 回首頁</a>
+  <main class="shell">
+    <header>
+      <div>
+        <h1>門市調撥工具</h1>
+      </div>
+      <div class="stamp">
+        <strong>Store Ops</strong><br>
+        Store Transfer
+      </div>
+    </header>
+
+    <section class="grid">
+      <aside class="panel">
+        <div class="panel-head">
+          <span>存貨彙總</span>
+          <i data-lucide="warehouse"></i>
+        </div>
+        <div class="panel-body">
+          <label class="dropzone" id="dropzone">
+            <input id="fileInput" type="file" accept=".xlsx,.xls">
+            <div>
+              <i class="upload-icon" data-lucide="file-up"></i>
+              <strong>選擇 Excel 檔</strong>
+              <div class="file-name" id="fileName">尚未選擇檔案</div>
+            </div>
+          </label>
+          <div class="store-picker">
+            <label for="storeSelect">選擇本店門市</label>
+            <select id="storeSelect" disabled>
+              <option value="">請先上傳存貨彙總</option>
+            </select>
+          </div>
+          <div class="actions">
+            <button id="runBtn" disabled><i data-lucide="play"></i>執行分析</button>
+            <button id="downloadSuggestionBtn" class="secondary" disabled><i data-lucide="download"></i>下載調撥建議清單</button>
+            <button id="downloadPlanBtn" class="ghost" disabled><i data-lucide="list-checks"></i>下載調撥計畫</button>
+          </div>
+        </div>
+      </aside>
+
+      <section class="panel">
+        <div class="panel-head">
+          <span>結果</span>
+          <i data-lucide="bar-chart-3"></i>
+        </div>
+        <div class="panel-body">
+          <div class="metrics">
+            <div class="metric"><b id="candidateCount">0</b><span>候選品項</span></div>
+            <div class="metric"><b id="warehouseCount">0</b><span>來源倉數</span></div>
+            <div class="metric"><b id="stepCount">0</b><span>調撥步驟</span></div>
+          </div>
+          <div id="status" class="status">等待檔案</div>
+          <div style="height: 14px"></div>
+          <div class="tabs" aria-label="結果切換">
+            <button id="planTab" class="tab active" type="button">調撥計畫</button>
+            <button id="suggestionTab" class="tab" type="button">建議清單</button>
+          </div>
+          <div id="planView" class="result-view active">
+            <div id="planPreview" class="empty">尚無資料</div>
+          </div>
+          <div id="suggestionView" class="result-view">
+            <div id="suggestionPreview" class="empty">尚無資料</div>
+          </div>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <script>
+    const KNOWN_STORE_WAREHOUSES = new Set([
+      "大立倉", "士林倉", "微風倉", "永和倉", "台南西門倉", "美麗華倉", "板橋誠品倉", "夢時代倉",
+      "彩虹台中倉", "新竹遠百倉", "新竹光復倉", "中壢大江倉", "高雄三多門市", "阿波羅倉",
+      "台中金典倉", "新竹中正倉", "新西門倉", "台中中科倉", "台中精誠倉", "桃園台茂倉",
+      "大葉高島屋倉", "花蓮門市倉", "羅東門市倉", "苗栗尚順門市倉", "桃園統領門市倉",
+      "台中豐原門市倉", "板橋遠百門市倉", "新莊宏匯門市倉", "竹北遠百門市倉",
+      "台中麗寶門市倉", "岡山秀泰門市倉", "新店裕隆城門市倉"
+    ]);
+
+    const STEP_FILLS = ["EAF3FF", "EAF7EA", "FFF4DA", "FCEBF3", "ECEBFF", "E8F6F7", "F4F1EA", "F0F6E8"];
+    const state = { file: null, workbook: null, stores: [], selectedStore: "", rows: [], plan: [] };
+
+    const $ = (id) => document.getElementById(id);
+    const fileInput = $("fileInput");
+    const dropzone = $("dropzone");
+    const storeSelect = $("storeSelect");
+    const runBtn = $("runBtn");
+    const downloadSuggestionBtn = $("downloadSuggestionBtn");
+    const downloadPlanBtn = $("downloadPlanBtn");
+
+    function normalize(value) {
+      if (value === null || value === undefined) return "";
+      return String(value).trim();
+    }
+
+    function toNumber(value) {
+      if (typeof value === "number" && Number.isFinite(value)) return value;
+      const cleaned = normalize(value).replace(/,/g, "");
+      if (!cleaned) return 0;
+      const parsed = Number(cleaned);
+      return Number.isFinite(parsed) ? parsed : 0;
+    }
+
+    function modelFromName(name) {
+      const text = normalize(name);
+      return text ? text.split(/\s+/)[0] : "";
+    }
+
+    function setStatus(message, type = "") {
+      const el = $("status");
+      el.className = `status ${type}`.trim();
+      el.textContent = message;
+    }
+
+    function setMetric(id, value) {
+      $(id).textContent = String(value);
+    }
+
+    function selectedStoreName() {
+      return state.selectedStore || "本店";
+    }
+
+    function resetStorePicker(message = "請先上傳存貨彙總") {
+      storeSelect.innerHTML = `<option value="">${escapeHtml(message)}</option>`;
+      storeSelect.disabled = true;
+      state.stores = [];
+      state.selectedStore = "";
+    }
+
+    function populateStorePicker(stores) {
+      state.stores = stores;
+      state.selectedStore = stores.includes(state.selectedStore) ? state.selectedStore : "";
+      storeSelect.innerHTML = [
+        '<option value="">請選擇本店門市</option>',
+        ...stores.map(store => (
+          `<option value="${escapeHtml(store)}"${store === state.selectedStore ? " selected" : ""}>${escapeHtml(store)}</option>`
+        ))
+      ].join("");
+      storeSelect.disabled = !stores.length;
+    }
+
+    function findWarehouseRow(rows) {
+      const limit = Math.min(rows.length, 40);
+      for (let i = 0; i < limit; i += 1) {
+        const foundStoreCount = (rows[i] || []).map(normalize).filter(name => KNOWN_STORE_WAREHOUSES.has(name)).length;
+        if (foundStoreCount >= 3) return i;
+      }
+      throw new Error("找不到門市倉庫欄位");
+    }
+
+    function getWorkbookContext(workbook) {
+      const sheet = workbook.Sheets[workbook.SheetNames[0]];
+      const rows = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: null, blankrows: false });
+      const warehouseRow = findWarehouseRow(rows);
+      const headerRow = warehouseRow + 1;
+      const warehouseNames = rows[warehouseRow].map(normalize);
+      const headers = (rows[headerRow] || []).map(normalize);
+      const storeCols = new Map();
+
+      warehouseNames.forEach((name, index) => {
+        if (KNOWN_STORE_WAREHOUSES.has(name)) storeCols.set(index, name);
+      });
+
+      const codeCol = headers.indexOf("存貨代碼");
+      const nameCol = headers.indexOf("存貨名稱");
+      if (!storeCols.size) throw new Error("找不到可用的門市倉庫欄位");
+      if (codeCol === -1 || nameCol === -1) throw new Error("找不到存貨代碼或存貨名稱欄位");
+      return { rows, headerRow, storeCols, productCols: { code: codeCol, name: nameCol } };
+    }
+
+    function getStoresFromWorkbook(workbook) {
+      const { storeCols } = getWorkbookContext(workbook);
+      return [...storeCols.values()];
+    }
+
+    function analyzeWorkbook(workbook, targetStore) {
+      const { rows, headerRow, storeCols, productCols } = getWorkbookContext(workbook);
+      const targetCol = [...storeCols.entries()].find(([, name]) => name === targetStore)?.[0];
+      if (targetCol === undefined) throw new Error("請選擇本店門市");
+
+      const result = [];
+      for (let i = headerRow + 1; i < rows.length; i += 1) {
+        const row = rows[i] || [];
+        const code = normalize(row[productCols.code]);
+        const name = normalize(row[productCols.name]);
+        if (!code || !name || name.startsWith("@")) continue;
+
+        const targetQty = Math.trunc(toNumber(row[targetCol]));
+        if (targetQty > 1) continue;
+
+        const candidates = [];
+        for (const [col, warehouse] of storeCols.entries()) {
+          if (warehouse === targetStore) continue;
+          const qty = Math.trunc(toNumber(row[col]));
+          if (qty >= 3) candidates.push({ warehouse, qty });
+        }
+        if (!candidates.length) continue;
+
+        candidates.sort((a, b) => b.qty - a.qty || a.warehouse.localeCompare(b.warehouse, "zh-Hant"));
+        const best = candidates[0];
+        result.push({
+          code,
+          model: modelFromName(name),
+          name,
+          targetQty,
+          source: best.warehouse,
+          sourceQty: best.qty,
+          otherStock: candidates.map(item => `${item.warehouse}(${item.qty})`).join("、"),
+          candidates: Object.fromEntries(candidates.map(item => [item.warehouse, item.qty]))
+        });
+      }
+
+      result.sort((a, b) => a.targetQty - b.targetQty || b.sourceQty - a.sourceQty || a.code.localeCompare(b.code));
+      return result;
+    }
+
+    function buildGreedyPlan(rows) {
+      const remaining = new Map(rows.map(row => [row.code, row]));
+      const plan = [];
+      let step = 1;
+
+      while (remaining.size) {
+        const coverage = new Map();
+        for (const row of remaining.values()) {
+          Object.keys(row.candidates).forEach(warehouse => {
+            if (!coverage.has(warehouse)) coverage.set(warehouse, []);
+            coverage.get(warehouse).push(row);
+          });
+        }
+        if (!coverage.size) break;
+
+        let selectedSource = null;
+        let selectedRows = [];
+        for (const [source, covered] of coverage.entries()) {
+          const selectedScore = selectedRows.length;
+          const currentScore = covered.length;
+          const selectedStock = selectedRows.reduce((sum, row) => sum + row.candidates[selectedSource], 0);
+          const currentStock = covered.reduce((sum, row) => sum + row.candidates[source], 0);
+          if (
+            currentScore > selectedScore ||
+            (currentScore === selectedScore && currentStock > selectedStock) ||
+            (currentScore === selectedScore && currentStock === selectedStock && (!selectedSource || source.localeCompare(selectedSource, "zh-Hant") < 0))
+          ) {
+            selectedSource = source;
+            selectedRows = covered;
+          }
+        }
+
+        selectedRows.sort((a, b) => a.targetQty - b.targetQty || a.code.localeCompare(b.code));
+        plan.push({ step, source: selectedSource, items: selectedRows });
+        selectedRows.forEach(row => remaining.delete(row.code));
+        step += 1;
+      }
+      return plan;
+    }
+
+    function switchView(view) {
+      const isPlan = view === "plan";
+      $("planTab").classList.toggle("active", isPlan);
+      $("suggestionTab").classList.toggle("active", !isPlan);
+      $("planView").classList.toggle("active", isPlan);
+      $("suggestionView").classList.toggle("active", !isPlan);
+    }
+
+    function renderSuggestionPreview(rows) {
+      if (!rows.length) {
+        $("suggestionPreview").className = "empty";
+        $("suggestionPreview").innerHTML = "沒有符合條件的品項";
+        return;
+      }
+
+      $("suggestionPreview").className = "table-wrap";
+      $("suggestionPreview").innerHTML = `
+        <table>
+          <thead>
+            <tr>
+              <th>存貨代碼</th>
+              <th>型號</th>
+              <th>存貨名稱</th>
+              <th>${escapeHtml(selectedStoreName())}</th>
+              <th>建議來源</th>
+              <th>來源庫存</th>
+              <th>其他庫存≥3的倉庫</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${rows.map(row => `
+              <tr>
+                <td>${escapeHtml(row.code)}</td>
+                <td>${escapeHtml(row.model)}</td>
+                <td>${escapeHtml(row.name)}</td>
+                <td><span class="pill ${row.targetQty === 0 ? "zero" : "one"}">${row.targetQty}</span></td>
+                <td>${escapeHtml(row.source)}</td>
+                <td>${row.sourceQty}</td>
+                <td>${escapeHtml(row.otherStock)}</td>
+              </tr>
+            `).join("")}
+          </tbody>
+        </table>
+      `;
+    }
+
+    function renderPlanPreview(plan) {
+      if (!plan.length) {
+        $("planPreview").className = "empty";
+        $("planPreview").innerHTML = "沒有可執行的調撥步驟";
+        return;
+      }
+
+      $("planPreview").className = "plan-stack";
+      $("planPreview").innerHTML = plan.map(block => {
+        const models = [...new Set(block.items.map(row => row.model).filter(Boolean))]
+          .slice(0, 8)
+          .join("、");
+        const hiddenCount = Math.max(0, new Set(block.items.map(row => row.model).filter(Boolean)).size - 8);
+        const color = STEP_FILLS[(block.step - 1) % STEP_FILLS.length];
+        return `
+          <section class="plan-step" style="background:#${color}">
+            <div class="step-head">
+              <div class="step-no">${block.step}</div>
+              <div class="step-title">
+                ${escapeHtml(block.source)}
+                <span>${escapeHtml(models)}${hiddenCount ? ` 等 ${hiddenCount + 8} 個型號` : ""}</span>
+              </div>
+              <div class="step-count">${block.items.length} 項</div>
+            </div>
+            <div class="step-items">
+              <table>
+                <thead>
+                  <tr>
+                    <th>存貨代碼</th>
+                    <th>型號</th>
+                    <th>存貨名稱</th>
+                    <th>${escapeHtml(selectedStoreName())}</th>
+                    <th>來源庫存</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  ${block.items.map(row => `
+                    <tr>
+                      <td>${escapeHtml(row.code)}</td>
+                      <td>${escapeHtml(row.model)}</td>
+                      <td>${escapeHtml(row.name)}</td>
+                      <td><span class="pill ${row.targetQty === 0 ? "zero" : "one"}">${row.targetQty}</span></td>
+                      <td>${row.candidates[block.source]}</td>
+                    </tr>
+                  `).join("")}
+                </tbody>
+              </table>
+            </div>
+          </section>
+        `;
+      }).join("");
+    }
+
+    function renderResults() {
+      renderPlanPreview(state.plan);
+      renderSuggestionPreview(state.rows);
+      switchView("plan");
+    }
+
+    function escapeHtml(value) {
+      return normalize(value).replace(/[&<>"']/g, char => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#039;"
+      })[char]);
+    }
+
+    function styleHeader(row) {
+      row.eachCell(cell => {
+        cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FF1F4E78" } };
+        cell.font = { name: "Arial", size: 10, bold: true, color: { argb: "FFFFFFFF" } };
+        cell.alignment = { vertical: "middle", horizontal: "center", wrapText: true };
+        cell.border = thinBorder();
+      });
+    }
+
+    function thinBorder() {
+      return {
+        top: { style: "thin", color: { argb: "FFD9E2EC" } },
+        left: { style: "thin", color: { argb: "FFD9E2EC" } },
+        bottom: { style: "thin", color: { argb: "FFD9E2EC" } },
+        right: { style: "thin", color: { argb: "FFD9E2EC" } }
+      };
+    }
+
+    function styleWorksheet(ws) {
+      ws.eachRow(row => {
+        row.eachCell(cell => {
+          cell.font = cell.font || { name: "Arial", size: 10, color: { argb: "FF1F2933" } };
+          cell.alignment = { vertical: "middle", wrapText: true };
+          cell.border = thinBorder();
+        });
+      });
+      styleHeader(ws.getRow(1));
+      ws.views = [{ state: "frozen", ySplit: 1 }];
+      ws.autoFilter = { from: { row: 1, column: 1 }, to: { row: ws.rowCount, column: ws.columnCount } };
+    }
+
+    function setColumns(ws, columns) {
+      ws.columns = columns.map(col => ({ header: col.header, key: col.key, width: col.width }));
+    }
+
+    async function downloadSuggestion() {
+      const storeName = selectedStoreName();
+      const workbook = new ExcelJS.Workbook();
+      workbook.creator = "門市調撥工具";
+      const ws = workbook.addWorksheet(`${storeName}調撥建議清單`.slice(0, 31));
+      setColumns(ws, [
+        { header: "存貨代碼", key: "code", width: 14 },
+        { header: "型號", key: "model", width: 18 },
+        { header: "存貨名稱", key: "name", width: 58 },
+        { header: `${storeName}現有庫存`, key: "targetQty", width: 14 },
+        { header: "建議調撥來源", key: "source", width: 18 },
+        { header: "來源倉庫存數量", key: "sourceQty", width: 16 },
+        { header: "其他庫存≥3的倉庫（庫存量）", key: "otherStock", width: 70 }
+      ]);
+      state.rows.forEach(row => ws.addRow(row));
+      styleWorksheet(ws);
+      ws.eachRow((row, rowNumber) => {
+        if (rowNumber === 1) return;
+        row.getCell(4).fill = { type: "pattern", pattern: "solid", fgColor: { argb: row.getCell(4).value === 0 ? "FFFDE2E1" : "FFFFE8CC" } };
+        row.getCell(6).fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FFD9F2DD" } };
+      });
+      await saveWorkbook(workbook, `${storeName}調撥建議清單.xlsx`);
+    }
+
+    async function downloadPlan() {
+      const storeName = selectedStoreName();
+      const workbook = new ExcelJS.Workbook();
+      workbook.creator = "門市調撥工具";
+      const overview = workbook.addWorksheet("調撥計畫總覽");
+      const summary = workbook.addWorksheet("調撥摘要");
+
+      setColumns(overview, [
+        { header: "優先順序", key: "step", width: 10 },
+        { header: "來源倉庫", key: "source", width: 18 },
+        { header: "存貨代碼", key: "code", width: 14 },
+        { header: "型號", key: "model", width: 18 },
+        { header: "存貨名稱", key: "name", width: 58 },
+        { header: `${storeName}現有`, key: "targetQty", width: 12 },
+        { header: "來源倉庫存", key: "sourceQty", width: 12 }
+      ]);
+
+      state.plan.forEach(block => {
+        block.items.forEach(row => {
+          overview.addRow({
+            step: block.step,
+            source: block.source,
+            code: row.code,
+            model: row.model,
+            name: row.name,
+            targetQty: row.targetQty,
+            sourceQty: row.candidates[block.source]
+          });
+        });
+      });
+
+      setColumns(summary, [
+        { header: "優先順序", key: "step", width: 10 },
+        { header: "來源倉庫", key: "source", width: 18 },
+        { header: "可調品項數", key: "count", width: 12 },
+        { header: "涵蓋型號", key: "models", width: 80 }
+      ]);
+
+      state.plan.forEach(block => {
+        const models = [...new Set(block.items.map(row => row.model).filter(Boolean))].sort((a, b) => a.localeCompare(b));
+        summary.addRow({ step: block.step, source: block.source, count: block.items.length, models: models.join("、") });
+      });
+
+      [overview, summary].forEach(styleWorksheet);
+      overview.eachRow((row, rowNumber) => {
+        if (rowNumber === 1) return;
+        const color = STEP_FILLS[(row.getCell(1).value - 1) % STEP_FILLS.length];
+        row.eachCell(cell => {
+          cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: `FF${color}` } };
+        });
+      });
+      summary.eachRow((row, rowNumber) => {
+        if (rowNumber === 1) return;
+        const color = STEP_FILLS[(rowNumber - 2) % STEP_FILLS.length];
+        row.eachCell(cell => {
+          cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: `FF${color}` } };
+        });
+      });
+
+      await saveWorkbook(workbook, `${storeName}調撥計畫.xlsx`);
+    }
+
+    async function saveWorkbook(workbook, filename) {
+      const buffer = await workbook.xlsx.writeBuffer();
+      const blob = new Blob([buffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
+    }
+
+    async function runAnalysis() {
+      if (!state.workbook || !state.selectedStore) return;
+      runBtn.disabled = true;
+      downloadSuggestionBtn.disabled = true;
+      downloadPlanBtn.disabled = true;
+      setStatus(`分析中：${state.selectedStore}`);
+
+      try {
+        state.rows = analyzeWorkbook(state.workbook, state.selectedStore);
+        state.plan = buildGreedyPlan(state.rows);
+        const warehouses = new Set(state.rows.flatMap(row => Object.keys(row.candidates)));
+
+        setMetric("candidateCount", state.rows.length);
+        setMetric("warehouseCount", warehouses.size);
+        setMetric("stepCount", state.plan.length);
+        renderResults();
+        setStatus(`完成：${state.selectedStore} 有 ${state.rows.length} 個候選品項，${state.plan.length} 個調撥步驟`, "success");
+        downloadSuggestionBtn.disabled = false;
+        downloadPlanBtn.disabled = false;
+      } catch (error) {
+        console.error(error);
+        state.rows = [];
+        state.plan = [];
+        setMetric("candidateCount", 0);
+        setMetric("warehouseCount", 0);
+        setMetric("stepCount", 0);
+        renderResults();
+        setStatus(error.message || "分析失敗", "error");
+      } finally {
+        runBtn.disabled = !state.workbook || !state.selectedStore;
+      }
+    }
+
+    async function setFile(file) {
+      state.file = file;
+      state.workbook = null;
+      $("fileName").textContent = file ? file.name : "尚未選擇檔案";
+      runBtn.disabled = true;
+      downloadSuggestionBtn.disabled = true;
+      downloadPlanBtn.disabled = true;
+      state.rows = [];
+      state.plan = [];
+      resetStorePicker();
+      renderResults();
+      if (!file) {
+        setStatus("等待檔案");
+        return;
+      }
+
+      try {
+        setStatus("讀取門市欄位中");
+        const buffer = await file.arrayBuffer();
+        state.workbook = XLSX.read(buffer, { type: "array" });
+        const stores = getStoresFromWorkbook(state.workbook);
+        populateStorePicker(stores);
+        runBtn.disabled = !state.selectedStore;
+        setStatus(`已讀到 ${stores.length} 個門市倉，請選擇本店門市`);
+      } catch (error) {
+        console.error(error);
+        state.file = null;
+        state.workbook = null;
+        resetStorePicker("讀取失敗");
+        setStatus(error.message || "讀取檔案失敗", "error");
+      }
+    }
+
+    fileInput.addEventListener("change", event => {
+      setFile(event.target.files[0] || null);
+    });
+
+    dropzone.addEventListener("dragover", event => {
+      event.preventDefault();
+      dropzone.classList.add("dragover");
+    });
+
+    dropzone.addEventListener("dragleave", () => {
+      dropzone.classList.remove("dragover");
+    });
+
+    dropzone.addEventListener("drop", event => {
+      event.preventDefault();
+      dropzone.classList.remove("dragover");
+      setFile(event.dataTransfer.files[0] || null);
+    });
+
+    runBtn.addEventListener("click", runAnalysis);
+    downloadSuggestionBtn.addEventListener("click", downloadSuggestion);
+    downloadPlanBtn.addEventListener("click", downloadPlan);
+    storeSelect.addEventListener("change", () => {
+      state.selectedStore = storeSelect.value;
+      state.rows = [];
+      state.plan = [];
+      setMetric("candidateCount", 0);
+      setMetric("warehouseCount", 0);
+      setMetric("stepCount", 0);
+      downloadSuggestionBtn.disabled = true;
+      downloadPlanBtn.disabled = true;
+      runBtn.disabled = !state.workbook || !state.selectedStore;
+      renderResults();
+      setStatus(state.selectedStore ? `已選擇本店門市：${state.selectedStore}` : "請選擇本店門市");
+    });
+    $("planTab").addEventListener("click", () => switchView("plan"));
+    $("suggestionTab").addEventListener("click", () => switchView("suggestion"));
+
+    if (window.lucide) lucide.createIcons();
+  </script>
+</body>
+</html>
