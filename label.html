@@ -6,137 +6,220 @@
 <title>標籤產生器</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&family=JetBrains+Mono:wght@400;700&display=swap');
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
-    --bg: #0f0f0f; --surface: #1a1a1a; --border: #2a2a2a;
-    --accent: #e8ff00; --accent2: #00e5ff; --text: #f0f0f0;
-    --muted: #666; --success: #00ff88; --error: #ff4444;
+    --ink: #17212b;
+    --muted: #617083;
+    --line: #d8e0ea;
+    --panel: #ffffff;
+    --bg: #f5f7fa;
+    --accent: #1f5f99;
+    --accent-2: #e7f1fb;
+    --green: #18745b;
+    --green-2: #dff3ea;
+    --amber: #b65f00;
+    --amber-2: #ffe7c7;
+    --red: #b42318;
+    --red-2: #fde4e2;
+    --text: #17212b;
+    --border: #d8e0ea;
+    --surface: #ffffff;
+    --shadow: 0 18px 48px rgba(24, 39, 56, .10);
   }
   body {
-    font-family: 'Noto Sans TC', sans-serif; background: var(--bg); color: var(--text);
-    min-height: 100vh; display: flex; flex-direction: column;
-    align-items: center; justify-content: center; padding: 40px 20px;
+    margin: 0;
+    min-height: 100vh;
+    color: var(--ink);
+    background:
+      linear-gradient(90deg, rgba(31, 95, 153, .05) 1px, transparent 1px),
+      linear-gradient(0deg, rgba(31, 95, 153, .04) 1px, transparent 1px),
+      var(--bg);
+    background-size: 34px 34px;
+    font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
   }
   .home-link {
     position: fixed;
-    top: 18px;
-    left: 18px;
+    top: 14px;
+    left: 14px;
     z-index: 20;
     display: inline-flex;
     align-items: center;
     min-height: 34px;
     padding: 7px 11px;
-    border: 1px solid var(--border);
+    border: 1px solid var(--line);
     border-radius: 999px;
-    color: var(--accent);
-    background: rgba(26, 26, 26, .92);
+    color: var(--ink);
+    background: rgba(255, 255, 255, .92);
     text-decoration: none;
     font-size: 12px;
-    font-family: 'JetBrains Mono', monospace;
+    font-weight: 800;
+    box-shadow: 0 8px 24px rgba(24, 39, 56, .10);
   }
-  .home-link:hover { border-color: var(--accent); }
-  .container { width: 100%; max-width: 600px; }
-  .header { margin-bottom: 40px; }
+  .home-link:hover { border-color: var(--ink); }
+  .container {
+    width: min(1180px, calc(100vw - 32px));
+    margin: 0 auto;
+    padding: 28px 0 44px;
+  }
+  .header {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 20px;
+    align-items: end;
+    margin-bottom: 18px;
+    border-bottom: 2px solid var(--ink);
+    padding-bottom: 16px;
+  }
   .header h1 {
-    font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 400;
-    color: var(--accent); letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 12px;
+    display: none;
   }
-  .header h2 { font-size: 32px; font-weight: 700; letter-spacing: -0.02em; line-height: 1.1; }
-  .header p { margin-top: 10px; color: var(--muted); font-size: 14px; line-height: 1.6; }
+  .header h2 {
+    margin: 0;
+    font-size: clamp(28px, 4vw, 46px);
+    line-height: 1;
+    letter-spacing: 0;
+    font-weight: 900;
+  }
+  .header p {
+    margin-top: 10px;
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 1.6;
+    font-weight: 650;
+  }
 
   .label-preview {
-    background: var(--surface); border: 1px solid var(--border);
-    border-radius: 8px; padding: 16px 20px; margin-bottom: 32px;
-    font-family: 'JetBrains Mono', monospace; font-size: 12px;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+    margin-bottom: 14px;
   }
-  .preview-section { margin-bottom: 12px; }
-  .preview-title { font-size: 10px; color: var(--muted); margin-bottom: 6px; }
-  .label-row { display: flex; justify-content: space-between; padding: 3px 0; }
-  .label-row span:first-child { color: var(--accent2); }
-  .label-row span:last-child { color: var(--accent); }
-  .divider { border-top: 1px solid var(--border); margin: 10px 0; }
+  .preview-section {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    box-shadow: var(--shadow);
+    padding: 14px 16px;
+    font-size: 13px;
+  }
+  .preview-title {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 8px;
+    font-weight: 900;
+  }
+  .label-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 4px 0;
+    font-weight: 800;
+  }
+  .label-row span:first-child { color: var(--accent); }
+  .label-row span:last-child { color: var(--ink); }
+  .divider { display: none; }
 
   .drop-zone {
-    border: 2px dashed var(--border); border-radius: 12px;
-    padding: 48px 32px; text-align: center; cursor: pointer;
-    transition: all 0.2s ease; position: relative; background: var(--surface);
+    border: 2px dashed #9fb1c4;
+    border-radius: 8px;
+    padding: 24px 18px;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color .18s ease, transform .18s ease, background .18s ease;
+    position: relative;
+    background: linear-gradient(180deg, #fff, #f7fafc);
+    box-shadow: var(--shadow);
   }
-  .drop-zone:hover, .drop-zone.drag-over { border-color: var(--accent); background: #1f1f00; }
+  .drop-zone:hover, .drop-zone.drag-over {
+    border-color: var(--accent);
+    background: #f1f7fd;
+    transform: translateY(-1px);
+  }
   .drop-zone input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
-  .drop-icon { font-size: 40px; margin-bottom: 16px; display: block; }
-  .drop-zone h3 { font-size: 16px; font-weight: 500; margin-bottom: 6px; }
+  .drop-icon { font-size: 32px; margin-bottom: 10px; display: block; }
+  .drop-zone h3 { font-size: 16px; font-weight: 900; margin-bottom: 6px; }
   .drop-zone p { font-size: 13px; color: var(--muted); }
 
   .status {
-    margin-top: 20px; padding: 14px 18px; border-radius: 8px; font-size: 13px;
-    display: none; align-items: center; gap: 10px; font-family: 'JetBrains Mono', monospace;
+    margin-top: 12px;
+    padding: 10px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+    display: none;
+    align-items: center;
+    gap: 10px;
+    border-left: 4px solid var(--accent);
   }
   .status.show { display: flex; }
-  .status.loading { background: #1a1a00; border: 1px solid #333300; color: var(--accent); }
-  .status.success { background: #001a0d; border: 1px solid #003319; color: var(--success); }
-  .status.error   { background: #1a0000; border: 1px solid #330000; color: var(--error); }
+  .status.loading { background: var(--accent-2); color: #173f67; }
+  .status.success { background: var(--green-2); border-left-color: var(--green); color: var(--green); }
+  .status.error   { background: var(--red-2); border-left-color: var(--red); color: var(--red); }
   .spinner {
-    width: 16px; height: 16px; border: 2px solid #333;
+    width: 16px; height: 16px; border: 2px solid #c8d5e3;
     border-top-color: var(--accent); border-radius: 50%;
     animation: spin 0.8s linear infinite; flex-shrink: 0;
   }
   @keyframes spin { to { transform: rotate(360deg); } }
 
   .items-table {
-    margin-top: 24px; display: none; width: 100%;
-    border-collapse: collapse; font-size: 12px; font-family: 'JetBrains Mono', monospace;
+    margin-top: 14px; display: none; width: 100%;
+    border-collapse: collapse; font-size: 13px;
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: var(--shadow);
   }
   .items-table.show { display: table; }
   .items-table th {
-    text-align: left; padding: 8px 12px; background: var(--surface);
-    color: var(--muted); font-weight: 400; letter-spacing: 0.05em;
-    border-bottom: 1px solid var(--border);
+    text-align: left; padding: 10px 12px; background: var(--ink);
+    color: #fff; font-weight: 800;
+    border-bottom: 1px solid var(--line);
   }
-  .items-table td { padding: 8px 12px; border-bottom: 1px solid var(--border); color: var(--text); }
-  .items-table tr:hover td { background: var(--surface); }
+  .items-table td { padding: 10px 12px; border-bottom: 1px solid #e8edf2; color: var(--text); }
+  .items-table tr:hover td { background: #f7fafc; }
   .qty-badge {
-    display: inline-block; background: var(--accent); color: #000;
-    font-weight: 700; font-size: 10px; padding: 1px 6px; border-radius: 3px;
+    display: inline-block; background: var(--accent); color: #fff;
+    font-weight: 900; font-size: 11px; padding: 2px 7px; border-radius: 999px;
   }
   .type-badge {
     display: inline-block; font-size: 9px; padding: 1px 5px; border-radius: 3px;
     font-weight: 700; margin-left: 4px;
   }
-  .type-mac     { background: #1a3a5c; color: var(--accent2); }
-  .type-watch   { background: #3a1a5c; color: #cc88ff; }
-  .type-ipad    { background: #1a5c3a; color: var(--success); }
-  .type-iphone  { background: #5c3a1a; color: #ffaa44; }
+  .type-mac     { display: none; }
+  .type-watch   { background: #ecebff; color: #5143b8; }
+  .type-ipad    { background: var(--green-2); color: var(--green); }
+  .type-iphone  { background: var(--amber-2); color: var(--amber); }
 
   .total-row {
     margin-top: 12px; text-align: right; font-size: 12px;
-    font-family: 'JetBrains Mono', monospace; color: var(--muted);
+    color: var(--muted);
   }
-  .total-row span { color: var(--accent); font-weight: 700; }
+  .total-row span { color: var(--accent); font-weight: 900; }
 
   .btn-generate {
     display: none; width: 100%; margin-top: 20px; padding: 16px;
-    background: var(--accent); color: #000; border: none; border-radius: 8px;
-    font-size: 15px; font-weight: 700; font-family: 'Noto Sans TC', sans-serif;
-    cursor: pointer; transition: all 0.15s ease; letter-spacing: 0.05em;
+    background: var(--ink); color: #fff; border: none; border-radius: 6px;
+    font-size: 15px; font-weight: 900; font-family: inherit;
+    cursor: pointer; transition: all 0.15s ease;
   }
-  .btn-generate:hover { background: #d4e800; transform: translateY(-1px); }
+  .btn-generate:hover { background: var(--accent); transform: translateY(-1px); }
   .btn-generate:active { transform: translateY(0); }
   .btn-generate.show { display: block; }
 
   .start-pos-wrap {
-    margin-top: 20px;
-    background: var(--surface);
-    border: 1px solid var(--border);
+    margin-top: 12px;
+    background: var(--panel);
+    border: 1px solid var(--line);
     border-radius: 8px;
-    padding: 14px 18px;
+    padding: 14px 16px;
+    box-shadow: var(--shadow);
   }
   .start-pos-label {
     font-size: 11px;
     color: var(--muted);
-    font-family: 'JetBrains Mono', monospace;
-    letter-spacing: 0.05em;
     margin-bottom: 10px;
+    font-weight: 900;
   }
   .start-pos-row {
     display: flex;
@@ -146,13 +229,13 @@
   #startPosInput {
     width: 72px;
     padding: 6px 10px;
-    background: var(--bg);
-    border: 1px solid var(--border);
+    background: #fff;
+    border: 1px solid var(--line);
     border-radius: 6px;
-    color: var(--accent);
-    font-family: 'JetBrains Mono', monospace;
+    color: var(--ink);
+    font-family: inherit;
     font-size: 20px;
-    font-weight: 700;
+    font-weight: 900;
     text-align: center;
     outline: none;
   }
@@ -160,25 +243,39 @@
   #weekInput {
     width: 72px;
     padding: 6px 10px;
-    background: var(--bg);
-    border: 1px solid var(--border);
+    background: #fff;
+    border: 1px solid var(--line);
     border-radius: 6px;
-    color: var(--accent);
-    font-family: 'JetBrains Mono', monospace;
+    color: var(--ink);
+    font-family: inherit;
     font-size: 16px;
-    font-weight: 700;
+    font-weight: 900;
     text-align: center;
     outline: none;
   }
   #weekInput:focus { border-color: var(--accent); }
   .pos-hint {
-    font-family: 'JetBrains Mono', monospace;
     font-size: 12px;
     color: var(--muted);
   }
   .footer-note {
     margin-top: 24px; font-size: 11px; color: var(--muted);
-    text-align: center; font-family: 'JetBrains Mono', monospace; line-height: 1.8;
+    text-align: center; line-height: 1.8;
+  }
+
+  #offsetX,
+  #offsetY {
+    background: #fff !important;
+    border: 1px solid var(--line) !important;
+    color: var(--ink) !important;
+    font-family: inherit !important;
+  }
+
+  @media (max-width: 760px) {
+    .header,
+    .label-preview {
+      grid-template-columns: 1fr;
+    }
   }
 
   @media print {
@@ -238,24 +335,24 @@
   <div class="header">
     <h1>// label generator</h1>
     <h2>標籤自動產生器</h2>
-    <p>支援 Mac、iPad、iPhone、Apple Watch，上傳 Excel 自動產生標籤</p>
+    <p>支援 iPad、iPhone、Apple Watch，上傳 Excel 自動產生標籤</p>
   </div>
 
   <div class="label-preview">
     <div class="preview-section">
-      <div class="preview-title">▸ Mac / iPad</div>
-      <div class="label-row"><span>MBA 13.6</span><span>1TB</span></div>
-      <div class="label-row"><span>午夜色</span><span>HF4</span></div>
+      <div class="preview-title">iPad</div>
+      <div class="label-row"><span>iPad Air 13</span><span>256GB</span></div>
+      <div class="label-row"><span>銀色</span><span>YFJ</span></div>
     </div>
     <div class="divider"></div>
     <div class="preview-section">
-      <div class="preview-title">▸ Apple Watch</div>
+      <div class="preview-title">Apple Watch</div>
       <div class="label-row"><span>S11 42</span><span>U04</span></div>
       <div class="label-row"><span>玫瑰金</span><span>S/M</span></div>
     </div>
     <div class="divider"></div>
     <div class="preview-section">
-      <div class="preview-title">▸ iPhone</div>
+      <div class="preview-title">iPhone</div>
       <div class="label-row"><span>17 Pro</span><span>256GB</span></div>
       <div class="label-row"><span>Dee</span><span>G8J</span></div>
     </div>
@@ -290,14 +387,14 @@
       <div style="display:flex;align-items:center;gap:8px;">
         <span class="pos-hint">水平 ←→</span>
         <input type="number" id="offsetX" value="0" min="-20" max="20" step="0.5"
-          style="width:72px;padding:6px 10px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--accent);font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:700;text-align:center;outline:none;"
+          style="width:72px;padding:6px 10px;background:#fff;border:1px solid var(--line);border-radius:6px;color:var(--ink);font-family:inherit;font-size:16px;font-weight:900;text-align:center;outline:none;"
           oninput="updateOffset()" />
         <span class="pos-hint">mm</span>
       </div>
       <div style="display:flex;align-items:center;gap:8px;">
         <span class="pos-hint">垂直 ↕</span>
         <input type="number" id="offsetY" value="7" min="-10" max="30" step="0.5"
-          style="width:72px;padding:6px 10px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--accent);font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:700;text-align:center;outline:none;"
+          style="width:72px;padding:6px 10px;background:#fff;border:1px solid var(--line);border-radius:6px;color:var(--ink);font-family:inherit;font-size:16px;font-weight:900;text-align:center;outline:none;"
           oninput="updateOffset()" />
         <span class="pos-hint">mm（預設 7）</span>
       </div>
@@ -377,6 +474,7 @@ function enColorToChinese(colorStr) {
 
 let parsedLabels = [];
 let startPos = 1; // 1-based
+const OFFSET_STORAGE_KEY = 'labelGeneratorPrintOffset';
 
 function getISOWeek(date) {
   const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
@@ -394,10 +492,25 @@ function updateWeek() {
 }
 
 function updateOffset() {
-  const x = parseFloat(document.getElementById('offsetX').value) || 0;
-  const y = parseFloat(document.getElementById('offsetY').value) ?? 7;
-  document.getElementById('printArea').style.setProperty('--offset-x', x + 'mm');
-  document.getElementById('printArea').style.setProperty('--offset-y', y + 'mm');
+  const x = parseFloat(document.getElementById('offsetX').value);
+  const y = parseFloat(document.getElementById('offsetY').value);
+  const safeX = Number.isFinite(x) ? x : 0;
+  const safeY = Number.isFinite(y) ? y : 7;
+  document.getElementById('printArea').style.setProperty('--offset-x', safeX + 'mm');
+  document.getElementById('printArea').style.setProperty('--offset-y', safeY + 'mm');
+  try {
+    localStorage.setItem(OFFSET_STORAGE_KEY, JSON.stringify({ x: safeX, y: safeY }));
+  } catch {}
+}
+
+function loadSavedOffset() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(OFFSET_STORAGE_KEY) || '{}');
+    if (Number.isFinite(saved.x)) document.getElementById('offsetX').value = saved.x;
+    if (Number.isFinite(saved.y)) document.getElementById('offsetY').value = saved.y;
+  } catch {
+    localStorage.removeItem(OFFSET_STORAGE_KEY);
+  }
 }
 
 function changeStart() {
@@ -708,6 +821,8 @@ function printLabels() {
 
 // Init week input
 document.getElementById('weekInput').value = WEEK_LABEL;
+loadSavedOffset();
+updateOffset();
 
 // Drag and drop
 const dropZone = document.getElementById('dropZone');
