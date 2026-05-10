@@ -271,9 +271,88 @@
     font-family: inherit !important;
   }
 
+  .layout-panel {
+    display: none;
+    grid-template-columns: minmax(0, 1fr) minmax(230px, 300px);
+    gap: 14px;
+    align-items: start;
+  }
+  .layout-panel.show {
+    display: grid;
+  }
+  .layout-controls {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+  .layout-field {
+    display: grid;
+    gap: 7px;
+  }
+  .layout-field label {
+    font-size: 12px;
+    color: var(--muted);
+    font-weight: 900;
+  }
+  .layout-field input {
+    width: 100%;
+    min-height: 36px;
+    padding: 7px 10px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    background: #fff;
+    color: var(--ink);
+    font: inherit;
+    font-weight: 900;
+    outline: none;
+  }
+  .layout-field input:focus {
+    border-color: var(--accent);
+  }
+  .layout-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 12px;
+  }
+  .btn-reset {
+    min-height: 36px;
+    padding: 8px 12px;
+    border: 0;
+    border-radius: 6px;
+    background: #edf2f7;
+    color: var(--ink);
+    font: inherit;
+    font-weight: 900;
+    cursor: pointer;
+  }
+  .btn-reset:hover {
+    background: #dfe8f1;
+  }
+  .layout-preview-wrap {
+    display: grid;
+    gap: 10px;
+  }
+  .layout-preview-title {
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 900;
+  }
+  .single-label-preview {
+    width: 42mm;
+    height: 15mm;
+    max-width: 100%;
+    position: relative;
+    overflow: hidden;
+    background: #fff;
+    border: 1px solid #9fb1c4;
+    box-shadow: 0 10px 28px rgba(24, 39, 56, .12);
+  }
+
   @media (max-width: 760px) {
     .header,
-    .label-preview {
+    .label-preview,
+    .layout-panel,
+    .layout-controls {
       grid-template-columns: 1fr;
     }
   }
@@ -286,6 +365,20 @@
   }
   #printArea { display: none; }
 
+  #printArea,
+  .single-label-preview {
+    --offset-x: 0mm;
+    --offset-y: 7mm;
+    --label-left-pad: 5mm;
+    --label-right-pad: 6mm;
+    --label-first-font: 10pt;
+    --label-second-font: 10pt;
+    --label-week-font: 5pt;
+    --label-first-top: 2mm;
+    --label-content-top: 2mm;
+    --watermark-size: 13pt;
+    --watermark-opacity: .35;
+  }
   .label-sheet { width: 210mm; font-family: Arial, 'Noto Sans TC', sans-serif; }
   .label-page { width: 210mm; padding-top: var(--offset-y, 7mm); margin-left: var(--offset-x, 0mm); page-break-after: always; }
   .label-page:last-child { page-break-after: auto; }
@@ -294,21 +387,24 @@
     position: relative;
     width: 42mm; height: 15mm;
     display: flex; flex-direction: column; justify-content: center;
-    flex-shrink: 0; overflow: hidden; padding-top: 2mm;
+    flex-shrink: 0; overflow: hidden; padding-top: var(--label-content-top, 2mm);
   }
   .label-cell.has-border { border: 0.3px solid #aaa; }
   .label-line { display: flex; justify-content: space-between; align-items: baseline; height: 50%; line-height: 1; }
-  .label-cell .label-line:first-child { padding-top: 2mm; }
-  .label-cell .label-line:first-child .label-left { font-size: 10pt; }
-  .label-cell.brand-905 { padding-top: 3mm; }
+  .label-line.primary { padding-top: var(--label-first-top, 2mm); }
+  .label-line.primary .label-left,
+  .label-line.primary .label-right { font-size: var(--label-first-font, 10pt); }
+  .label-line.secondary .label-left,
+  .label-line.secondary .label-right { font-size: var(--label-second-font, 10pt); }
+  .label-cell.brand-905 { padding-top: var(--label-content-top, 2mm); }
   .label-watermark {
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    font-size: 13pt;
+    font-size: var(--watermark-size, 13pt);
     font-weight: bold;
-    color: rgba(0,0,0,0.35);
+    color: rgba(0,0,0,var(--watermark-opacity, .35));
     pointer-events: none;
     white-space: nowrap;
     z-index: 0;
@@ -318,14 +414,14 @@
     position: absolute;
     top: 1mm;
     right: 1.5mm;
-    font-size: 5pt;
+    font-size: var(--label-week-font, 5pt);
     color: #000;
     font-weight: normal;
     pointer-events: none;
     z-index: 1;
   }
-  .label-left  { font-size: 10pt; font-weight: bold; padding-left: 5mm; white-space: nowrap; overflow: hidden; color: #000; text-transform: uppercase; }
-  .label-right { font-size: 10pt; font-weight: bold; padding-right: 6mm; white-space: nowrap; text-align: right; color: #000; }
+  .label-left  { font-size: var(--label-second-font, 10pt); font-weight: bold; padding-left: var(--label-left-pad, 5mm); white-space: nowrap; overflow: hidden; color: #000; text-transform: uppercase; }
+  .label-right { font-size: var(--label-second-font, 10pt); font-weight: bold; padding-right: var(--label-right-pad, 6mm); white-space: nowrap; text-align: right; color: #000; }
 </style>
 </head>
 <body>
@@ -388,15 +484,79 @@
         <span class="pos-hint">水平 ←→</span>
         <input type="number" id="offsetX" value="0" min="-20" max="20" step="0.5"
           style="width:72px;padding:6px 10px;background:#fff;border:1px solid var(--line);border-radius:6px;color:var(--ink);font-family:inherit;font-size:16px;font-weight:900;text-align:center;outline:none;"
-          oninput="updateOffset()" />
+          oninput="updateLayout()" />
         <span class="pos-hint">mm</span>
       </div>
       <div style="display:flex;align-items:center;gap:8px;">
         <span class="pos-hint">垂直 ↕</span>
         <input type="number" id="offsetY" value="7" min="-10" max="30" step="0.5"
           style="width:72px;padding:6px 10px;background:#fff;border:1px solid var(--line);border-radius:6px;color:var(--ink);font-family:inherit;font-size:16px;font-weight:900;text-align:center;outline:none;"
-          oninput="updateOffset()" />
+          oninput="updateLayout()" />
         <span class="pos-hint">mm（預設 7）</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="start-pos-wrap layout-panel" id="layoutPanel">
+    <div>
+      <div class="start-pos-label">排版調整</div>
+      <div class="layout-controls">
+        <div class="layout-field">
+          <label for="labelLeftPad">左側文字位置 mm</label>
+          <input type="number" id="labelLeftPad" value="5" min="0" max="15" step="0.5" oninput="updateLayout()" />
+        </div>
+        <div class="layout-field">
+          <label for="labelRightPad">右側文字位置 mm</label>
+          <input type="number" id="labelRightPad" value="6" min="0" max="15" step="0.5" oninput="updateLayout()" />
+        </div>
+        <div class="layout-field">
+          <label for="labelFirstFont">第一行字級 pt</label>
+          <input type="number" id="labelFirstFont" value="10" min="6" max="16" step="0.5" oninput="updateLayout()" />
+        </div>
+        <div class="layout-field">
+          <label for="labelSecondFont">第二行字級 pt</label>
+          <input type="number" id="labelSecondFont" value="10" min="6" max="16" step="0.5" oninput="updateLayout()" />
+        </div>
+        <div class="layout-field">
+          <label for="labelWeekFont">週數字級 pt</label>
+          <input type="number" id="labelWeekFont" value="5" min="3" max="10" step="0.5" oninput="updateLayout()" />
+        </div>
+        <div class="layout-field">
+          <label for="labelFirstTop">第一行上距 mm</label>
+          <input type="number" id="labelFirstTop" value="2" min="0" max="8" step="0.5" oninput="updateLayout()" />
+        </div>
+        <div class="layout-field">
+          <label for="labelContentTop">內容整體下移 mm</label>
+          <input type="number" id="labelContentTop" value="2" min="0" max="8" step="0.5" oninput="updateLayout()" />
+        </div>
+        <div class="layout-field">
+          <label for="watermarkSize">905 大小 pt</label>
+          <input type="number" id="watermarkSize" value="13" min="8" max="24" step="0.5" oninput="updateLayout()" />
+        </div>
+        <div class="layout-field">
+          <label for="watermarkOpacity">905 透明度</label>
+          <input type="number" id="watermarkOpacity" value="0.35" min="0" max="1" step="0.05" oninput="updateLayout()" />
+        </div>
+      </div>
+      <div class="layout-actions">
+        <button class="btn-reset" type="button" onclick="resetLayout()">恢復預設</button>
+      </div>
+    </div>
+    <div class="layout-preview-wrap">
+      <div class="layout-preview-title">單格預覽</div>
+      <div class="single-label-preview" id="singleLabelPreview">
+        <div class="label-cell has-border brand-905">
+          <div class="label-watermark">905</div>
+          <div class="label-week" id="layoutPreviewWeek">W18</div>
+          <div class="label-line primary">
+            <span class="label-left">G8J</span>
+            <span class="label-right">17 Pro</span>
+          </div>
+          <div class="label-line secondary">
+            <span class="label-left">藏藍色</span>
+            <span class="label-right">256GB</span>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -475,6 +635,21 @@ function enColorToChinese(colorStr) {
 let parsedLabels = [];
 let startPos = 1; // 1-based
 const OFFSET_STORAGE_KEY = 'labelGeneratorPrintOffset';
+const LAYOUT_STORAGE_KEY = 'labelGeneratorPrintLayout';
+const DEFAULT_LAYOUT = {
+  offsetX: 0,
+  offsetY: 7,
+  labelLeftPad: 5,
+  labelRightPad: 6,
+  labelFirstFont: 10,
+  labelSecondFont: 10,
+  labelWeekFont: 5,
+  labelFirstTop: 2,
+  labelContentTop: 2,
+  watermarkSize: 13,
+  watermarkOpacity: 0.35,
+};
+const LAYOUT_FIELDS = Object.keys(DEFAULT_LAYOUT);
 
 function getISOWeek(date) {
   const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
@@ -489,28 +664,85 @@ let WEEK_LABEL = 'W' + String(currentWeek).padStart(2, '0');
 
 function updateWeek() {
   WEEK_LABEL = document.getElementById('weekInput').value.trim();
+  updateLayout();
 }
 
-function updateOffset() {
-  const x = parseFloat(document.getElementById('offsetX').value);
-  const y = parseFloat(document.getElementById('offsetY').value);
-  const safeX = Number.isFinite(x) ? x : 0;
-  const safeY = Number.isFinite(y) ? y : 7;
-  document.getElementById('printArea').style.setProperty('--offset-x', safeX + 'mm');
-  document.getElementById('printArea').style.setProperty('--offset-y', safeY + 'mm');
+function readLayoutFromInputs() {
+  return LAYOUT_FIELDS.reduce((layout, key) => {
+    const value = parseFloat(document.getElementById(key).value);
+    layout[key] = Number.isFinite(value) ? value : DEFAULT_LAYOUT[key];
+    return layout;
+  }, {});
+}
+
+function applyLayout(layout) {
+  const targets = [
+    document.getElementById('printArea'),
+    document.getElementById('singleLabelPreview'),
+  ].filter(Boolean);
+  const vars = {
+    '--offset-x': layout.offsetX + 'mm',
+    '--offset-y': layout.offsetY + 'mm',
+    '--label-left-pad': layout.labelLeftPad + 'mm',
+    '--label-right-pad': layout.labelRightPad + 'mm',
+    '--label-first-font': layout.labelFirstFont + 'pt',
+    '--label-second-font': layout.labelSecondFont + 'pt',
+    '--label-week-font': layout.labelWeekFont + 'pt',
+    '--label-first-top': layout.labelFirstTop + 'mm',
+    '--label-content-top': layout.labelContentTop + 'mm',
+    '--watermark-size': layout.watermarkSize + 'pt',
+    '--watermark-opacity': layout.watermarkOpacity,
+  };
+  for (const target of targets) {
+    for (const [name, value] of Object.entries(vars)) {
+      target.style.setProperty(name, value);
+    }
+  }
+  const previewWeek = document.getElementById('layoutPreviewWeek');
+  if (previewWeek) previewWeek.textContent = WEEK_LABEL || 'W18';
+}
+
+function writeLayoutToInputs(layout) {
+  for (const key of LAYOUT_FIELDS) {
+    document.getElementById(key).value = layout[key];
+  }
+}
+
+function saveLayout(layout) {
   try {
-    localStorage.setItem(OFFSET_STORAGE_KEY, JSON.stringify({ x: safeX, y: safeY }));
+    localStorage.setItem(LAYOUT_STORAGE_KEY, JSON.stringify(layout));
   } catch {}
 }
 
-function loadSavedOffset() {
+function updateLayout() {
+  const layout = readLayoutFromInputs();
+  applyLayout(layout);
+  saveLayout(layout);
+}
+
+function loadSavedLayout() {
+  let layout = { ...DEFAULT_LAYOUT };
   try {
-    const saved = JSON.parse(localStorage.getItem(OFFSET_STORAGE_KEY) || '{}');
-    if (Number.isFinite(saved.x)) document.getElementById('offsetX').value = saved.x;
-    if (Number.isFinite(saved.y)) document.getElementById('offsetY').value = saved.y;
+    const savedLayout = JSON.parse(localStorage.getItem(LAYOUT_STORAGE_KEY) || '{}');
+    for (const key of LAYOUT_FIELDS) {
+      if (Number.isFinite(savedLayout[key])) layout[key] = savedLayout[key];
+    }
+    const oldOffset = JSON.parse(localStorage.getItem(OFFSET_STORAGE_KEY) || '{}');
+    if (!Number.isFinite(savedLayout.offsetX) && Number.isFinite(oldOffset.x)) layout.offsetX = oldOffset.x;
+    if (!Number.isFinite(savedLayout.offsetY) && Number.isFinite(oldOffset.y)) layout.offsetY = oldOffset.y;
   } catch {
-    localStorage.removeItem(OFFSET_STORAGE_KEY);
+    try {
+      localStorage.removeItem(LAYOUT_STORAGE_KEY);
+    } catch {}
   }
+  writeLayoutToInputs(layout);
+  applyLayout(layout);
+  saveLayout(layout);
+}
+
+function resetLayout() {
+  writeLayoutToInputs(DEFAULT_LAYOUT);
+  updateLayout();
 }
 
 function changeStart() {
@@ -764,8 +996,9 @@ async function handleFile(file) {
     document.getElementById('startPosWrap').style.display = 'block';
     document.getElementById('weekWrap').style.display = 'block';
     document.getElementById('offsetWrap').style.display = 'block';
+    document.getElementById('layoutPanel').classList.add('show');
     document.getElementById('borderWrap').style.display = 'block';
-    updateOffset();
+    updateLayout();
   } catch(err) {
     setStatus('error', '✗ ' + err.message);
   }
@@ -797,11 +1030,11 @@ function buildPrintHTML() {
           cellDiv.innerHTML = `
             ${watermark}
             <div class="label-week">${WEEK_LABEL}</div>
-            <div class="label-line">
+            <div class="label-line primary">
               <span class="label-left">${lbl.right2}</span>
               <span class="label-right">${lbl.product}</span>
             </div>
-            <div class="label-line">
+            <div class="label-line secondary">
               <span class="label-left">${lbl.color}</span>
               <span class="label-right">${lbl.right1}</span>
             </div>`;
@@ -821,8 +1054,7 @@ function printLabels() {
 
 // Init week input
 document.getElementById('weekInput').value = WEEK_LABEL;
-loadSavedOffset();
-updateOffset();
+loadSavedLayout();
 
 // Drag and drop
 const dropZone = document.getElementById('dropZone');
