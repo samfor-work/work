@@ -13,6 +13,7 @@
       --bg: #f4f7fa;
       --label: #d8f000;
       --transfer: #1f5f99;
+      --setup: #2f7d72;
       --shadow: 0 20px 60px rgba(21, 25, 31, .12);
     }
 
@@ -69,7 +70,7 @@
 
     .tools {
       display: grid;
-      grid-template-columns: repeat(2, minmax(0, 1fr));
+      grid-template-columns: repeat(3, minmax(0, 1fr));
       gap: 16px;
       margin-top: 24px;
     }
@@ -132,6 +133,11 @@
       background: var(--transfer);
     }
 
+    .tool-card.setup strong {
+      color: #fff;
+      background: var(--setup);
+    }
+
     .tool-card.label {
       background:
         linear-gradient(135deg, rgba(216, 240, 0, .22), transparent 44%),
@@ -141,6 +147,12 @@
     .tool-card.transfer {
       background:
         linear-gradient(135deg, rgba(31, 95, 153, .18), transparent 44%),
+        var(--panel);
+    }
+
+    .tool-card.setup {
+      background:
+        linear-gradient(135deg, rgba(47, 125, 114, .18), transparent 44%),
         var(--panel);
     }
 
@@ -190,6 +202,14 @@
         <div>
           <h2>調撥工具</h2>
           <p>上傳存貨彙總，選擇本店門市，產生調撥計畫與建議清單。</p>
+        </div>
+      </a>
+
+      <a class="tool-card setup" href="MySetup.html">
+        <strong>Setup</strong>
+        <div>
+          <h2>Personal Setup 統計</h2>
+          <p>上傳 Personal Setup 匯出檔，統計各裝置與員工完成數。</p>
         </div>
       </a>
     </section>

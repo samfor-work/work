@@ -1,0 +1,1122 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Personal Setup 完成統計</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@300;400;500;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+
+  :root {
+    --ink: #15191f;
+    --muted: #647080;
+    --quiet: #8b96a5;
+    --line: #d9e1ea;
+    --panel: #ffffff;
+    --bg: #f4f7fa;
+    --grid: rgba(31, 95, 153, .055);
+    --setup: #2f7d72;
+    --setup-soft: #dff4ee;
+    --label: #d8f000;
+    --transfer: #1f5f99;
+    --iphone: #1f5f99;
+    --iphone-bg: #e4eef8;
+    --ipad: #2f7d72;
+    --ipad-bg: #dff4ee;
+    --mac: #6f4bb6;
+    --mac-bg: #eee8fb;
+    --watch: #b8671f;
+    --watch-bg: #f9ebdc;
+    --danger: #a33939;
+    --danger-bg: #fff1f1;
+    --shadow: 0 20px 60px rgba(21, 25, 31, .12);
+  }
+
+  body {
+    margin: 0;
+    min-height: 100vh;
+    color: var(--ink);
+    background:
+      linear-gradient(90deg, var(--grid) 1px, transparent 1px),
+      linear-gradient(0deg, rgba(31, 95, 153, .045) 1px, transparent 1px),
+      var(--bg);
+    background-size: 36px 36px;
+    font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+  }
+
+  button,
+  input {
+    font: inherit;
+  }
+
+  button {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  #upload-screen {
+    display: flex;
+    min-height: 100vh;
+    align-items: center;
+    justify-content: center;
+    padding: 32px 16px;
+  }
+
+  .upload-shell {
+    width: min(1040px, 100%);
+  }
+
+  .tool-header {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 20px;
+    align-items: end;
+    padding-bottom: 18px;
+    margin-bottom: 18px;
+    border-bottom: 2px solid var(--ink);
+  }
+
+  .eyebrow,
+  .upload-logo,
+  .panel-title,
+  .metric-label {
+    letter-spacing: .08em;
+    text-transform: uppercase;
+  }
+
+  .eyebrow,
+  .upload-logo {
+    display: inline-flex;
+    width: fit-content;
+    min-height: 34px;
+    align-items: center;
+    padding: 6px 10px;
+    margin-bottom: 12px;
+    border-radius: 999px;
+    background: var(--setup-soft);
+    color: #0e4f45;
+    font-size: 13px;
+    font-weight: 800;
+  }
+
+  h1 {
+    margin: 0;
+    font-size: clamp(36px, 6vw, 70px);
+    line-height: .95;
+    letter-spacing: 0;
+    font-weight: 900;
+  }
+
+  .header-copy {
+    margin: 12px 0 0;
+    max-width: 38rem;
+    color: var(--muted);
+    font-size: 15px;
+    line-height: 1.65;
+    font-weight: 650;
+  }
+
+  .nav-link,
+  .reload-btn,
+  .upload-btn,
+  .copy-btn,
+  .filter-btn {
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--panel);
+    color: var(--ink);
+    cursor: pointer;
+    text-decoration: none;
+    transition: transform .16s ease, box-shadow .16s ease, border-color .16s ease, background .16s ease, color .16s ease;
+  }
+
+  .nav-link {
+    min-width: 150px;
+    padding: 10px 12px;
+    border: 2px solid var(--ink);
+    box-shadow: 5px 5px 0 var(--ink);
+    text-align: center;
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 800;
+  }
+
+  .nav-link:hover {
+    transform: translate(-1px, -1px);
+    box-shadow: 7px 7px 0 var(--ink);
+  }
+
+  .upload-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.05fr) minmax(280px, .95fr);
+    gap: 16px;
+    align-items: stretch;
+  }
+
+  .intro-card,
+  .drop-zone,
+  .metric-card,
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    box-shadow: var(--shadow);
+  }
+
+  .intro-card {
+    min-height: 310px;
+    padding: 22px;
+    background:
+      linear-gradient(135deg, rgba(47, 125, 114, .18), transparent 45%),
+      var(--panel);
+  }
+
+  .intro-card h2 {
+    margin: 0 0 14px;
+    max-width: 12ch;
+    font-size: clamp(34px, 5vw, 56px);
+    line-height: 1;
+    letter-spacing: 0;
+  }
+
+  .intro-card p {
+    margin: 0;
+    max-width: 31rem;
+    color: var(--muted);
+    font-size: 15px;
+    line-height: 1.65;
+    font-weight: 650;
+  }
+
+  .feature-list {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    margin-top: 28px;
+  }
+
+  .feature-list span {
+    min-height: 42px;
+    padding: 10px 12px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: rgba(255,255,255,.72);
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 800;
+  }
+
+  .drop-zone {
+    display: grid;
+    min-height: 310px;
+    padding: 22px;
+    text-align: left;
+    cursor: pointer;
+  }
+
+  .drop-zone:hover,
+  .drop-zone.drag-over {
+    transform: translateY(-3px);
+    border-color: var(--ink);
+    box-shadow: 0 24px 70px rgba(21, 25, 31, .16);
+  }
+
+  .drop-icon {
+    display: inline-flex;
+    width: 52px;
+    height: 52px;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid var(--ink);
+    border-radius: 8px;
+    background: var(--label);
+    box-shadow: 4px 4px 0 var(--ink);
+    color: var(--ink);
+    font-family: 'DM Mono', ui-monospace, monospace;
+    font-size: 21px;
+    font-weight: 800;
+  }
+
+  .drop-zone h2 {
+    align-self: end;
+    margin: 0 0 10px;
+    font-size: clamp(28px, 4vw, 44px);
+    line-height: 1;
+    letter-spacing: 0;
+  }
+
+  .drop-zone p {
+    align-self: end;
+    margin: 0;
+    color: var(--muted);
+    font-size: 15px;
+    line-height: 1.6;
+    font-weight: 650;
+  }
+
+  .drop-zone p span {
+    display: block;
+    margin-top: 6px;
+    color: var(--quiet);
+    font-family: 'DM Mono', ui-monospace, monospace;
+    font-size: 12px;
+  }
+
+  .upload-btn {
+    width: fit-content;
+    min-height: 42px;
+    padding: 9px 18px;
+    margin-top: 18px;
+    background: var(--ink);
+    color: #fff;
+    font-size: 14px;
+    font-weight: 800;
+  }
+
+  .upload-btn:hover,
+  .reload-btn:hover,
+  .copy-btn:hover,
+  .filter-btn:hover {
+    transform: translateY(-1px);
+    border-color: var(--ink);
+  }
+
+  #file-input { display: none; }
+
+  .upload-hint {
+    margin-top: 16px;
+    color: var(--muted);
+    font-family: 'DM Mono', ui-monospace, monospace;
+    font-size: 12px;
+  }
+
+  .error-msg {
+    width: min(100%, 620px);
+    margin-top: 14px;
+    padding: 14px 16px;
+    border: 1px solid #efb0b0;
+    border-radius: 8px;
+    background: var(--danger-bg);
+    color: var(--danger);
+    font-size: 14px;
+    font-weight: 700;
+  }
+
+  #dashboard { display: none; }
+
+  .dashboard-shell {
+    width: min(1180px, calc(100vw - 32px));
+    margin: 0 auto;
+    padding: 42px 0;
+  }
+
+  .dashboard-shell .tool-header {
+    align-items: end;
+  }
+
+  .header-left p {
+    margin: 10px 0 0;
+    color: var(--muted);
+    font-family: 'DM Mono', ui-monospace, monospace;
+    font-size: 13px;
+  }
+
+  .header-right {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+  }
+
+  .date-badge {
+    min-height: 38px;
+    display: inline-flex;
+    align-items: center;
+    padding: 8px 12px;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--panel);
+    color: var(--muted);
+    font-family: 'DM Mono', ui-monospace, monospace;
+    font-size: 12px;
+    white-space: nowrap;
+  }
+
+  .reload-btn {
+    min-height: 38px;
+    padding: 8px 14px;
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 800;
+  }
+
+  .container {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .summary-grid {
+    display: grid;
+    grid-template-columns: minmax(210px, 1.45fr) repeat(4, minmax(130px, 1fr));
+    gap: 12px;
+  }
+
+  .metric-card {
+    min-height: 132px;
+    padding: 18px;
+  }
+
+  .metric-total {
+    background:
+      linear-gradient(135deg, rgba(216, 240, 0, .2), transparent 48%),
+      var(--ink);
+    border-color: var(--ink);
+  }
+
+  .metric-label {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    margin-bottom: 16px;
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 800;
+  }
+
+  .metric-total .metric-label {
+    color: rgba(255,255,255,.68);
+  }
+
+  .metric-val {
+    color: var(--ink);
+    font-family: 'DM Mono', ui-monospace, monospace;
+    font-size: clamp(32px, 4vw, 44px);
+    font-weight: 800;
+    line-height: .92;
+  }
+
+  .metric-total .metric-val {
+    color: #fff;
+    font-size: clamp(42px, 6vw, 64px);
+  }
+
+  .metric-sub {
+    margin-top: 10px;
+    color: var(--quiet);
+    font-family: 'DM Mono', ui-monospace, monospace;
+    font-size: 12px;
+  }
+
+  .metric-total .metric-sub {
+    color: rgba(255,255,255,.48);
+  }
+
+  .metric-dot {
+    display: inline-block;
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+  }
+
+  .panel {
+    overflow: hidden;
+    box-shadow: none;
+  }
+
+  .panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 16px 18px;
+    border-bottom: 1px solid var(--line);
+    flex-wrap: wrap;
+  }
+
+  .panel-title {
+    color: var(--muted);
+    font-size: 13px;
+    font-weight: 900;
+  }
+
+  .panel-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .filter-row {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  .filter-btn {
+    min-height: 34px;
+    padding: 6px 12px;
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 800;
+  }
+
+  .filter-btn.active {
+    background: var(--ink);
+    color: #fff;
+    border-color: var(--ink);
+  }
+
+  .copy-btn {
+    display: flex;
+    min-height: 34px;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 800;
+    white-space: nowrap;
+  }
+
+  .copy-btn.copied {
+    background: var(--setup-soft);
+    color: #0e4f45;
+    border-color: var(--setup);
+  }
+
+  .chart-wrap {
+    padding: 18px;
+  }
+
+  .chart-bars {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .chart-row {
+    display: grid;
+    grid-template-columns: minmax(76px, 130px) minmax(0, 1fr) 32px;
+    gap: 10px;
+    align-items: center;
+  }
+
+  .chart-name {
+    overflow: hidden;
+    color: var(--ink);
+    font-size: 13px;
+    font-weight: 800;
+    text-align: right;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .chart-bar-bg {
+    height: 28px;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: #eef3f8;
+  }
+
+  .chart-bar-fill {
+    display: flex;
+    height: 100%;
+    min-width: 2px;
+    align-items: center;
+    padding-left: 8px;
+    transition: width .5s cubic-bezier(.4,0,.2,1);
+  }
+
+  .chart-val,
+  .chart-val-out,
+  td.right,
+  .rank-num,
+  .pct-label,
+  .badge,
+  .total-val {
+    font-family: 'DM Mono', ui-monospace, monospace;
+  }
+
+  .chart-val {
+    color: rgba(255,255,255,.92);
+    font-size: 12px;
+    font-weight: 800;
+  }
+
+  .chart-val-out {
+    min-width: 24px;
+    color: var(--muted);
+    font-size: 12px;
+  }
+
+  .table-scroll {
+    width: 100%;
+    overflow-x: auto;
+  }
+
+  table {
+    width: 100%;
+    min-width: 720px;
+    border-collapse: collapse;
+  }
+
+  thead th {
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--line);
+    background: #eef3f8;
+    color: var(--muted);
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: .07em;
+    text-align: left;
+    text-transform: uppercase;
+  }
+
+  thead th.right {
+    text-align: right;
+  }
+
+  tbody tr {
+    border-bottom: 1px solid #eef3f8;
+    transition: background .1s;
+  }
+
+  tbody tr:last-child { border-bottom: none; }
+
+  tbody tr:hover,
+  tbody tr.total-row {
+    background: #f6f9fc;
+  }
+
+  td {
+    padding: 13px 16px;
+    vertical-align: middle;
+    font-size: 14px;
+  }
+
+  td.right {
+    text-align: right;
+  }
+
+  .staff-name {
+    font-weight: 800;
+  }
+
+  .rank-num {
+    color: var(--quiet);
+    font-size: 12px;
+  }
+
+  .rank-1 {
+    padding: 2px 6px;
+    border-radius: 6px;
+    background: var(--watch-bg);
+    color: var(--watch);
+    font-weight: 800;
+  }
+
+  .bar-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .bar-bg {
+    flex: 1;
+    min-width: 80px;
+    height: 8px;
+    overflow: hidden;
+    border-radius: 99px;
+    background: #e8eef4;
+  }
+
+  .bar-fill {
+    height: 100%;
+    border-radius: 99px;
+  }
+
+  .pct-label {
+    min-width: 36px;
+    color: var(--muted);
+    font-size: 11px;
+    text-align: right;
+  }
+
+  .badges {
+    display: flex;
+    gap: 5px;
+    flex-wrap: wrap;
+  }
+
+  .badge {
+    padding: 3px 8px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 800;
+  }
+
+  .badge-iphone { background: var(--iphone-bg); color: var(--iphone); }
+  .badge-ipad   { background: var(--ipad-bg);   color: var(--ipad); }
+  .badge-mac    { background: var(--mac-bg);     color: var(--mac); }
+  .badge-watch  { background: var(--watch-bg);   color: var(--watch); }
+
+  .total-label,
+  .total-val {
+    font-weight: 900;
+  }
+
+  .toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    z-index: 999;
+    padding: 10px 18px;
+    border: 2px solid var(--ink);
+    border-radius: 8px;
+    background: var(--ink);
+    color: #fff;
+    box-shadow: 5px 5px 0 rgba(21,25,31,.2);
+    font-size: 13px;
+    font-weight: 800;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateX(-50%) translateY(20px);
+    transition: opacity .2s, transform .2s;
+  }
+
+  .toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  @media (max-width: 900px) {
+    .upload-grid,
+    .summary-grid {
+      grid-template-columns: 1fr 1fr;
+    }
+
+    .intro-card,
+    .metric-total {
+      grid-column: 1 / -1;
+    }
+
+    .tool-header {
+      grid-template-columns: 1fr;
+    }
+
+    .header-right {
+      justify-content: flex-start;
+    }
+  }
+
+  @media (max-width: 640px) {
+    #upload-screen {
+      align-items: flex-start;
+      padding: 28px 16px;
+    }
+
+    .dashboard-shell {
+      width: min(100vw - 24px, 1180px);
+      padding: 28px 0;
+    }
+
+    .upload-grid,
+    .feature-list,
+    .summary-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .intro-card,
+    .drop-zone {
+      min-height: 240px;
+      padding: 18px;
+    }
+
+    .panel-header,
+    .panel-actions,
+    .filter-row,
+    .header-right {
+      width: 100%;
+    }
+
+    .filter-btn,
+    .copy-btn,
+    .reload-btn,
+    .date-badge {
+      flex: 1 1 auto;
+      justify-content: center;
+    }
+
+    .chart-row {
+      grid-template-columns: 1fr;
+      gap: 6px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid #eef3f8;
+    }
+
+    .chart-row:last-child {
+      border-bottom: 0;
+    }
+
+    .chart-name {
+      text-align: left;
+    }
+
+    .chart-val-out {
+      display: none;
+    }
+  }
+</style>
+</head>
+<body>
+
+<!-- Upload -->
+<div id="upload-screen">
+  <main class="upload-shell">
+    <header class="tool-header">
+      <div>
+        <span class="upload-logo">Personal Setup</span>
+        <h1>完成統計</h1>
+        <p class="header-copy">上傳 Personal Setup 匯出檔，快速整理裝置別完成數、員工排行與可貼回表格的統計資料。</p>
+      </div>
+      <a class="nav-link" href="index.html">工作工具<br>Store Toolkit</a>
+    </header>
+
+    <section class="upload-grid" aria-label="Personal Setup 檔案上傳">
+      <div class="intro-card">
+        <h2>門市完成數看板</h2>
+        <p>資料只會在瀏覽器內解析，不會上傳到伺服器。支援 iPhone、iPad、Mac、Apple Watch 分頁統計。</p>
+        <div class="feature-list" aria-label="統計功能">
+          <span>裝置別總覽</span>
+          <span>員工排行</span>
+          <span>日期區間</span>
+          <span>一鍵複製</span>
+        </div>
+      </div>
+
+      <div class="drop-zone" id="drop-zone">
+        <span class="drop-icon">XLS</span>
+        <div>
+          <h2>拖曳 Excel 檔案到這裡</h2>
+          <p>或點擊下方按鈕選擇檔案<span>支援 .xlsx / .xls Personal Setup 匯出檔</span></p>
+          <button class="upload-btn" onclick="document.getElementById('file-input').click()">選擇檔案</button>
+        </div>
+      </div>
+    </section>
+
+    <div class="upload-hint">每次換新資料只要重新拖曳或選擇檔案即可</div>
+    <div id="upload-error"></div>
+    <input type="file" id="file-input" accept=".xlsx,.xls">
+  </main>
+</div>
+
+<!-- Dashboard -->
+<div id="dashboard">
+  <main class="dashboard-shell">
+    <header class="tool-header">
+      <div class="header-left">
+        <span class="eyebrow">Personal Setup</span>
+        <h1>完成統計</h1>
+        <p id="store-name">—</p>
+      </div>
+      <div class="header-right">
+        <span class="date-badge" id="date-range">—</span>
+        <button class="reload-btn" onclick="resetToUpload()">換新檔案</button>
+        <a class="nav-link" href="index.html">工作工具<br>Store Toolkit</a>
+      </div>
+    </header>
+
+    <div class="container">
+
+    <!-- Summary -->
+    <div class="summary-grid">
+      <div class="metric-card metric-total">
+        <div class="metric-label">總完成數</div>
+        <div class="metric-val" id="total-count">—</div>
+        <div class="metric-sub">所有裝置合計</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label"><span class="metric-dot" style="background:var(--iphone)"></span>iPhone</div>
+        <div class="metric-val" id="iphone-count">—</div>
+        <div class="metric-sub" id="iphone-pct">—</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label"><span class="metric-dot" style="background:var(--ipad)"></span>iPad</div>
+        <div class="metric-val" id="ipad-count">—</div>
+        <div class="metric-sub" id="ipad-pct">—</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label"><span class="metric-dot" style="background:var(--mac)"></span>Mac</div>
+        <div class="metric-val" id="mac-count">—</div>
+        <div class="metric-sub" id="mac-pct">—</div>
+      </div>
+      <div class="metric-card">
+        <div class="metric-label"><span class="metric-dot" style="background:var(--watch)"></span>Watch</div>
+        <div class="metric-val" id="watch-count">—</div>
+        <div class="metric-sub" id="watch-pct">—</div>
+      </div>
+    </div>
+
+    <!-- Chart panel -->
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-title">員工完成數 — 視覺化</span>
+        <div class="filter-row" id="chart-filters">
+          <button class="filter-btn active" onclick="setFilter('all',this,'chart')">全部</button>
+          <button class="filter-btn" onclick="setFilter('iPhone',this,'chart')">iPhone</button>
+          <button class="filter-btn" onclick="setFilter('iPad',this,'chart')">iPad</button>
+          <button class="filter-btn" onclick="setFilter('Mac',this,'chart')">Mac</button>
+          <button class="filter-btn" onclick="setFilter('Watch',this,'chart')">Apple Watch</button>
+        </div>
+      </div>
+      <div class="chart-wrap"><div class="chart-bars" id="chart-bars"></div></div>
+    </div>
+
+    <!-- Detail table panel -->
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-title">員工排行明細</span>
+        <div class="panel-actions">
+          <div class="filter-row" id="table-filters">
+            <button class="filter-btn active" onclick="setFilter('all',this,'table')">全部</button>
+            <button class="filter-btn" onclick="setFilter('iPhone',this,'table')">iPhone</button>
+            <button class="filter-btn" onclick="setFilter('iPad',this,'table')">iPad</button>
+            <button class="filter-btn" onclick="setFilter('Mac',this,'table')">Mac</button>
+            <button class="filter-btn" onclick="setFilter('Watch',this,'table')">Apple Watch</button>
+          </div>
+          <button class="copy-btn" id="copy-btn" onclick="copyData()">⎘ 一鍵複製</button>
+        </div>
+      </div>
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr>
+              <th style="width:44px">#</th>
+              <th>員工</th>
+              <th class="right" style="width:72px">完成數</th>
+              <th style="min-width:160px">佔比</th>
+              <th>裝置明細</th>
+            </tr>
+          </thead>
+          <tbody id="table-body"></tbody>
+        </table>
+      </div>
+    </div>
+
+    </div>
+  </main>
+</div>
+
+<div class="toast" id="toast">已複製，可直接貼入表格 ✓</div>
+
+<script>
+const DEVICE_KEYWORDS = { iPhone:['iphone'], iPad:['ipad'], Mac:['mac'], Watch:['watch'] };
+const barColors = { iPhone:'#2563c4', iPad:'#0d7a56', Mac:'#6038c4', Watch:'#b85c00' };
+
+let rawData = {};
+let chartFilter = 'all', tableFilter = 'all';
+
+// ── File ──
+const dropZone = document.getElementById('drop-zone');
+const fileInput = document.getElementById('file-input');
+dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+dropZone.addEventListener('drop', e => {
+  e.preventDefault(); dropZone.classList.remove('drag-over');
+  if (e.dataTransfer.files[0]) processFile(e.dataTransfer.files[0]);
+});
+fileInput.addEventListener('change', e => { if (e.target.files[0]) processFile(e.target.files[0]); });
+
+function processFile(file) {
+  document.getElementById('upload-error').innerHTML = '';
+  const reader = new FileReader();
+  reader.onload = e => {
+    try { parseWorkbook(XLSX.read(e.target.result, { type: 'array' }), file.name); }
+    catch { showError('無法讀取檔案，請確認是否為正確的 .xlsx 格式。'); }
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+function detectDevice(name) {
+  const n = name.toLowerCase();
+  for (const [dev, keys] of Object.entries(DEVICE_KEYWORDS))
+    if (keys.some(k => n.includes(k))) return dev;
+  return null;
+}
+
+function parseWorkbook(wb, filename) {
+  const result = { iPhone:{}, iPad:{}, Mac:{}, Watch:{} };
+  let storeName = '', minDate = Infinity, maxDate = -Infinity;
+
+  wb.SheetNames.forEach(sn => {
+    const dev = detectDevice(sn);
+    if (!dev) return;
+    const rows = XLSX.utils.sheet_to_json(wb.Sheets[sn], { defval: '' });
+    rows.forEach(row => {
+      const sc = Object.keys(row).find(k => k.toLowerCase().includes('staff') && k.toLowerCase().includes('name'))
+               || Object.keys(row).find(k => k.toLowerCase().includes('staff'));
+      const name = sc ? String(row[sc]).trim() : '';
+      if (!name || name === '(空白)' || name === 'Staff Name') return;
+      result[dev][name] = (result[dev][name] || 0) + 1;
+      if (!storeName) {
+        const pc = Object.keys(row).find(k => k.toLowerCase().includes('pos'));
+        if (pc && row[pc]) storeName = String(row[pc]).trim();
+      }
+      const dc = Object.keys(row).find(k => k.toLowerCase().includes('start time') || k === 'Personal Setup Start Time');
+      if (dc && typeof row[dc] === 'number') { minDate = Math.min(minDate, row[dc]); maxDate = Math.max(maxDate, row[dc]); }
+    });
+  });
+
+  const total = Object.values(result).reduce((s,d) => s + Object.values(d).reduce((a,b)=>a+b,0), 0);
+  if (total === 0) { showError('找不到有效資料。請確認工作表名稱含 iPhone / iPad / Mac / Watch，且有 Staff Name 欄位。'); return; }
+
+  rawData = result;
+
+  let dateStr = '—';
+  if (minDate !== Infinity) {
+    const fmt = n => { const d = XLSX.SSF.parse_date_code(Math.floor(n)); return `${d.y}/${String(d.m).padStart(2,'0')}/${String(d.d).padStart(2,'0')}`; };
+    dateStr = fmt(minDate) + (minDate !== maxDate ? ' — ' + fmt(maxDate) : '');
+  }
+  document.getElementById('store-name').textContent = storeName || filename;
+  document.getElementById('date-range').textContent = dateStr;
+
+  chartFilter = 'all'; tableFilter = 'all';
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.toggle('active', b.textContent.trim() === '全部'));
+  showDashboard();
+}
+
+function showError(msg) { document.getElementById('upload-error').innerHTML = `<div class="error-msg">${msg}</div>`; }
+
+function showDashboard() {
+  document.getElementById('upload-screen').style.display = 'none';
+  document.getElementById('dashboard').style.display = 'block';
+  renderSummary(); renderChart(); renderTable();
+}
+
+function resetToUpload() {
+  document.getElementById('dashboard').style.display = 'none';
+  document.getElementById('upload-screen').style.display = 'flex';
+  document.getElementById('file-input').value = '';
+  document.getElementById('upload-error').innerHTML = '';
+  rawData = {};
+}
+
+// ── Data ──
+function buildData(filter) {
+  const staff = {};
+  const devices = filter === 'all' ? ['iPhone','iPad','Mac','Watch'] : [filter];
+  devices.forEach(dev => {
+    Object.entries(rawData[dev] || {}).forEach(([name, cnt]) => {
+      if (!staff[name]) staff[name] = { total: 0, breakdown: {} };
+      staff[name].total += cnt;
+      staff[name].breakdown[dev] = (staff[name].breakdown[dev] || 0) + cnt;
+    });
+  });
+  return Object.entries(staff).sort((a,b) => b[1].total - a[1].total);
+}
+
+function renderSummary() {
+  let t = { iPhone:0, iPad:0, Mac:0, Watch:0 };
+  ['iPhone','iPad','Mac','Watch'].forEach(d => Object.values(rawData[d]||{}).forEach(v => t[d]+=v));
+  const g = Object.values(t).reduce((a,b)=>a+b,0);
+  document.getElementById('total-count').textContent = g;
+  ['iPhone','iPad','Mac','Watch'].forEach(d => {
+    document.getElementById(`${d.toLowerCase()}-count`).textContent = t[d];
+    document.getElementById(`${d.toLowerCase()}-pct`).textContent = g > 0 ? Math.round(t[d]/g*100)+'%' : '0%';
+  });
+}
+
+function setFilter(f, btn, target) {
+  const gid = target === 'chart' ? 'chart-filters' : 'table-filters';
+  document.getElementById(gid).querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  if (target === 'chart') { chartFilter = f; renderChart(); }
+  else { tableFilter = f; renderTable(); }
+}
+
+function renderChart() {
+  const data = buildData(chartFilter);
+  const maxVal = data[0] ? data[0][1].total : 1;
+  const color = chartFilter === 'all' ? '#2563c4' : barColors[chartFilter];
+  const container = document.getElementById('chart-bars');
+  container.innerHTML = '';
+  data.forEach(([name, info]) => {
+    const w = Math.round(info.total / maxVal * 100);
+    const row = document.createElement('div');
+    row.className = 'chart-row';
+    row.innerHTML = `
+      <div class="chart-name">${name}</div>
+      <div class="chart-bar-bg">
+        <div class="chart-bar-fill" style="width:${w}%;background:${color}">
+          ${info.total >= 3 ? `<span class="chart-val">${info.total}</span>` : ''}
+        </div>
+      </div>
+      <span class="chart-val-out">${info.total < 3 ? info.total : ''}</span>`;
+    container.appendChild(row);
+  });
+}
+
+function renderTable() {
+  const data = buildData(tableFilter);
+  const grand = data.reduce((s,[,v])=>s+v.total,0);
+  const maxVal = data[0] ? data[0][1].total : 1;
+  const color = tableFilter === 'all' ? '#2563c4' : barColors[tableFilter];
+  const tbody = document.getElementById('table-body');
+  tbody.innerHTML = '';
+
+  data.forEach(([name, info], i) => {
+    const pct = grand > 0 ? Math.round(info.total/grand*100) : 0;
+    const barW = Math.round(info.total/maxVal*100);
+    const badges = Object.entries(info.breakdown)
+      .map(([dev,cnt]) => `<span class="badge badge-${dev.toLowerCase()}">${dev} ${cnt}</span>`).join('');
+    const rankSpan = i === 0 ? `<span class="rank-num rank-1">01</span>` : `<span class="rank-num">${String(i+1).padStart(2,'0')}</span>`;
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${rankSpan}</td>
+      <td class="staff-name">${name}</td>
+      <td class="right">${info.total}</td>
+      <td>
+        <div class="bar-wrap">
+          <div class="bar-bg"><div class="bar-fill" style="width:${barW}%;background:${color}"></div></div>
+          <span class="pct-label">${pct}%</span>
+        </div>
+      </td>
+      <td><div class="badges">${badges}</div></td>`;
+    tbody.appendChild(tr);
+  });
+
+  const tr = document.createElement('tr');
+  tr.className = 'total-row';
+  tr.innerHTML = `<td></td><td><span class="total-label">總計</span></td><td class="right"><span class="total-val">${grand}</span></td><td></td><td></td>`;
+  tbody.appendChild(tr);
+}
+
+// ── Copy — only name + count, tab-separated, for pasting into spreadsheet ──
+function copyData() {
+  const data = buildData(tableFilter);
+  // Tab-separated: name \t count, one row per line — pastes perfectly into Excel / Numbers / Sheets
+  const lines = data.map(([name, info]) => `${name}\t${info.total}`);
+  const text = lines.join('\n');
+
+  navigator.clipboard.writeText(text).then(() => {
+    const btn = document.getElementById('copy-btn');
+    btn.classList.add('copied');
+    btn.textContent = '✓ 已複製';
+    showToast();
+    setTimeout(() => { btn.classList.remove('copied'); btn.innerHTML = '⎘ 一鍵複製'; }, 2200);
+  }).catch(() => showToast('複製失敗，請手動選取'));
+}
+
+function showToast(msg) {
+  const toast = document.getElementById('toast');
+  toast.textContent = msg || '已複製，可直接貼入表格 ✓';
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 2400);
+}
+</script>
+</body>
+</html>
