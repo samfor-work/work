@@ -1,0 +1,627 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>2026 5月行銷活動工作台</title>
+  <style>
+    :root {
+      --ink: #17212b;
+      --muted: #617083;
+      --quiet: #8b96a5;
+      --line: #d8e0ea;
+      --line-strong: #a9b8c8;
+      --panel: #ffffff;
+      --surface: #ffffff;
+      --bg: #f5f7fa;
+      --accent: #1f5f99;
+      --accent-soft: #e7f1fb;
+      --green: #18745b;
+      --green-soft: #dff3ea;
+      --amber: #b65f00;
+      --amber-soft: #ffe7c7;
+      --red: #b42318;
+      --red-soft: #fde4e2;
+      --grid: rgba(31, 95, 153, .05);
+      --shadow: 0 18px 48px rgba(24, 39, 56, .10);
+      --radius: 8px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        linear-gradient(90deg, var(--grid) 1px, transparent 1px),
+        linear-gradient(0deg, rgba(31, 95, 153, .04) 1px, transparent 1px),
+        var(--bg);
+      background-size: 34px 34px;
+      color: var(--ink);
+      font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+      letter-spacing: 0;
+    }
+
+    .home-link {
+      position: fixed;
+      top: 14px;
+      left: 14px;
+      z-index: 20;
+      display: inline-flex;
+      align-items: center;
+      min-height: 34px;
+      padding: 7px 11px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: var(--ink);
+      background: rgba(255, 255, 255, .92);
+      text-decoration: none;
+      font-size: 12px;
+      font-weight: 800;
+      box-shadow: 0 8px 24px rgba(24, 39, 56, .10);
+    }
+
+    .home-link:hover {
+      border-color: var(--ink);
+    }
+
+    .shell {
+      width: min(1280px, calc(100vw - 32px));
+      margin: 0 auto;
+      padding: 72px 0 44px;
+    }
+
+    .topbar {
+      display: grid;
+      grid-template-columns: minmax(280px, 1fr) auto;
+      align-items: end;
+      gap: 20px;
+      padding-bottom: 16px;
+      border-bottom: 2px solid var(--ink);
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(30px, 4vw, 48px);
+      line-height: 1;
+      font-weight: 900;
+    }
+
+    .stamp {
+      min-width: 150px;
+      padding: 10px 12px;
+      background: var(--panel);
+      border: 2px solid var(--ink);
+      box-shadow: 5px 5px 0 var(--ink);
+      text-align: center;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      min-height: 26px;
+      padding: 4px 9px;
+      border: 1px solid var(--line-strong);
+      border-radius: 999px;
+      background: rgba(255,255,255,.7);
+      white-space: nowrap;
+    }
+
+    .toolbar {
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      display: grid;
+      grid-template-columns: minmax(260px, 1fr) auto auto;
+      gap: 10px;
+      align-items: center;
+      margin: 16px 0 18px;
+      padding: 10px;
+      background: rgba(245,247,250,.92);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 8px 22px rgba(27,30,33,.05);
+    }
+
+    .search {
+      display: grid;
+      grid-template-columns: 28px 1fr;
+      align-items: center;
+      min-height: 42px;
+      padding: 0 12px;
+      background: var(--surface);
+      border: 1px solid var(--line-strong);
+      border-radius: var(--radius);
+    }
+
+    .search span { color: var(--muted); font-weight: 800; }
+    input[type="search"] {
+      width: 100%;
+      border: 0;
+      outline: 0;
+      background: transparent;
+      color: var(--ink);
+      font: inherit;
+      font-size: 15px;
+    }
+
+    .segments {
+      display: flex;
+      gap: 4px;
+      padding: 4px;
+      background: #eef3f8;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+    }
+
+    button {
+      min-height: 34px;
+      border: 1px solid transparent;
+      border-radius: 6px;
+      background: transparent;
+      color: var(--ink);
+      font: inherit;
+      font-size: 13px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    button.segment {
+      padding: 0 10px;
+      white-space: nowrap;
+    }
+
+    button.segment.active {
+      background: var(--surface);
+      border-color: var(--line-strong);
+      box-shadow: 0 4px 12px rgba(27,30,33,.06);
+    }
+
+    .ghost-btn {
+      padding: 0 12px;
+      background: var(--ink);
+      color: white;
+      border-color: var(--ink);
+    }
+
+    .overview {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+      margin-bottom: 18px;
+    }
+
+    .metric {
+      min-height: 84px;
+      padding: 14px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+    }
+
+    .metric strong {
+      display: block;
+      font-size: 26px;
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+
+    .metric span {
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .group-nav {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding: 2px 0 14px;
+      scrollbar-width: thin;
+    }
+
+    .group-chip {
+      flex: 0 0 auto;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      min-height: 34px;
+      padding: 0 10px;
+      color: var(--ink);
+      text-decoration: none;
+      background: rgba(255,255,255,.78);
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .group-chip b {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 22px;
+      height: 22px;
+      padding: 0 6px;
+      color: white;
+      background: var(--chip-color, var(--ink));
+      border-radius: 999px;
+      font-size: 12px;
+    }
+
+    .group {
+      margin-top: 22px;
+      border-top: 4px solid var(--group-color);
+      scroll-margin-top: 88px;
+    }
+
+    .group-head {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 12px;
+      align-items: end;
+      padding: 12px 0 10px;
+      border-bottom: 1px solid var(--line-strong);
+    }
+
+    .group-title {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+    }
+
+    .group-title h2 {
+      margin: 0;
+      font-size: 22px;
+      line-height: 1.2;
+      font-weight: 900;
+    }
+
+    .group-title span {
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 800;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      padding-top: 10px;
+    }
+
+    .activity-card {
+      display: grid;
+      grid-template-rows: auto auto 1fr auto;
+      min-height: 232px;
+      padding: 13px;
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-left: 5px solid var(--group-color);
+      border-radius: var(--radius);
+      box-shadow: 0 10px 28px rgba(27,30,33,.06);
+    }
+
+    .card-head {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      align-items: start;
+      margin-bottom: 8px;
+    }
+
+    .card-title {
+      margin: 0;
+      font-size: 16px;
+      line-height: 1.35;
+      font-weight: 900;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 24px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      border: 1px solid var(--line-strong);
+      background: #f7fafc;
+      color: var(--ink);
+      font-size: 12px;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .badge.changed {
+      color: var(--red);
+      border-color: #f0aaa4;
+      background: #fff3c9;
+    }
+
+    .badge.long { color: var(--green); background: var(--green-soft); border-color: #a7d5c4; }
+    .badge.stock { color: var(--amber); background: var(--amber-soft); border-color: #ecc086; }
+
+    .subline {
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 800;
+      line-height: 1.35;
+      min-height: 18px;
+      margin-bottom: 9px;
+    }
+
+    .content {
+      margin: 0;
+      white-space: pre-line;
+      font-size: 13px;
+      line-height: 1.52;
+    }
+
+    .fields {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 7px;
+      margin-top: 12px;
+      padding-top: 10px;
+      border-top: 1px solid var(--line);
+    }
+
+    .field {
+      min-width: 0;
+      padding: 8px;
+      background: #f7fafc;
+      border: 1px solid #e8edf2;
+      border-radius: 6px;
+    }
+
+    .field.wide { grid-column: 1 / -1; }
+    .label {
+      display: block;
+      margin-bottom: 4px;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 900;
+    }
+    .value {
+      display: block;
+      overflow-wrap: anywhere;
+      white-space: pre-line;
+      font-size: 12px;
+      line-height: 1.45;
+      font-weight: 700;
+    }
+
+    .empty-state {
+      margin: 26px 0;
+      padding: 24px;
+      background: var(--surface);
+      border: 1px dashed var(--line-strong);
+      border-radius: var(--radius);
+      text-align: center;
+      color: var(--muted);
+      font-weight: 800;
+    }
+
+    .hidden { display: none !important; }
+
+    @media (max-width: 1120px) {
+      .cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .overview { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .toolbar { grid-template-columns: 1fr; }
+      .segments { overflow-x: auto; }
+    }
+
+    @media (max-width: 720px) {
+      .shell {
+        width: min(100% - 20px, 1280px);
+        padding-top: 62px;
+      }
+      .topbar { grid-template-columns: 1fr; }
+      h1 { font-size: 24px; }
+      .overview { grid-template-columns: 1fr; }
+      .cards { grid-template-columns: 1fr; }
+      .fields { grid-template-columns: 1fr; }
+      .toolbar {
+        top: 0;
+        margin-left: -2px;
+        margin-right: -2px;
+      }
+    }
+
+    @media print {
+      body { background: white; }
+      .toolbar, .group-nav, .ghost-btn { display: none !important; }
+      .shell { width: 100%; padding: 0; }
+      .cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .activity-card { break-inside: avoid; box-shadow: none; }
+    }
+  </style>
+</head>
+<body>
+  <a class="home-link" href="index.html">← 回工具首頁</a>
+  <main class="shell">
+    <header class="topbar">
+      <div>
+        <h1>2026 5月行銷活動工作台</h1>
+        <div class="meta">
+          <span class="pill">來源：2026.5月行銷活動_整理版.xlsx</span>
+          <span class="pill">整理：2026/05/12 01:07</span>
+          <span class="pill">活動區塊：<b id="totalCount">120</b></span>
+        </div>
+      </div>
+      <div class="stamp">Marketing</div>
+    </header>
+
+    <section class="toolbar" aria-label="filters">
+      <label class="search">
+        <span>⌕</span>
+        <input id="searchInput" type="search" placeholder="搜尋活動、主機、存代、門市、日期">
+      </label>
+      <div class="segments" id="statusFilters">
+        <button class="segment active" type="button" data-status="all">全部</button>
+        <button class="segment" type="button" data-status="changed">異動重點</button>
+        <button class="segment" type="button" data-status="long">長期</button>
+        <button class="segment" type="button" data-status="stock">售完為止</button>
+      </div>
+      <div class="segments" id="densityFilters">
+        <button class="segment active" type="button" data-density="normal">摘要</button>
+        <button class="segment" type="button" data-density="compact">精簡</button>
+      </div>
+    </section>
+
+    <section class="overview" id="overview"></section>
+    <nav class="group-nav" id="groupNav" aria-label="groups"></nav>
+    <div id="groups"></div>
+    <div class="empty-state hidden" id="emptyState">沒有符合條件的活動</div>
+  </main>
+
+  <script>
+    const ACTIVITIES = [{"活動序號": "1", "原始列範圍": "4-10", "大類": "Momax 兩件組優惠", "項目": "Momax 兩件組優惠\n購買兩顆享促銷優惠1,499元（活動只到 5/10）", "活動/子項": "Momax 兩件組優惠\n購買兩顆享促銷優惠1,499元（活動只到 5/10）", "活動內容": "Momax 兩件組優惠\n購買兩顆享促銷優惠1,499元（活動只到 5/10）", "存代數": "10", "存貨代碼清單": "45300670、45300671、45300672、45300673、45300829、45300830、45300831、45300751、45300752、45300753", "適用範圍": "", "適用門市": "全門市", "開始日期": "2026/03/22", "結束日期": "2026/05/10", "標示": "紅字+黃底", "group": "accessory", "groupTitle": "週邊配件與套組", "statusKind": "changed", "statusLabel": "異動重點", "summary": "• Momax 兩件組優惠\n• 購買兩顆享促銷優惠1,499元（活動只到 5/10）", "summaryCompact": "• Momax 兩件組優惠\n• 購買兩顆享促銷優惠1,499元（活動只到 5/10）", "codesDisplay": "45300670、45300671、45300672、45300673、45300829、45300830、45300831、45300751\n另有 2 個存代", "codesCompact": "45300670、45300671、45300672、45300673\n另有 6 個存代", "scopeDisplay": "未填", "storesDisplay": "全門市"}, {"活動序號": "2", "原始列範圍": "11-12", "大類": "買 PQI 三合一磁吸無線充電座($1,790)送 PQI 無線立充($990)", "項目": "買 PQI 三合一磁吸無線充電座($1,790)送 PQI 無線立充($990)", "活動/子項": "買 PQI 三合一磁吸無線充電座($1,790)送 PQI 無線立充($990)", "活動內容": "買 PQI 三合一磁吸無線充電座($1,790)送 PQI 無線立充($990)", "存代數": "2", "存貨代碼清單": "27700648、27700562", "適用範圍": "", "適用門市": "全門市", "開始日期": "2026/03/22", "結束日期": "2026/05/31", "標示": "紅字", "group": "accessory", "groupTitle": "週邊配件與套組", "statusKind": "normal", "statusLabel": "期間活動", "summary": "買 PQI 三合一磁吸無線充電座($1,790)送 PQI 無線立充($990)", "summaryCompact": "買 PQI 三合一磁吸無線充電座($1,790)送 PQI 無線立充($990)", "codesDisplay": "27700648、27700562", "codesCompact": "27700648、27700562", "scopeDisplay": "未填", "storesDisplay": "全門市"}, {"活動序號": "3", "原始列範圍": "13-20", "大類": "eSIM旅行組活動", "項目": "eSIM旅行組活動", "活動/子項": "eSIM旅行組活動", "活動內容": "日本 eSIM＋旅行組套餐＋贈 UAG 收納包\n五日 活動價 1,088\n日本 eSIM＋旅行組套餐＋贈 UAG 收納包\n七日 活動價 1,248\n韓國 eSIM＋旅行組套餐＋贈 UAG 收納包＋韓國轉接頭\n五日 活動價 1,088\n韓國 eSIM＋旅行組套餐＋贈 UAG 收納包＋韓國轉接頭\n七日 活動價 1,248", "存代數": "7", "存貨代碼清單": "99903363、99903365、99902905、99903213、27700639、54600005、35300070", "適用範圍": "", "適用門市": "", "開始日期": "即日起", "結束日期": "2026/05/31", "標示": "紅字+黃底", "group": "accessory", "groupTitle": "週邊配件與套組", "statusKind": "changed", "statusLabel": "異動重點", "summary": "• 日本 eSIM+旅行組套餐+贈 UAG 收納包\n• 五日 活動價 1,088\n• 七日 活動價 1,248", "summaryCompact": "• 日本 eSIM+旅行組套餐+贈 UAG 收納包\n• 五日 活動價 1,088", "codesDisplay": "99903363、99903365、99902905、99903213、27700639、54600005、35300070", "codesCompact": "99903363、99903365、99902905、99903213\n另有 3 個存代", "scopeDisplay": "未填", "storesDisplay": "未填"}, {"活動序號": "4", "原始列範圍": "21-23", "大類": "AirPods Max EOL 款", "項目": "AirPods Max EOL 款", "活動/子項": "AirPods Max EOL 款", "活動內容": "原價 17,990，現折 1,000 元（POS 價格採購已改）", "存代數": "5", "存貨代碼清單": "07310970、07310971、07310972、07310973、07310974", "適用範圍": "", "適用門市": "全門市", "開始日期": "2026/02/01", "結束日期": "賣完為止", "標示": "紅字", "group": "airpods", "groupTitle": "AirPods", "statusKind": "stock", "statusLabel": "售完為止", "summary": "原價 17,990，現折 1,000 元（POS 價格採購已改）", "summaryCompact": "原價 17,990，現折 1,000 元（POS 價格採購已改）", "codesDisplay": "07310970、07310971、07310972、07310973、07310974", "codesCompact": "07310970、07310971、07310972、07310973\n另有 1 個存代", "scopeDisplay": "未填", "storesDisplay": "全門市"}, {"活動序號": "5", "原始列範圍": "24-25", "大類": "BON TON TOYS 吊飾娃娃", "項目": "BON TON TOYS 吊飾娃娃", "活動/子項": "BON TON TOYS 吊飾娃娃", "活動內容": "指定主機加購：BON TON TOYS 吊飾娃哇享9 折優惠\n（限定主機：Mac/iPhone/iPad/Watch/AirPods 全系列）\n（限定⾨市：美麗華、夢時代、新竹遠百、阿波羅、中壢大江、新竹中正、新西門、桃園台茂、大葉高島屋、苗栗尚順、桃園統領、板橋遠百、新莊宏匯、竹北遠百、台中麗寶、岡山秀泰、新店裕隆城）", "存代數": "9", "存貨代碼清單": "54200001、54200002、54200003、54200004、54200005、54200006、54200007、54200008、54200009", "適用範圍": "", "適用門市": "（限定⾨市：美麗華、夢時代、新竹遠百、阿波羅、中壢大江、新竹中正、新西門、桃園台茂、大葉高島屋、苗栗尚順、桃園統領、板橋遠百、新莊宏匯、竹北遠百、台中麗寶、岡山秀泰、新店裕隆城）", "開始日期": "2025/10/01", "結束日期": "2026/05/31", "標示": "", "group": "accessory", "groupTitle": "週邊配件與套組", "statusKind": "normal", "statusLabel": "期間活動", "summary": "指定主機加購：BON TON TOYS 吊飾娃哇享9 折優惠", "summaryCompact": "指定主機加購：BON TON TOYS 吊飾娃哇享9 折優惠", "codesDisplay": "54200001、54200002、54200003、54200004、54200005、54200006、54200007、54200008\n另有 1 個存代", "codesCompact": "54200001、54200002、54200003、54200004\n另有 5 個存代", "scopeDisplay": "未填", "storesDisplay": "美麗華、夢時代、新竹遠百、阿波羅、中壢大江 等 17 間"}, {"活動序號": "6", "原始列範圍": "26-28", "大類": "原廠周邊", "項目": "原廠周邊", "活動/子項": "iPhone 指定機型原廠殼優惠", "活動內容": "全新原廠手機殼（透明/矽膠/皮革）\niPhone 12 mini/SE 優惠價$390\niPhone 14 優惠價 $490\niPhone 15 優惠價 $590\niPhone 16 優惠價 $690\n（最高原始價格 $1,490）", "存代數": "36", "存貨代碼清單": "07307104、07307105、07307106、07307110、07308360、07308361、07308904、07308906、07308907、07308908、07308909、07308910、07308911、07308912、07308934、07308935、07308936、07308939、07308941、07308942、07308957、07308960、07309784、07309785、07309788、07309789、07309790、07309792、07309794、07309795、07309811、07309825、07309826、07309828、07309829、07309836", "適用範圍": "", "適用門市": "全門市", "開始日期": "", "結束日期": "售完為止", "標示": "", "group": "iphone", "groupTitle": "iPhone 主機", "statusKind": "stock", "statusLabel": "售完為止", "summary": "• iPhone 12 mini/SE 優惠價$390\n• iPhone 14 優惠價 $490\n• iPhone 15 優惠價 $590", "summaryCompact": "• iPhone 12 mini/SE 優惠價$390\n• iPhone 14 優惠價 $490", "codesDisplay": "07307104、07307105、07307106、07307110、07308360、07308361、07308904、07308906\n另有 28 個存代", "codesCompact": "07307104、07307105、07307106、07307110\n另有 32 個存代", "scopeDisplay": "未填", "storesDisplay": "全門市"}, {"活動序號": "7", "原始列範圍": "29-30", "大類": "iPhone Air", "項目": "iPhone Air\n單機優惠、保固優惠", "活動/子項": "iPhone Air\n單機優惠、保固優惠", "活動內容": "iPhone Air 512g/1TB 款式：現折 2,000 元＋\n再送 PG 保護殼＋PQI 保護貼＋PQI 鏡頭貼（總價值 4,850）\n加購保固再送 PQI 23w+18w（價值 2,780）\niPhone Air 256g 直贈 2,000 副廠配件購物金（需當下使用）\n加購保固再送 PQI 23w+18w（價值 2,780）", "存代數": "9", "存貨代碼清單": "51600007、05901976、46200234、46200225、46200226、46200227、46200228、27700648、27700562", "適用範圍": "", "適用門市": "全門市", "開始日期": "2026/04/01", "結束日期": "2026/05/31", "標示": "紅字+黃底", "group": "iphone", "groupTitle": "iPhone 主機", "statusKind": "changed", "statusLabel": "異動重點", "summary": "• iPhone Air 512g/1TB 款式：現折 2,000 元+\n• 再送 PG 保護殼+PQI 保護貼+PQI 鏡頭貼（總價值 4,850）\n• 加購保固再送 PQI 23w+18w（價值 2,780）", "summaryCompact": "• iPhone Air 512g/1TB 款式：現折 2,000 元+\n• 再送 PG 保護殼+PQI 保護貼+PQI 鏡頭貼（總價值 4,850）", "codesDisplay": "51600007、05901976、46200234、46200225、46200226、46200227、46200228、27700648\n另有 1 個存代", "codesCompact": "51600007、05901976、46200234、46200225\n另有 5 個存代", "scopeDisplay": "未填", "storesDisplay": "全門市"}, {"活動序號": "8", "原始列範圍": "31-32", "大類": "iPhone 17e", "項目": "iPhone 17e\n保固活動", "活動/子項": "iPhone 17e\n保固活動", "活動內容": "加購SA Care2.0(二年期)，好禮二選一：\n1、送PQI iPhone 17e 保貼＋PQI iPhone 17e 鏡頭貼（價值 1,480）\n2、PQI 45w 充電頭＋PQI iPHone 17e 保護貼（價值 1,780）\n加購SA Care2.0(一年期)，直贈 PQI 45w 充電頭", "存代數": "11", "存貨代碼清單": "05901971、05901982、05901983、05901984、05901985、05901986、05901987、46200241、46200242、46200243、46200244", "適用範圍": "", "適用門市": "全門市", "開始日期": "2026/04/01", "結束日期": "2026/05/31", "標示": "紅字", "group": "iphone", "groupTitle": "iPhone 主機", "statusKind": "normal", "statusLabel": "期間活動", "summary": "• 加購SA Care2.0(二年期)，好禮二選一\n• 1、送PQI iPhone 17e 保貼+PQI iPhone 17e 鏡頭貼（價值 1,480）\n• 加購SA Care2.0(一年期)，直贈 PQI 45w 充電頭", "summaryCompact": "• 加購SA Care2.0(二年期)，好禮二選一\n• 1、送PQI iPhone 17e 保貼+PQI iPhone 17e 鏡頭貼（價值 1,480）", "codesDisplay": "05901971、05901982、05901983、05901984、05901985、05901986、05901987、46200241\n另有 3 個存代", "codesCompact": "05901971、05901982、05901983、05901984\n另有 7 個存代", "scopeDisplay": "未填", "storesDisplay": "全門市"}, {"活動序號": "9", "原始列範圍": "33-42", "大類": "iPhone", "項目": "iPhone", "活動/子項": "保固活動", "活動內容": "iPhone Air/17/17 Pro/17 Pro Max\n加購 SA Care (二年期)/AC+\n方案一、PQI WCC2302 Qi2 23W三合一無線充電座\n＋蔡司清潔噴霧組\n＋組合套餐（A、B、C、D 四選一）\n方案二、ARpedia繪本組合二選一\nＡ. ARpedia Into the Curiosity 繪本組(含Ｍirror支架)\nＢ. ARpedia AR Science Lab 繪本組(含Ｍirror支架)\n------------------------------------------------------", "存代數": "8", "存貨代碼清單": "10600474、24402395、99902983、99902985、26500234、26500235、26500236、26500237", "適用範圍": "", "適用門市": "全門市", "開始日期": "2025/09/19", "結束日期": "2026/05/31", "標示": "紅字", "group": "iphone", "groupTitle": "iPhone 主機", "statusKind": "normal", "statusLabel": "期間活動", "summary": "• 加購 SA Care (二年期)/AC+\n• 方案一、PQI WCC2302 Qi2 23W三合一無線充電座\n• +組合套餐（A、B、C、D 四選一）", "summaryCompact": "• 加購 SA Care (二年期)/AC+\n• 方案一、PQI WCC2302 Qi2 23W三合一無線充電座", "codesDisplay": "10600474、24402395、99902983、99902985、26500234、26500235、26500236、26500237", "codesCompact": "10600474、24402395、99902983、99902985\n另有 4 個存代", "scopeDisplay": "未填", "storesDisplay": "全門市"}, {"活動序號": "10", "原始列範圍": "43-50", "大類": "iPhone", "項目": "iPhone", "活動/子項": "保固活動", "活動內容": "A 組合套餐（四選一）\nPureGear 磁吸透明殼 + PQI 玻璃保貼 (價值 $2,460)\n+$300 升級 Simmpo 指定款抗藍光保貼(價值$1,580)\n+$300 升級普格爾冰鑽支架磁吸殼or升級 JTL 指定款磁吸支架殼（價值$1,180）", "存代數": "0", "存貨代碼清單": "", "適用範圍": "", "適用門市": "全門市", "開始日期": "2025/09/19", "結束日期": "2026/05/31", "標示": "紅字", "group": "iphone", "groupTitle": "iPhone 主機", "statusKind": "normal", "statusLabel": "期間活動", "summary": "A 組合套餐（四選一）", "summaryCompact": "A 組合套餐（四選一）", "codesDisplay": "未填", "codesCompact": "未填", "scopeDisplay": "未填", "storesDisplay": "全門市"}, {"活動序號": "11", "原始列範圍": "51-56", "大類": "iPhone", "項目": "iPhone", "活動/子項": "保固活動", "活動內容": "B 組合套餐（四選一）\nPQI 玻璃保貼 + PQI 鏡頭貼 (價值 $1,970)\n+$300 升級 Simmpo 指定款抗藍光保貼(價值$1,580)", "存代數": "0", "存貨代碼清單": "", "適用範圍": "", "適用門市": "全門市", "開始日期": "2025/09/19", "結束日期": "2026/05/31", "標示": "", "group": "iphone", "groupTitle": "iPhone 主機", "statusKind": "normal", "statusLabel": "期間活動", "summary": "B 組合套餐（四選一）", "summaryCompact": "B 組合套餐（四選一）", "codesDisplay": "未填", "codesCompact": "未填", "scopeDisplay": "未填", "storesDisplay": "全門市"}, {"活動序號": "12", "原始列範圍": "57-63", "大類": "iPhone", "項目": "iPhone", "活動/子項": "保固活動", "活動內容": "C 組合套餐（四選一）\nPureGear 磁吸透明殼 + PQI 鏡頭貼 (價值 $1,870)\n+$300 升級普格爾冰鑽支架磁吸殼or升級 JTL 指定款磁吸支架殼（價值$1,180）", "存代數": "0", "存貨代碼清單": "", "適用範圍": "", "適用門市": "全門市", "開始日期": "2025/09/19", "結束日期": "2026/05/31", "標示": "", "group": "iphone", "groupTitle": "iPhone 主機", "statusKind": "normal", "statusLabel": "期間活動", "summary": "C 組合套餐（四選一）", "summaryCompact": "C 組合套餐（四選一）", "codesDisplay": "未填", "codesCompact": "未填", "scopeDisplay": "未填", "storesDisplay": "全門市"}, {"活動序號": "13", "原始列範圍": "64", "大類": "iPhone", "項目": "iPhone", "活動/子項": "保固活動", "活動內容": "D 組合套餐（四選一）\nPQI 45W 充電器+PQI USB3.2 高速傳輸線", "存代數": "9", "存貨代碼清單": "05901971、05901982、05901983、05901984、05901985、05901986、05901987、05901979、27700483", "適用範圍": "", "適用門市": "全門市", "開始日期": "2025/09/19", "結束日期": "2026/05/31", "標示": "", "group": "iphone", "groupTitle": "iPhone 主機", "statusKind": "normal", "statusLabel": "期間活動", "summary": "D 組合套餐（四選一）", "summaryCompact": "D 組合套餐（四選一）", "codesDisplay": "05901971、05901982、05901983、05901984、05901985、05901986、05901987、05901979\n另有 1 個存代", "codesCompact": "05901971、05901982、05901983、05901984\n另有 5 個存代", "scopeDisplay": "未填", "storesDisplay": "全門市"}, {"活動序號": "14", "原始列範圍": "65-71", "大類": "iPhone", "項目": "iPhone", "活動/子項": "超值加購", "活動內容": "A 組合套餐 (加購價$2,280)\nPureGear 磁吸透明殼 + PQI 玻璃保貼\n＋蔡司清潔噴霧組\n+$300 升級 Simmpo 指定款抗藍光保貼\n+$300 升級普格爾冰鑽支架磁吸殼or升級 JTL 指定款磁吸支架殼（價值$1,180）", "存代數": "1", "存貨代碼清單": "24402395", "適用範圍": "", "適用門市": "全門市", "開始日期": "2025/09/19", "結束日期": "~", "標示": "紅字", "group": "iphone", "groupTitle": "iPhone 主機", "statusKind": "long", "statusLabel": "長期", "summary": "A 組合套餐 (加購價$2,280)", "summaryCompact": "A 組合套餐 (加購價$2,280)", "codesDisplay": "24402395", "codesCompact": "24402395", "scopeDisplay": "未填", "storesDisplay": "全門市"}, {"活動序號": "15", "原始列範圍": "72-78", "大類": "iPhone", "項目": "iPhone", "活動/子項": "超值加購", "活動內容": "B 組合套餐 (加購價$1,680)\nPQI 玻璃保貼 + PQI 鏡頭貼\n＋蔡司清潔噴霧組\n+$300 升級 Simmpo 指定款抗藍光保貼(價值$1,580)", "存代數": "1", "存貨代碼清單": "24402395", "適用範圍": "", "適用門市": "全門市", "開始日期": "2025/09/19", "結束日期": "~", "標示": "", "group": "iphone", "groupTitle": "iPhone 主機", "statusKind": "long", "statusLabel": "長期", "summary": "B 組合套餐 (加購價$1,680)", "summaryCompact": "B 組合套餐 (加購價$1,680)", "codesDisplay": "24402395", "codesCompact": "24402395", "scopeDisplay": "未填", "storesDisplay": "全門市"}, {"活動序號": "16", "原始列範圍": "79-86", "大類": "iPhone", "項目": "iPhone", "活動/子項": "超值加購", "活動內容": "C 組合套餐 (加購價$1,580)\nPureGear 磁吸透明殼 + PQI 鏡頭貼\n＋蔡司清潔噴霧組\n+$300 升級普格爾冰鑽支架磁吸殼or升級 JTL 指定款磁吸支架殼（價值$1,180）", "存代數": "1", "存貨代碼清單": "24402395", "適用範圍": "", "適用門市": "全門市", "開始日期": "2025/09/19", "結束日期": "~", "標示": "", "group": "iphone", "groupTitle": "iPhone 主機", "statusKind": "long", "statusLabel": "長期", "summary": "C 組合套餐 (加購價$1,580)", "summaryCompact": "C 組合套餐 (加購價$1,580)", "codesDisplay": "24402395", "codesCompact": "24402395", "scopeDisplay": "未填", "storesDisplay": "全門市"}, {"活動序號": "17", "原始列範圍": "87-89", "大類": "iPhone", "項目": "iPhone", "活動/子項": "超值加購", "活動內容": "D 組合套餐 (加購價$1,280)\nPQI 45W 充電器+VAP USB3.2 高速傳輸線", "存代數": "4", "存貨代碼清單": "24402395、05901971、05901979、27700483", "適用範圍": "", "適用門市": "全門市", "開始日期": "2025/09/19", "結束日期": "~", "標示": "", "group": "iphone", "groupTitle": "iPhone 主機", "statusKind": "long", "statusLabel": "長期", "summary": "D 組合套餐 (加購價$1,280)", "summaryCompact": "D 組合套餐 (加購價$1,280)", "codesDisplay": "24402395、05901971、05901979、27700483", "codesCompact": "24402395、05901971、05901979、27700483", "scopeDisplay": "未填", "storesDisplay": "全門市"}, {"活動序號": "18", "原始列範圍": "90", "大類": "iPhone", "項目": "iPhone", "活動/子項": "超值加購", "活動內容": "保貼套餐（加購價1,280元）\nPQI 玻璃保貼 買1送1", "存代數": "0", "存貨代碼清單": "", "適用範圍": "", "適用門市": "全門市", "開始日期": "2025/09/19", "結束日期": "~", "標示": "紅字", "group": "iphone", "groupTitle": "iPhone 主機", "statusKind": "long", "statusLabel": "長期", "summary": "• 保貼套餐（加購價1,280元）\n• PQI 玻璃保貼 買1送1", "summaryCompact": "• 保貼套餐（加購價1,280元）\n• PQI 玻璃保貼 買1送1", "codesDisplay": "未填", "codesCompact": "未填", "scopeDisplay": "未填", "storesDisplay": "全門市"}, {"活動序號": "19", "原始列範圍": "91-92", "大類": "iPhone", "項目": "iPhone", "活動/子項": "超值加購", "活動內容": "音響超值組 ( 加購價 $980)\nMomax Vibe Go 磁吸無線⾳箱+蔡司清潔噴霧組", "存代數": "8", "存貨代碼清單": "45300670、45300671、45300672、45300673、45300751、45300752、45300753、24402395", "適用範圍": "", "適用門市": "全門市", "開始日期": "2025/09/19", "結束日期": "~", "標示": "", "group": "iphone", "groupTitle": "iPhone 主機", "statusKind": "long", "statusLabel": "長期", "summary": "音響超值組 ( 加購價 $980)", "summaryCompact": "音響超值組 ( 加購價 $980)", "codesDisplay": "45300670、45300671、45300672、45300673、45300751、45300752、45300753、24402395", "codesCompact": "45300670、45300671、45300672、45300673\n另有 4 個存代", "scopeDisplay": "未填", "storesDisplay": "全門市"}, {"活動序號": "20", "原始列範圍": "93-103", "大類": "iPhone", "項目": "iPhone", "活動/子項": "保固一年期", "活動內容": "iPhone Air/17/17 Pro/17 Pro Max 加購 SA Care (ㄧ年期)\n三選一\n1. PQI 45W 充電器+pqi USB 3.2 10Gbps 100W 高速傳輸充電線\n2. Momax Vibe Go 磁吸無線⾳箱+蔡司清潔噴霧組\n3. ARpedia Into the Community繪本組(含Ｍirror支架)", "存代數": "18", "存貨代碼清單": "99902009、99902441、99903307、99902629、99902010、45300670、45300671、45300672、45300673、45300751、45300752、45300753、24402395、05901979、05901996、27700483、49600004、49600043", "適用範圍": "", "適用門市": "全門市", "開始日期": "2025/09/19", "結束日期": "~；送完為止", "標示": "紅字", "group": "iphone", "groupTitle": "iPhone 主機", "statusKind": "long", "statusLabel": "長期", "summary": "• iPhone Air/17/17 Pro/17 Pro Max 加購 SA Care (ㄧ年期)\n• 三選一", "summaryCompact": "• iPhone Air/17/17 Pro/17 Pro Max 加購 SA Care (ㄧ年期)\n• 三選一", "codesDisplay": "99902009、99902441、99903307、99902629、99902010、45300670、45300671、45300672\n另有 10 個存代", "codesCompact": "99902009、99902441、99903307、99902629\n另有 14 個存代", "scopeDisplay": "未填", "storesDisplay": "全門市"}, {"活動序號": "21", "原始列範圍": "104-112", "大類": "Watch", "項目": "Watch", "活動/子項": "保固活動", "活動內容": "Apple Watch S11 加購 SA Care (二年期)/AC+\n送（好禮三選一）：\n1. MAGEASY x STUDIO A 聯名款 錶帶（任選一條）\n2. PQI 45W 充電器+PG錶貼\n3. PQI 錶帶（任選一條）", "存代數": "3", "存貨代碼清單": "99902979、99902987、26500240", "適用範圍": "", "適用門市": "全門市", "開始日期": "2025/09/19", "結束日期": "~；2026/05/31", "標示": "紅字+黃底", "group": "watch", "groupTitle": "Apple Watch", "statusKind": "changed", "statusLabel": "異動重點", "summary": "• Apple Watch S11 加購 SA Care (二年期)/AC+\n• 送（好禮三選一）\n• 1. MAGEASY x STUDIO A 聯名款 錶帶（任選一條）", "summaryCompact": "• Apple Watch S11 加購 SA Care (二年期)/AC+\n• 送（好禮三選一）", "codesDisplay": "99902979、99902987、26500240", "codesCompact": "99902979、99902987、26500240", "scopeDisplay": "未填", "storesDisplay": "全門市"}, {"活動序號": "22", "原始列範圍": "113-114", "大類": "Watch", "項目": "Watch", "活動/子項": "保固活動", "活動內容": "Apple Watch Ultra 3 加購 SA Care (二年期)/AC+\n送（好禮三選一）：\n1. MAGEASY xSTUDIOA 聯名款錶帶\n2.PQI 45W 充電器+PG錶貼\n3. PQI 錶帶（任選一條）", "存代數": "2", "存貨代碼清單": "99902987、26500241", "適用範圍": "", "適用門市": "全門市", "開始日期": "2025/09/19", "結束日期": "2026/05/31", "標示": "紅字", "group": "watch", "groupTitle": "Apple Watch", "statusKind": "normal", "statusLabel": "期間活動", "summary": "• Apple Watch Ultra 3 加購 SA Care (二年期)/AC+\n• 送（好禮三選一）\n• 3. PQI 錶帶（任選一條）", "summaryCompact": "• Apple Watch Ultra 3 加購 SA Care (二年期)/AC+\n• 送（好禮三選一）", "codesDisplay": "99902987、26500241", "codesCompact": "99902987、26500241", "scopeDisplay": "未填", "storesDisplay": "全門市"}, {"活動序號": "23", "原始列範圍": "115-117", "大類": "Watch", "項目": "Watch", "活動/子項": "保固活動", "活動內容": "Apple Watch SE 3 加購 SA Care (二年期)/AC+ 40mm / 44mm 送：\nPQI 45W充電器", "存代數": "2", "存貨代碼清單": "99902977、26500242", "適用範圍": "", "適用門市": "", "開始日期": "", "結束日期": "2026/05/31", "標示": "紅字", "group": "watch", "groupTitle": "Apple Watch", "statusKind": "normal", "statusLabel": "期間活動", "summary": "Apple Watch SE 3 加購 SA Care (二年期)/AC+ 40mm / 44mm 送", "summaryCompact": "Apple Watch SE 3 加購 SA Care (二年期)/AC+ 40mm / 44mm 送", "codesDisplay": "99902977、26500242", "codesCompact": "99902977、26500242", "scopeDisplay": "未填", "storesDisplay": "未填"}, {"活動序號": "24", "原始列範圍": "118", "大類": "Watch周邊", "項目": "Watch周邊", "活動/子項": "PureGear\n完美酷膜活動", "活動內容": "Apple Watch 加購保護膜可現折 50 元", "存代數": "7", "存貨代碼清單": "51600001、51600002、51600003、51600004、51600005、51600010、51600011", "適用範圍": "", "適用門市": "全門市", "開始日期": "2025/09/19", "結束日期": "2026/05/31", "標示": "紅字", "group": "watch", "groupTitle": "Apple Watch", "statusKind": "normal", "statusLabel": "期間活動", "summary": "Apple Watch 加購保護膜可現折 50 元", "summaryCompact": "Apple Watch 加購保護膜可現折 50 元", "codesDisplay": "51600001、51600002、51600003、51600004、51600005、51600010、51600011", "codesCompact": "51600001、51600002、51600003、51600004\n另有 3 個存代", "scopeDisplay": "未填", "storesDisplay": "全門市"}, {"活動序號": "25", "原始列範圍": "119-120", "大類": "iPhone", "項目": "iPhone\n保貼優惠", "活動/子項": "PQI\n保護貼買一送一", "活動內容": "PQI iPhone 全系列，玻璃保護貼買一送一\n憑卡享一年內、免費兌換一張", "存代數": "2", "存貨代碼清單": "99902319、99902320", "適用範圍": "VAP iPhone 全系列保護貼", "適用門市": "全門市", "開始日期": "2025/09/19；2024/09/20", "結束日期": "2026/05/31", "標示": "", "group": "iphone", "groupTitle": "iPhone 主機", "statusKind": "normal", "statusLabel": "期間活動", "summary": "• PQI iPhone 全系列，玻璃保護貼買一送一\n• 憑卡享一年內、免費兌換一張", "summaryCompact": "• PQI iPhone 全系列，玻璃保護貼買一送一\n• 憑卡享一年內、免費兌換一張", "codesDisplay": "99902319、99902320", "codesCompact": "99902319、99902320", "scopeDisplay": "VAP iPhone 全系列保護貼", "storesDisplay": "全門市"}, {"活動序號": "26", "原始列範圍": "121", "大類": "VAP 螢幕清潔組", "項目": "VAP 螢幕清潔組\n優惠活動", "活動/子項": "環保植萃清潔液充填", "活動內容": "持VAP清潔液空瓶，於門市補充植萃清潔液（扣會員點數100點）", "存代數": "1", "存貨代碼清單": "99902901", "適用範圍": "VAP 螢幕清潔組", "適用門市": "全門市", "開始日期": "", "結束日期": "2026/05/31", "標示": "紅字", "group": "accessory", "groupTitle": "週邊配件與套組", "statusKind": "normal", "statusLabel": "期間活動", "summary": "持VAP清潔液空瓶，於門市補充植萃清潔液（扣會員點數100點）", "summaryCompact": "持VAP清潔液空瓶，於門市補充植萃清潔液（扣會員點數100點）", "codesDisplay": "99902901", "codesCompact": "99902901", "scopeDisplay": "VAP 螢幕清潔組", "storesDisplay": "全門市"}, {"活動序號": "27", "原始列範圍": "122", "大類": "週邊配件", "項目": "週邊配件\n優惠活動", "活動/子項": "手機支架保護殼，買1送1\n（不與其他手機殼活動並行）", "活動內容": "VAP iPhone 14 全系列手機支架保護殼，買一送一", "存代數": "0", "存貨代碼清單": "", "適用範圍": "VAP iPhone 14 全系列\n手機支架保護殼", "適用門市": "全門市", "開始日期": "2021/11/1起", "結束日期": "持續進行", "標示": "", "group": "iphone", "groupTitle": "iPhone 主機", "statusKind": "long", "statusLabel": "長期", "summary": "VAP iPhone 14 全系列手機支架保護殼，買一送一", "summaryCompact": "VAP iPhone 14 全系列手機支架保護殼，買一送一", "codesDisplay": "未填", "codesCompact": "未填", "scopeDisplay": "VAP iPhone 14 全系列 手機支架保護殼", "storesDisplay": "全門市"}, {"活動序號": "28", "原始列範圍": "123-125", "大類": "週邊配件", "項目": "週邊配件\n優惠活動", "活動/子項": "PQI 商品全(取代VAP 商品)\n9 折優惠", "活動內容": "如左", "存代數": "0", "存貨代碼清單": "", "適用範圍": "", "適用門市": "全門市", "開始日期": "2021/11/1起；2023/04/22；2023/02/04", "結束日期": "持續進行；2026/05/31", "標示": "紅字", "group": "accessory", "groupTitle": "週邊配件與套組", "statusKind": "long", "statusLabel": "長期", "summary": "如左", "summaryCompact": "如左", "codesDisplay": "未填", "codesCompact": "未填", "scopeDisplay": "未填", "storesDisplay": "全門市"}, {"活動序號": "29", "原始列範圍": "126", "大類": "週邊配件", "項目": "週邊配件\n優惠活動", "活動/子項": "STUDIO A 聯名款\n替換式觸控筆頭4入", "活動內容": "加購價$299", "存代數": "2", "存貨代碼清單": "51800034、54600003", "適用範圍": "", "適用門市": "", "開始日期": "", "結束日期": "2026/05/31", "標示": "紅字", "group": "accessory", "groupTitle": "週邊配件與套組", "statusKind": "normal", "statusLabel": "期間活動", "summary": "加購價$299", "summaryCompact": "加購價$299", "codesDisplay": "51800034、54600003", "codesCompact": "51800034、54600003", "scopeDisplay": "未填", "storesDisplay": "未填"}, {"活動序號": "30", "原始列範圍": "127", "大類": "週邊配件", "項目": "週邊配件\n優惠活動", "活動/子項": "VAP錶帶買一送一\n（不與原watch 加購64/61折優惠並行）", "活動內容": "VAP全系列Watch 錶帶，享買一送一", "存代數": "0", "存貨代碼清單": "", "適用範圍": "", "適用門市": "", "開始日期": "", "結束日期": "2026/05/31", "標示": "", "group": "watch", "groupTitle": "Apple Watch", "statusKind": "normal", "statusLabel": "期間活動", "summary": "VAP全系列Watch 錶帶，享買一送一", "summaryCompact": "VAP全系列Watch 錶帶，享買一送一", "codesDisplay": "未填", "codesCompact": "未填", "scopeDisplay": "未填", "storesDisplay": "未填"}, {"活動序號": "31", "原始列範圍": "128", "大類": "週邊配件", "項目": "週邊配件\n優惠活動", "活動/子項": "免費下載「e筆(硬筆篇)app」", "活動內容": "iPad全系列，限時開放免費下載e筆（硬筆篇）app，\n（「硬筆篇」為免費下載、原e筆app為購iPad 才贈）", "存代數": "0", "存貨代碼清單": "", "適用範圍": "", "適用門市": "", "開始日期": "", "結束日期": "2026/05/31", "標示": "", "group": "accessory", "groupTitle": "週邊配件與套組", "statusKind": "normal", "statusLabel": "期間活動", "summary": "• iPad全系列，限時開放免費下載e筆（硬筆篇）app\n• （「硬筆篇」為免費下載、原e筆app為購iPad 才贈）", "summaryCompact": "• iPad全系列，限時開放免費下載e筆（硬筆篇）app\n• （「硬筆篇」為免費下載、原e筆app為購iPad 才贈）", "codesDisplay": "未填", "codesCompact": "未填", "scopeDisplay": "未填", "storesDisplay": "未填"}, {"活動序號": "32", "原始列範圍": "129-132", "大類": "iPad 搭ARpedia", "項目": "iPad 搭ARpedia\n加購優惠", "活動/子項": "iPad 搭ARpedia 加購優惠：(買多組也只送一個 mirror)\nARpedia Disney (15本 or 30本）售價7,999（含Mirror）\niPad 單機加購現折2,000元\nARpedia Into the Community 售價 2,000（含Mirror）\niPad 單機加購 現折500元\nARpedia Into the Curiosity 售價4,000 (Mirror)\niPad 單機加購 現折1,000元\nARpedia AR Science Lab 售價 4,000（含Mirror）\niPad 單機加購 現折1,000元\nARpedia AR 科學實驗室入門組 售價999（含Mirror）四種主題\niPad 單機加購 現折100元\nARpedia AR Words 售價 1,499 元起（含Mirror）六種主題\n一套現折200\niPad 單機加購 ARWords/Hello Nature 主題任選\n一套現折300\n* ﻿﻿可並行現有保固活動\n* ﻿﻿可並行教育價活動", "活動內容": "iPad 搭ARpedia 加購優惠：(買多組也只送一個 mirror)\nARpedia Disney (15本 or 30本）售價7,999（含Mirror）\niPad 單機加購現折2,000元\nARpedia Into the Community 售價 2,000（含Mirror）\niPad 單機加購 現折500元\nARpedia Into the Curiosity 售價4,000 (Mirror)\niPad 單機加購 現折1,000元\nARpedia AR Science Lab 售價 4,000（含Mirror）\niPad 單機加購 現折1,000元\nARpedia AR 科學實驗室入門組 售價999（含Mirror）四種主題\niPad 單機加購 現折100元\nARpedia AR Words 售價 1,499 元起（含Mirror）六種主題\n一套現折200\niPad 單機加購 ARWords/Hello Nature 主題任選\n一套現折300\n* ﻿﻿可並行現有保固活動\n* ﻿﻿可並行教育價活動", "存代數": "7", "存貨代碼清單": "99200201、49600004、49600005、49600006、49600043、49600034、49600035", "適用範圍": "ARpedia", "適用門市": "全門市", "開始日期": "2024/12/01；2023/01/04；2022/10/01；2025/09/01", "結束日期": "2026/05/31；持續進行；2025/12/31", "標示": "紅字", "group": "ipad", "groupTitle": "iPad 主機", "statusKind": "long", "statusLabel": "長期", "summary": "• iPad 搭ARpedia 加購優惠：(買多組也只送一個 mirror)\n• iPad 單機加購現折2,000元\n• iPad 單機加購 現折500元", "summaryCompact": "• iPad 搭ARpedia 加購優惠：(買多組也只送一個 mirror)\n• iPad 單機加購現折2,000元", "codesDisplay": "99200201、49600004、49600005、49600006、49600043、49600034、49600035", "codesCompact": "99200201、49600004、49600005、49600006\n另有 3 個存代", "scopeDisplay": "ARpedia", "storesDisplay": "全門市"}, {"活動序號": "33", "原始列範圍": "133-152", "大類": "Mac", "項目": "Mac", "活動/子項": "保固活動", "活動內容": "1、Mac筆電 +ACPP+/ SA care（三年期）\n享主機金額 5% 回饋", "存代數": "18", "存貨代碼清單": "26500006、26500057、26500058、26500078、26500101、26500102、26500104、26500119、26500120、26500121、99902937、99902661、99902642、99902643、99902944、99903055、99903056、99902945", "適用範圍": "", "適用門市": "", "開始日期": "2025/09/01；2024/11/08；2024/11/23；2023/07/15；2024/05/01", "結束日期": "2025/12/31；2026/05/31", "標示": "紅字", "group": "mac", "groupTitle": "Mac 主機", "statusKind": "normal", "statusLabel": "期間活動", "summary": "享主機金額 5% 回饋", "summaryCompact": "享主機金額 5% 回饋", "codesDisplay": "26500006、26500057、26500058、26500078、26500101、26500102、26500104、26500119\n另有 10 個存代", "codesCompact": "26500006、26500057、26500058、26500078\n另有 14 個存代", "scopeDisplay": "未填", "storesDisplay": "未填"}, {"活動序號": "34", "原始列範圍": "153-154", "大類": "Mac", "項目": "Mac", "活動/子項": "保固活動", "活動內容": "2、Mac筆電+ACPP+/ SA care（三年期）\nMacBook Pro 14/16吋 M3/M4：贈送3PP＄4,000元購物金\nMacBook Air 13/15吋 M2/M3：贈送3PP＄3,000元購物金", "存代數": "2", "存貨代碼清單": "99200200、99200202", "適用範圍": "", "適用門市": "", "開始日期": "2024/05/01", "結束日期": "2026/05/31", "標示": "", "group": "mac", "groupTitle": "Mac 主機", "statusKind": "normal", "statusLabel": "期間活動", "summary": "• MacBook Pro 14/16吋 M3/M4：贈送3PP＄4,000元購物金\n• MacBook Air 13/15吋 M2/M3：贈送3PP＄3,000元購物金", "summaryCompact": "• MacBook Pro 14/16吋 M3/M4：贈送3PP＄4,000元購物金\n• MacBook Air 13/15吋 M2/M3：贈送3PP＄3,000元購物金", "codesDisplay": "99200200、99200202", "codesCompact": "99200200、99200202", "scopeDisplay": "未填", "storesDisplay": "未填"}, {"活動序號": "35", "原始列範圍": "155-156", "大類": "Mac", "項目": "Mac", "活動/子項": "保固活動", "活動內容": "3、Mac筆電+ SA care（三年期）Office 2024軟體優惠(原價$5,690)\na.加購優惠價 $2,690 (限 MBA 13吋 / 15吋）\nb.加購優惠價 $1690 (限 MBP 14吋 /16吋）\n5.Mac筆電+ SA care（三年期） Office 個⼈版⼀年盒裝無光碟優惠（原價＄3,090）\na.加購優惠價 $690 (限 MBA 13吋 / 15吋 )\nb.直送Office 個⼈版⼀年盒裝無光碟 (限 MBP 14吋 /16吋）", "存代數": "2", "存貨代碼清單": "02900341、02900396", "適用範圍": "", "適用門市": "", "開始日期": "2024/05/01；2023/07/15", "結束日期": "2026/05/31", "標示": "紅字", "group": "mac", "groupTitle": "Mac 主機", "statusKind": "normal", "statusLabel": "期間活動", "summary": "• a.加購優惠價 $2,690 (限 MBA 13吋 / 15吋）\n• b.加購優惠價 $1690 (限 MBP 14吋 /16吋）\n• a.加購優惠價 $690 (限 MBA 13吋 / 15吋 )", "summaryCompact": "• a.加購優惠價 $2,690 (限 MBA 13吋 / 15吋）\n• b.加購優惠價 $1690 (限 MBP 14吋 /16吋）", "codesDisplay": "02900341、02900396", "codesCompact": "02900341、02900396", "scopeDisplay": "未填", "storesDisplay": "未填"}, {"活動序號": "36", "原始列範圍": "157-161", "大類": "Mac", "項目": "Mac", "活動/子項": "保固活動", "活動內容": "4、Mac筆電+ACPP+/ SA care（三年期）\n贈 Riivan or TUCANO 全系列電腦包＋PQI 鍵盤膜＋VAP 螢幕保護貼＋VAP 八合一集線器 or PQI 五合一集線器", "存代數": "27", "存貨代碼清單": "24401713、24401608、24401714、24401609、24402435、24402434、24402433、24402437、24402436、24402427、24402428、24402711、24402712、24402713、24402714、24402726、24402727、24402728、24402729、24402730、24402731、24402732、24402733、24402734、05901970、05901969、05901973", "適用範圍": "", "適用門市": "", "開始日期": "", "結束日期": "2026/05/31", "標示": "紅字", "group": "mac", "groupTitle": "Mac 主機", "statusKind": "normal", "statusLabel": "期間活動", "summary": "贈 Riivan or TUCANO 全系列電腦包+PQI 鍵盤膜+VAP 螢幕保護貼+VAP 八合一集線器 or…", "summaryCompact": "贈 Riivan or TUCANO 全系列電腦包+PQI 鍵盤膜+VAP 螢幕保護貼+VAP 八合一集線器 or…", "codesDisplay": "24401713、24401608、24401714、24401609、24402435、24402434、24402433、24402437\n另有 19 個存代", "codesCompact": "24401713、24401608、24401714、24401609\n另有 23 個存代", "scopeDisplay": "未填", "storesDisplay": "未填"}, {"活動序號": "37", "原始列範圍": "162", "大類": "Mac", "項目": "Mac", "活動/子項": "保固活動", "活動內容": "6、Mac筆電+ACPP+/ SA care（三年期）\nMBA 13/15 吋 加購$390 Marshall Willen II\nMBP 14/15 吋 直贈 Marshall Willen II", "存代數": "2", "存貨代碼清單": "09600048、09600049", "適用範圍": "", "適用門市": "", "開始日期": "", "結束日期": "2026/05/31", "標示": "紅字", "group": "mac", "groupTitle": "Mac 主機", "statusKind": "normal", "statusLabel": "期間活動", "summary": "• MBA 13/15 吋 加購$390 Marshall Willen II\n• MBP 14/15 吋 直贈 Marshall Willen II", "summaryCompact": "• MBA 13/15 吋 加購$390 Marshall Willen II\n• MBP 14/15 吋 直贈 Marshall Willen II", "codesDisplay": "09600048、09600049", "codesCompact": "09600048、09600049", "scopeDisplay": "未填", "storesDisplay": "未填"}, {"活動序號": "38", "原始列範圍": "163-164", "大類": "新品", "項目": "新品", "活動/子項": "MacBook Neo", "活動內容": "MacBook Neo＋三年期保固，享好禮六選一\n1、主機享5%回饋\n2、贈送3PP＄2,000元購物金\n3、Office 2024軟體優惠(原價$5,690) 加購優惠價2,990元\n4、送 Riivan or TUCANO 13/14吋 ＋PQI 鍵盤膜＋PQI螢幕貼＋PQI HUB\n5、Office 個⼈版⼀年盒裝無光碟優惠（原價$3,090) 加購優惠價1,290元\n6、Marshall Willen II 攜帶式藍牙喇叭（原價$3,990) 加購優惠價1,990元", "存代數": "9", "存貨代碼清單": "99200200、02900396、24402427、46200246、05901970、05901969、02900341、09600048、09600049", "適用範圍": "", "適用門市": "", "開始日期": "", "結束日期": "2026/05/31", "標示": "紅字+黃底", "group": "mac", "groupTitle": "Mac 主機", "statusKind": "changed", "statusLabel": "異動重點", "summary": "• MacBook Neo+三年期保固，享好禮六選一\n• 1、主機享5%回饋\n• 2、贈送3PP＄2,000元購物金", "summaryCompact": "• MacBook Neo+三年期保固，享好禮六選一\n• 1、主機享5%回饋", "codesDisplay": "99200200、02900396、24402427、46200246、05901970、05901969、02900341、09600048\n另有 1 個存代", "codesCompact": "99200200、02900396、24402427、46200246\n另有 5 個存代", "scopeDisplay": "未填", "storesDisplay": "未填"}, {"活動序號": "39", "原始列範圍": "165", "大類": "Mac 筆電全系列＋SACare", "項目": "Mac 筆電全系列＋SACare\n（一年期）", "活動/子項": "Mac 筆電全系列＋SACare\n（一年期）", "活動內容": "1、MBA 13\" 15\"+SACare（一年期）送SACare 三年期\n2、MBA 14“16\"+SACare（一年期）送SACare 三年期\n3、MacBook Neo 13”+SACare（一年期） 送保護貼", "存代數": "3", "存貨代碼清單": "99200200、99200202、46200246", "適用範圍": "", "適用門市": "", "開始日期": "2023/07/15", "結束日期": "2026/05/31", "標示": "", "group": "mac", "groupTitle": "Mac 主機", "statusKind": "normal", "statusLabel": "期間活動", "summary": "• 1、MBA 13\" 15\"+SACare（一年期）送SACare 三年期\n• 2、MBA 14“16\"+SACare（一年期）送SACare 三年期\n• 3、MacBook Neo 13”+SACare（一年期） 送保護貼", "summaryCompact": "• 1、MBA 13\" 15\"+SACare（一年期）送SACare 三年期\n• 2、MBA 14“16\"+SACare（一年期）送SACare 三年期", "codesDisplay": "99200200、99200202、46200246", "codesCompact": "99200200、99200202、46200246", "scopeDisplay": "未填", "storesDisplay": "未填"}, {"活動序號": "40", "原始列範圍": "166-179", "大類": "iMac", "項目": "iMac", "活動/子項": "保固活動", "活動內容": "iMac 加購SA Care/ ACPP＋延長保固方案，享好禮二選一：\n1、主機97折回饋\n2.、Office 2024 軟體加購優惠價$2,790 (原價$5,690)", "存代數": "14", "存貨代碼清單": "26500052、99903028、99903029、99903030、99903031、99903032、99903033、99903034、99903035、99903036、99903037、99903038、99903039、02900396", "適用範圍": "iMac限定款式", "適用門市": "", "開始日期": "2025/10/01；2025/04/01；2019/10/01", "結束日期": "2026/05/31", "標示": "紅字", "group": "mac", "groupTitle": "Mac 主機", "statusKind": "normal", "statusLabel": "期間活動", "summary": "• iMac 加購SA Care/ ACPP+延長保固方案，享好禮二選一\n• 1、主機97折回饋\n• 2.、Office 2024 軟體加購優惠價$2,790 (原價$5,690)", "summaryCompact": "• iMac 加購SA Care/ ACPP+延長保固方案，享好禮二選一\n• 1、主機97折回饋", "codesDisplay": "26500052、99903028、99903029、99903030、99903031、99903032、99903033、99903034\n另有 6 個存代", "codesCompact": "26500052、99903028、99903029、99903030\n另有 10 個存代", "scopeDisplay": "iMac限定款式", "storesDisplay": "未填"}, {"活動序號": "41", "原始列範圍": "180-187", "大類": "Mac mini", "項目": "Mac mini", "活動/子項": "保固活動", "活動內容": "Mac mini 加購SA Care/ ACPP＋延長保固方案，享好禮四選一：\n1.、主機97折回饋\n2、Office 2024 軟體加購優惠價$3,690 (原價$5,690)\n3、享 Mac Mini Stand 鋁合金支架 優惠價$290 (原價$990)\n4、享 羅技 無線藍牙鍵盤滑鼠組 優惠價$890 (原價$1790)", "存代數": "8", "存貨代碼清單": "26500103、99902902、99902903、99902904、4300037、4300038、4300039、35300035", "適用範圍": "Mac mini系列", "適用門市": "", "開始日期": "2019/10/01；2023/03/01；2023/04/28；2025/06/01", "結束日期": "2026/05/31", "標示": "紅字", "group": "mac", "groupTitle": "Mac 主機", "statusKind": "normal", "statusLabel": "期間活動", "summary": "• Mac mini 加購SA Care/ ACPP+延長保固方案，享好禮四選一\n• 1.、主機97折回饋\n• 2、Office 2024 軟體加購優惠價$3,690 (原價$5,690)", "summaryCompact": "• Mac mini 加購SA Care/ ACPP+延長保固方案，享好禮四選一\n• 1.、主機97折回饋", "codesDisplay": "26500103、99902902、99902903、99902904、4300037、4300038、4300039、35300035", "codesCompact": "26500103、99902902、99902903、99902904\n另有 4 個存代", "scopeDisplay": "Mac mini系列", "storesDisplay": "未填"}, {"活動序號": "42", "原始列範圍": "188", "大類": "Mac Studio", "項目": "Mac Studio\n＋AC+ 主機 97折", "活動/子項": "Mac Studio 加購ACPP+延長保固方案，主機享3%回饋", "活動內容": "", "存代數": "1", "存貨代碼清單": "26500076", "適用範圍": "Mac Studio", "適用門市": "", "開始日期": "2025/06/01", "結束日期": "2026/05/31", "標示": "", "group": "mac", "groupTitle": "Mac 主機", "statusKind": "normal", "statusLabel": "期間活動", "summary": "Mac Studio 加購ACPP+延長保固方案，主機享3%回饋", "summaryCompact": "Mac Studio 加購ACPP+延長保固方案，主機享3%回饋", "codesDisplay": "26500076", "codesCompact": "26500076", "scopeDisplay": "Mac Studio", "storesDisplay": "未填"}, {"活動序號": "43", "原始列範圍": "189", "大類": "Studio Display", "項目": "Studio Display\n＋AC+ 螢幕 97折", "活動/子項": "Studio Display 加購ACPP+延長保固方案，主機享3%回饋", "活動內容": "", "存代數": "1", "存貨代碼清單": "26500073", "適用範圍": "Studio Display", "適用門市": "", "開始日期": "2025/06/01", "結束日期": "2026/05/31", "標示": "", "group": "mac", "groupTitle": "Mac 主機", "statusKind": "normal", "statusLabel": "期間活動", "summary": "Studio Display 加購ACPP+延長保固方案，主機享3%回饋", "summaryCompact": "Studio Display 加購ACPP+延長保固方案，主機享3%回饋", "codesDisplay": "26500073", "codesCompact": "26500073", "scopeDisplay": "Studio Display", "storesDisplay": "未填"}, {"活動序號": "44", "原始列範圍": "190", "大類": "Mac 配件套餐", "項目": "Mac 配件套餐", "活動/子項": "Mac 配件套餐", "活動內容": "Riivan or TUCANO電腦包全系列＋ PQI 鍵盤膜+ VAP 螢幕保護貼+蔡司蒸氣眼罩（8入） 加購價$2,090 原價$3,219", "存代數": "3", "存貨代碼清單": "24402427、24402428、24402396", "適用範圍": "", "適用門市": "", "開始日期": "2025/04/01", "結束日期": "2026/05/31", "標示": "紅字", "group": "mac", "groupTitle": "Mac 主機", "statusKind": "normal", "statusLabel": "期間活動", "summary": "Riivan or TUCANO電腦包全系列+ PQI 鍵盤膜+ VAP 螢幕保護貼+蔡司蒸氣眼罩（8入） 加購價…", "summaryCompact": "Riivan or TUCANO電腦包全系列+ PQI 鍵盤膜+ VAP 螢幕保護貼+蔡司蒸氣眼罩（8入） 加購價…", "codesDisplay": "24402427、24402428、24402396", "codesCompact": "24402427、24402428、24402396", "scopeDisplay": "未填", "storesDisplay": "未填"}, {"活動序號": "45", "原始列範圍": "191", "大類": "電腦配件活動", "項目": "電腦配件活動", "活動/子項": "Mac筆電主機加購優惠\n（可不同品項複選加購）\n(可與其他活動並行)", "活動內容": "+3,090元 Apple Pencil一代", "存代數": "1", "存貨代碼清單": "07309062", "適用範圍": "", "適用門市": "", "開始日期": "2022/09/01", "結束日期": "2026/05/31", "標示": "", "group": "mac", "groupTitle": "Mac 主機", "statusKind": "normal", "statusLabel": "期間活動", "summary": "+3,090元 Apple Pencil一代", "summaryCompact": "+3,090元 Apple Pencil一代", "codesDisplay": "07309062", "codesCompact": "07309062", "scopeDisplay": "未填", "storesDisplay": "未填"}, {"活動序號": "46", "原始列範圍": "192", "大類": "電腦配件活動", "項目": "電腦配件活動", "活動/子項": "Mac筆電主機加購優惠\n（可不同品項複選加購）\n(可與其他活動並行)", "活動內容": "+4,190元 Apple Pencil二代", "存代數": "1", "存貨代碼清單": "07304973", "適用範圍": "", "適用門市": "", "開始日期": "2022/09/01", "結束日期": "2026/05/31", "標示": "紅字", "group": "mac", "groupTitle": "Mac 主機", "statusKind": "normal", "statusLabel": "期間活動", "summary": "+4,190元 Apple Pencil二代", "summaryCompact": "+4,190元 Apple Pencil二代", "codesDisplay": "07304973", "codesCompact": "07304973", "scopeDisplay": "未填", "storesDisplay": "未填"}, {"活動序號": "47", "原始列範圍": "193", "大類": "電腦配件活動", "項目": "電腦配件活動", "活動/子項": "Mac筆電主機加購優惠\n（可不同品項複選加購）\n(可與其他活動並行)\"", "活動內容": "主機， 加購Office 365二套 ＄5,690(原價＄6,180)", "存代數": "1", "存貨代碼清單": "02900341", "適用範圍": "", "適用門市": "", "開始日期": "2025/06/01", "結束日期": "2026/05/31", "標示": "紅字", "group": "mac", "groupTitle": "Mac 主機", "statusKind": "normal", "statusLabel": "期間活動", "summary": "主機， 加購Office 365二套 ＄5,690(原價＄6,180)", "summaryCompact": "主機， 加購Office 365二套 ＄5,690(原價＄6,180)", "codesDisplay": "02900341", "codesCompact": "02900341", "scopeDisplay": "未填", "storesDisplay": "未填"}, {"活動序號": "48", "原始列範圍": "194", "大類": "電腦配件活動", "項目": "電腦配件活動", "活動/子項": "Mac筆電主機加購優惠\n（可不同品項複選加購）\n(可與其他活動並行)\"", "活動內容": "主機， 加購Windows 11 ＄4,150(原價＄4,610)", "存代數": "1", "存貨代碼清單": "02900379", "適用範圍": "", "適用門市": "", "開始日期": "2022/10/19", "結束日期": "2026/05/31", "標示": "紅字", "group": "mac", "groupTitle": "Mac 主機", "statusKind": "normal", "statusLabel": "期間活動", "summary": "主機， 加購Windows 11 ＄4,150(原價＄4,610)", "summaryCompact": "主機， 加購Windows 11 ＄4,150(原價＄4,610)", "codesDisplay": "02900379", "codesCompact": "02900379", "scopeDisplay": "未填", "storesDisplay": "未填"}, {"活動序號": "49", "原始列範圍": "195", "大類": "電腦配件活動", "項目": "電腦配件活動", "活動/子項": "Mac筆電主機加購優惠\n（可不同品項複選加購）\n(可與其他活動並行)\"", "活動內容": "主機，加購Office 2024 ＄5,090(原價＄5690)", "存代數": "1", "存貨代碼清單": "02900396", "適用範圍": "", "適用門市": "", "開始日期": "2022/10/19", "結束日期": "2026/05/31", "標示": "紅字+黃底", "group": "mac", "groupTitle": "Mac 主機", "statusKind": "changed", "statusLabel": "異動重點", "summary": "主機，加購Office 2024 ＄5,090(原價＄5690)", "summaryCompact": "主機，加購Office 2024 ＄5,090(原價＄5690)", "codesDisplay": "02900396", "codesCompact": "02900396", "scopeDisplay": "未填", "storesDisplay": "未填"}, {"活動序號": "50", "原始列範圍": "196", "大類": "電腦配件活動", "項目": "電腦配件活動", "活動/子項": "MacBook Air 加購優惠", "活動內容": "MacBook Air 2022 (M2) 款加購VAP 磨砂保護殼＄890(原價：1,290)", "存代數": "1", "存貨代碼清單": "05901797", "適用範圍": "", "適用門市": "", "開始日期": "2020/10/01", "結束日期": "售完為止", "標示": "紅字", "group": "mac", "groupTitle": "Mac 主機", "statusKind": "stock", "statusLabel": "售完為止", "summary": "MacBook Air 2022 (M2) 款加購VAP 磨砂保護殼＄890(原價：1,290)", "summaryCompact": "MacBook Air 2022 (M2) 款加購VAP 磨砂保護殼＄890(原價：1,290)", "codesDisplay": "05901797", "codesCompact": "05901797", "scopeDisplay": "未填", "storesDisplay": "未填"}, {"活動序號": "51", "原始列範圍": "197-198", "大類": "電腦配件活動", "項目": "電腦配件活動", "活動/子項": "MacBook Air 加購優惠", "活動內容": "MacBook Air (M1) 加購VAP 磨砂保護殼＄890(原價：1,290)", "存代數": "2", "存貨代碼清單": "05901684、05901685", "適用範圍": "", "適用門市": "", "開始日期": "2022/10/01；2020/10/01", "結束日期": "售完為止", "標示": "", "group": "mac", "groupTitle": "Mac 主機", "statusKind": "stock", "statusLabel": "售完為止", "summary": "MacBook Air (M1) 加購VAP 磨砂保護殼＄890(原價：1,290)", "summaryCompact": "MacBook Air (M1) 加購VAP 磨砂保護殼＄890(原價：1,290)", "codesDisplay": "05901684、05901685", "codesCompact": "05901684、05901685", "scopeDisplay": "未填", "storesDisplay": "未填"}, {"活動序號": "52", "原始列範圍": "199", "大類": "電腦配件活動", "項目": "電腦配件活動", "活動/子項": "MacBook Pro 加購優惠", "活動內容": "MacBook Pro M2 13吋 加購VAP 磨砂保護殼＄890(原價：1,290)", "存代數": "1", "存貨代碼清單": "05901781", "適用範圍": "", "適用門市": "", "開始日期": "2022/12/01", "結束日期": "售完為止", "標示": "", "group": "mac", "groupTitle": "Mac 主機", "statusKind": "stock", "statusLabel": "售完為止", "summary": "MacBook Pro M2 13吋 加購VAP 磨砂保護殼＄890(原價：1,290)", "summaryCompact": "MacBook Pro M2 13吋 加購VAP 磨砂保護殼＄890(原價：1,290)", "codesDisplay": "05901781", "codesCompact": "05901781", "scopeDisplay": "未填", "storesDisplay": "未填"}, {"活動序號": "53", "原始列範圍": "200", "大類": "電腦配件活動", "項目": "電腦配件活動", "活動/子項": "MacBook Pro 加購優惠", "活動內容": "MacBook Pro M2 13吋 加購VAP 磨砂保護殼＄890(原價：1,290)", "存代數": "1", "存貨代碼清單": "05901782", "適用範圍": "", "適用門市": "", "開始日期": "2021/09/01", "結束日期": "售完為止", "標示": "", "group": "mac", "groupTitle": "Mac 主機", "statusKind": "stock", "statusLabel": "售完為止", "summary": "MacBook Pro M2 13吋 加購VAP 磨砂保護殼＄890(原價：1,290)", "summaryCompact": "MacBook Pro M2 13吋 加購VAP 磨砂保護殼＄890(原價：1,290)", "codesDisplay": "05901782", "codesCompact": "05901782", "scopeDisplay": "未填", "storesDisplay": "未填"}, {"活動序號": "54", "原始列範圍": "201", "大類": "電腦配件活動", "項目": "電腦配件活動", "活動/子項": "MacBook Pro 加購優惠", "活動內容": "MacBook Pro 14吋 加購VAP 磨砂保護殼＄990(原價：1,390)", "存代數": "1", "存貨代碼清單": "05901778", "適用範圍": "", "適用門市": "", "開始日期": "2021/09/01", "結束日期": "售完為止", "標示": "", "group": "mac", "groupTitle": "Mac 主機", "statusKind": "stock", "statusLabel": "售完為止", "summary": "MacBook Pro 14吋 加購VAP 磨砂保護殼＄990(原價：1,390)", "summaryCompact": "MacBook Pro 14吋 加購VAP 磨砂保護殼＄990(原價：1,390)", "codesDisplay": "05901778", "codesCompact": "05901778", "scopeDisplay": "未填", "storesDisplay": "未填"}, {"活動序號": "55", "原始列範圍": "202", "大類": "電腦配件活動", "項目": "電腦配件活動", "活動/子項": "MacBook Pro 加購優惠", "活動內容": "MacBook Pro 16吋 加購VAP 磨砂保護殼＄1090(原價：1,490)", "存代數": "1", "存貨代碼清單": "05901779", "適用範圍": "", "適用門市": "", "開始日期": "2022/12/01", "結束日期": "2026/05/31", "標示": "紅字", "group": "mac", "groupTitle": "Mac 主機", "statusKind": "normal", "statusLabel": "期間活動", "summary": "MacBook Pro 16吋 加購VAP 磨砂保護殼＄1090(原價：1,490)", "summaryCompact": "MacBook Pro 16吋 加購VAP 磨砂保護殼＄1090(原價：1,490)", "codesDisplay": "05901779", "codesCompact": "05901779", "scopeDisplay": "未填", "storesDisplay": "未填"}, {"活動序號": "56", "原始列範圍": "203-206", "大類": "軟體活動", "項目": "軟體活動", "活動/子項": "MacBook系列加購", "活動內容": "Office 2024 +高清亮面保貼 (13 吋/14 吋)\n活動價 $6,090 (原價$7,270)", "存代數": "4", "存貨代碼清單": "02900396、46200166、46200167、46200168", "適用範圍": "", "適用門市": "", "開始日期": "2022/12/01；2022/11/01；2018/02/01", "結束日期": "2026/05/31", "標示": "紅字+黃底", "group": "software", "groupTitle": "軟體與系統", "statusKind": "changed", "statusLabel": "異動重點", "summary": "活動價 $6,090 (原價$7,270)", "summaryCompact": "活動價 $6,090 (原價$7,270)", "codesDisplay": "02900396、46200166、46200167、46200168", "codesCompact": "02900396、46200166、46200167、46200168", "scopeDisplay": "未填", "storesDisplay": "未填"}, {"活動序號": "57", "原始列範圍": "207-209", "大類": "軟體活動", "項目": "軟體活動", "活動/子項": "MacBook系列加購", "活動內容": "Office 2024 +高清亮面保貼 (15 吋/16 吋)\n活動價 $6,290 (原價$7,270)", "存代數": "3", "存貨代碼清單": "02900396、46200172、46200169", "適用範圍": "", "適用門市": "", "開始日期": "2022/10/01", "結束日期": "2026/05/31", "標示": "紅字+黃底", "group": "software", "groupTitle": "軟體與系統", "statusKind": "changed", "statusLabel": "異動重點", "summary": "活動價 $6,290 (原價$7,270)", "summaryCompact": "活動價 $6,290 (原價$7,270)", "codesDisplay": "02900396、46200172、46200169", "codesCompact": "02900396、46200172、46200169", "scopeDisplay": "未填", "storesDisplay": "未填"}, {"活動序號": "58", "原始列範圍": "210", "大類": "iPad", "項目": "iPad\n全系列", "活動/子項": "", "活動內容": "S.A CARE 2.0 for iPad Air 5 新二年期 ($2,390)", "存代數": "1", "存貨代碼清單": "99902663", "適用範圍": "", "適用門市": "全門市\n(教育價僅適用\nAPR+A Store)", "開始日期": "2020/02/01", "結束日期": "2026/05/31", "標示": "", "group": "ipad", "groupTitle": "iPad 主機", "statusKind": "normal", "statusLabel": "期間活動", "summary": "S.A CARE 2.0 for iPad Air 5 新二年期 ($2,390)", "summaryCompact": "S.A CARE 2.0 for iPad Air 5 新二年期 ($2,390)", "codesDisplay": "99902663", "codesCompact": "99902663", "scopeDisplay": "未填", "storesDisplay": "全門市 (教育價僅適用 APR+A Store)"}, {"活動序號": "59", "原始列範圍": "211", "大類": "iPad", "項目": "iPad\n全系列", "活動/子項": "", "活動內容": "S.A CARE 2.0 for iPad Pro 新二年期 ($3,890)", "存代數": "1", "存貨代碼清單": "99902929", "適用範圍": "", "適用門市": "全門市\n(教育價僅適用\nAPR+A Store)", "開始日期": "2020/02/01", "結束日期": "2026/05/31", "標示": "", "group": "ipad", "groupTitle": "iPad 主機", "statusKind": "normal", "statusLabel": "期間活動", "summary": "S.A CARE 2.0 for iPad Pro 新二年期 ($3,890)", "summaryCompact": "S.A CARE 2.0 for iPad Pro 新二年期 ($3,890)", "codesDisplay": "99902929", "codesCompact": "99902929", "scopeDisplay": "未填", "storesDisplay": "全門市 (教育價僅適用 APR+A Store)"}, {"活動序號": "60", "原始列範圍": "212", "大類": "iPad", "項目": "iPad\n全系列", "活動/子項": "", "活動內容": "S.A CARE 2.0 for iPad/iPad Air 4/iPad Mini 新二年期 ($2,090)", "存代數": "1", "存貨代碼清單": "99902639", "適用範圍": "", "適用門市": "全門市\n(教育價僅適用\nAPR+A Store)", "開始日期": "2022/10/01", "結束日期": "2026/05/31", "標示": "", "group": "ipad", "groupTitle": "iPad 主機", "statusKind": "normal", "statusLabel": "期間活動", "summary": "S.A CARE 2.0 for iPad/iPad Air 4/iPad Mini 新二年期 ($2,090)", "summaryCompact": "S.A CARE 2.0 for iPad/iPad Air 4/iPad Mini 新二年期 ($2,090)", "codesDisplay": "99902639", "codesCompact": "99902639", "scopeDisplay": "未填", "storesDisplay": "全門市 (教育價僅適用 APR+A Store)"}, {"活動序號": "61", "原始列範圍": "213-216", "大類": "iPad", "項目": "iPad\n全系列", "活動/子項": "", "活動內容": "ACPP+，for iPad / iPad mini系列", "存代數": "4", "存貨代碼清單": "26500014、26500065、26500098、26500066", "適用範圍": "", "適用門市": "全門市\n(教育價僅適用\nAPR+A Store)", "開始日期": "2022/09/16；2020/01/01", "結束日期": "2026/05/31", "標示": "紅字", "group": "ipad", "groupTitle": "iPad 主機", "statusKind": "normal", "statusLabel": "期間活動", "summary": "ACPP+，for iPad / iPad mini系列", "summaryCompact": "ACPP+，for iPad / iPad mini系列", "codesDisplay": "26500014、26500065、26500098、26500066", "codesCompact": "26500014、26500065、26500098、26500066", "scopeDisplay": "未填", "storesDisplay": "全門市 (教育價僅適用 APR+A Store)"}, {"活動序號": "62", "原始列範圍": "217", "大類": "iPad", "項目": "iPad\n全系列", "活動/子項": "", "活動內容": "ACPP+，for iPad Air 系列", "存代數": "1", "存貨代碼清單": "26500041", "適用範圍": "", "適用門市": "全門市\n(教育價僅適用\nAPR+A Store)", "開始日期": "2021/09/24", "結束日期": "2026/05/31", "標示": "紅字", "group": "ipad", "groupTitle": "iPad 主機", "statusKind": "normal", "statusLabel": "期間活動", "summary": "ACPP+，for iPad Air 系列", "summaryCompact": "ACPP+，for iPad Air 系列", "codesDisplay": "26500041", "codesCompact": "26500041", "scopeDisplay": "未填", "storesDisplay": "全門市 (教育價僅適用 APR+A Store)"}, {"活動序號": "63", "原始列範圍": "218-223", "大類": "iPad", "項目": "iPad\n全系列", "活動/子項": "", "活動內容": "ACPP+，for iPad Pro系列", "存代數": "6", "存貨代碼清單": "26500053、26500054、26500055、26500056、26500099、26500100", "適用範圍": "", "適用門市": "全門市\n(教育價僅適用\nAPR+A Store)", "開始日期": "2022/11/24；2021/09/24；2020/01/01；2021/04/21", "結束日期": "2026/05/31", "標示": "紅字", "group": "ipad", "groupTitle": "iPad 主機", "statusKind": "normal", "statusLabel": "期間活動", "summary": "ACPP+，for iPad Pro系列", "summaryCompact": "ACPP+，for iPad Pro系列", "codesDisplay": "26500053、26500054、26500055、26500056、26500099、26500100", "codesCompact": "26500053、26500054、26500055、26500056\n另有 2 個存代", "scopeDisplay": "未填", "storesDisplay": "全門市 (教育價僅適用 APR+A Store)"}, {"活動序號": "64", "原始列範圍": "224-229", "大類": "iPad", "項目": "iPad\n全系列", "活動/子項": "iPad mini 系列\n加購SA Care2.0(二年期)/或加購ACPP+\n(教育價可適用)", "活動內容": "好禮3選1\n1.聯名款觸控筆＋500購物金\n2. pqi-折疊支架藍芽鍵盤帶觸控板\n3. VAP保貼（任選：亮面 or 類紙膜、升級玻璃+ $199）＋500購物金", "存代數": "6", "存貨代碼清單": "05901981、05901723、51800041、46200123、46200122、54600001", "適用範圍": "iPad mini 系列", "適用門市": "全門市\n(教育價僅適用\nAPR+A Store)", "開始日期": "2021/04/21；2022/11/24；2024/06/27；2022/06/01；2024/12/01", "結束日期": "2026/05/31", "標示": "紅字", "group": "ipad", "groupTitle": "iPad 主機", "statusKind": "normal", "statusLabel": "期間活動", "summary": "• 1.聯名款觸控筆+500購物金\n• 2. pqi-折疊支架藍芽鍵盤帶觸控板\n• 3. VAP保貼（任選：亮面 or 類紙膜、升級玻璃+ $199）+500購物金", "summaryCompact": "• 1.聯名款觸控筆+500購物金\n• 2. pqi-折疊支架藍芽鍵盤帶觸控板", "codesDisplay": "05901981、05901723、51800041、46200123、46200122、54600001", "codesCompact": "05901981、05901723、51800041、46200123\n另有 2 個存代", "scopeDisplay": "iPad mini 系列", "storesDisplay": "全門市 (教育價僅適用 APR+A Store)"}, {"活動序號": "65", "原始列範圍": "230-240", "大類": "iPad", "項目": "iPad\n全系列", "活動/子項": "iPad Air系列\n(教育價可適用)", "活動內容": "加購SA Care2.0(二年期)/或加購ACPP+\n好禮3選1\n1. PQI 保護貼＋聯名款 觸控筆 ＋500購物金\n2. PQI 保護貼+pqi-折疊支架藍芽鍵盤帶觸控板\n*PQI保貼（任選：亮面 or 類紙膜、升級玻璃+ $199）\n3.加1,990 元 送中⽂ Microsoft 365 個⼈版⼀年盒裝無光碟", "存代數": "11", "存貨代碼清單": "54600001、05901981、05901914、05901915、51800036、51800037、46200214、46200215、46200217、02900341、46200218", "適用範圍": "iPad Air系列", "適用門市": "全門市\n(教育價僅適用\nAPR+A Store)", "開始日期": "2022/02/01；2020/07/01；2024/06/27；2024/12/01", "結束日期": "2026/05/31", "標示": "紅字", "group": "ipad", "groupTitle": "iPad 主機", "statusKind": "normal", "statusLabel": "期間活動", "summary": "• 加購SA Care2.0(二年期)/或加購ACPP+\n• 1. PQI 保護貼+聯名款 觸控筆 +500購物金\n• 2. PQI 保護貼+pqi-折疊支架藍芽鍵盤帶觸控板", "summaryCompact": "• 加購SA Care2.0(二年期)/或加購ACPP+\n• 1. PQI 保護貼+聯名款 觸控筆 +500購物金", "codesDisplay": "54600001、05901981、05901914、05901915、51800036、51800037、46200214、46200215\n另有 3 個存代", "codesCompact": "54600001、05901981、05901914、05901915\n另有 7 個存代", "scopeDisplay": "iPad Air系列", "storesDisplay": "全門市 (教育價僅適用 APR+A Store)"}, {"活動序號": "66", "原始列範圍": "241-252", "大類": "iPad", "項目": "iPad\n全系列", "活動/子項": "iPad Air系列\n(教育價可適用)", "活動內容": "加購SA Care2.0(二年期)\n送 AR 科學實驗室入⾨組 or Starter Kit 任選一套\n加 99 AR Words 一套\n加 199 Hello Nature 一套\n加 199 Into the Community (book set)\n加 899 Into the Curiosity (book set)\n加 899 AR Science Lab (book set)\n加 3,699 Disney AR互動繪本組\n加 3,699 Disney 有聲互動繪本組（30本書）", "存代數": "11", "存貨代碼清單": "49600043、49600004、49600005、49600006、49600054、49600055、49600056、49600057、49600058、49600059、99200202", "適用範圍": "iPad Air系列", "適用門市": "全門市\n(教育價僅適用\nAPR+A Store)", "開始日期": "2022/01/01；2024/12/20", "結束日期": "2026/05/31", "標示": "紅字", "group": "ipad", "groupTitle": "iPad 主機", "statusKind": "normal", "statusLabel": "期間活動", "summary": "• 加購SA Care2.0(二年期)\n• 送 AR 科學實驗室入⾨組 or Starter Kit 任選一套", "summaryCompact": "• 加購SA Care2.0(二年期)\n• 送 AR 科學實驗室入⾨組 or Starter Kit 任選一套", "codesDisplay": "49600043、49600004、49600005、49600006、49600054、49600055、49600056、49600057\n另有 3 個存代", "codesCompact": "49600043、49600004、49600005、49600006\n另有 7 個存代", "scopeDisplay": "iPad Air系列", "storesDisplay": "全門市 (教育價僅適用 APR+A Store)"}, {"活動序號": "67", "原始列範圍": "253-262", "大類": "iPad", "項目": "iPad\n全系列", "活動/子項": "iPad A16系列\n(教育價可適用)", "活動內容": "加購SA Care2.0(二年期)/或加購ACPP+\n好禮3選1\n1. 聯名款 觸控筆+500購物金\n2. pqi-折疊支架藍芽鍵盤帶觸控板\n3. PQI保貼（任選：亮面 or 類紙膜、升級玻璃+ $199）＋500購物金", "存代數": "7", "存貨代碼清單": "51800057、54600001、05901981、05901796、51800035、46200216、46200171", "適用範圍": "iPad 系列", "適用門市": "全門市\n(教育價僅適用\nAPR+A Store)", "開始日期": "2024/06/27", "結束日期": "2026/05/31", "標示": "紅字", "group": "ipad", "groupTitle": "iPad 主機", "statusKind": "normal", "statusLabel": "期間活動", "summary": "• 加購SA Care2.0(二年期)/或加購ACPP+\n• 1. 聯名款 觸控筆+500購物金\n• 2. pqi-折疊支架藍芽鍵盤帶觸控板", "summaryCompact": "• 加購SA Care2.0(二年期)/或加購ACPP+\n• 1. 聯名款 觸控筆+500購物金", "codesDisplay": "51800057、54600001、05901981、05901796、51800035、46200216、46200171", "codesCompact": "51800057、54600001、05901981、05901796\n另有 3 個存代", "scopeDisplay": "iPad 系列", "storesDisplay": "全門市 (教育價僅適用 APR+A Store)"}, {"活動序號": "68", "原始列範圍": "263-274", "大類": "iPad", "項目": "iPad\n全系列", "活動/子項": "iPad A16系列\n(教育價可適用)", "活動內容": "加購SA Care2.0(二年期)\n送 AR 科學實驗室入⾨組 or Starter Kit 任選一套\n加 99 AR Words 一套\n加 199 Hello Nature 一套\n加 199 Into the Community (book set)\n加 899 Into the Curiosity (book set)\n加 899 AR Science Lab (book set)\n加 3,699 Disney AR互動繪本組\n加 3,699 Disney 有聲互動繪本組（30本書）", "存代數": "11", "存貨代碼清單": "49600043、49600004、49600005、49600006、49600054、49600055、49600056、49600057、49600058、49600059、99200202", "適用範圍": "iPad 系列", "適用門市": "全門市\n(教育價僅適用\nAPR+A Store)", "開始日期": "2024/12/01；2022/01/01；2024/12/20", "結束日期": "2026/05/31", "標示": "紅字", "group": "ipad", "groupTitle": "iPad 主機", "statusKind": "normal", "statusLabel": "期間活動", "summary": "• 加購SA Care2.0(二年期)\n• 送 AR 科學實驗室入⾨組 or Starter Kit 任選一套", "summaryCompact": "• 加購SA Care2.0(二年期)\n• 送 AR 科學實驗室入⾨組 or Starter Kit 任選一套", "codesDisplay": "49600043、49600004、49600005、49600006、49600054、49600055、49600056、49600057\n另有 3 個存代", "codesCompact": "49600043、49600004、49600005、49600006\n另有 7 個存代", "scopeDisplay": "iPad 系列", "storesDisplay": "全門市 (教育價僅適用 APR+A Store)"}, {"活動序號": "69", "原始列範圍": "275-294", "大類": "iPad", "項目": "iPad\n全系列", "活動/子項": "iPad Pro系列\n(教育價可適用)", "活動內容": "加購SA Care2.0(二年期)/或加購ACPP+\n好禮選1\n1. VAP 保護貼+聯名款 觸控筆＋1000元購物金\n2. VAP 保護貼+pqi-折疊支架藍芽鍵盤帶觸控板\n*VAP保貼（任選：亮面 or 類紙膜、升級玻璃+ $199）\n3. Lycander Combo Lite iPad 藍牙觸控鍵盤 (11吋適用)\n4.加 990 元 送 中⽂ Microsoft 365 個⼈版⼀年盒裝無光碟\n5.加 1,800元 送 Marshall Willen II 喇叭", "存代數": "19", "存貨代碼清單": "54600001、05901981、09600048、09600049、05901916、05901917、51800038、51800039、46200192、46200193、46200196、46200197、49600043、35300032、35300033、35300034、49600005、49600006、09600037", "適用範圍": "iPad Pro 系列", "適用門市": "全門市\n(教育價僅適用\nAPR+A Store)", "開始日期": "2023/05/01；2024/06/27；2022/06/01；2022/01/01；2024/12/01", "結束日期": "2026/05/31", "標示": "紅字", "group": "ipad", "groupTitle": "iPad 主機", "statusKind": "normal", "statusLabel": "期間活動", "summary": "• 加購SA Care2.0(二年期)/或加購ACPP+\n• 1. VAP 保護貼+聯名款 觸控筆+1000元購物金\n• 2. VAP 保護貼+pqi-折疊支架藍芽鍵盤帶觸控板", "summaryCompact": "• 加購SA Care2.0(二年期)/或加購ACPP+\n• 1. VAP 保護貼+聯名款 觸控筆+1000元購物金", "codesDisplay": "54600001、05901981、09600048、09600049、05901916、05901917、51800038、51800039\n另有 11 個存代", "codesCompact": "54600001、05901981、09600048、09600049\n另有 15 個存代", "scopeDisplay": "iPad Pro 系列", "storesDisplay": "全門市 (教育價僅適用 APR+A Store)"}, {"活動序號": "70", "原始列範圍": "295-302", "大類": "iPad", "項目": "iPad\n全系列", "活動/子項": "iPad Pro系列\n(教育價可適用)", "活動內容": "iPad Pro 買 SA Care 2.0(⼆年期)\n送 AR 科學實驗室入⾨組 or Starter Kit 任選兩組\n送 AR Words\n送 Hello Nature\n送 Into the Community (book set)\n加 899 Into the Curiosity (book set)\n加 899 AR Science Lab (book set)\n加 3,699 Disney AR互動繪本組\n加 3,699 Disney 有聲互動繪本組（30本書）", "存代數": "7", "存貨代碼清單": "49600043、49600054、49600055、49600056、49600057、49600058、49600059", "適用範圍": "iPad Pro 系列", "適用門市": "全門市\n(教育價僅適用\nAPR+A Store)", "開始日期": "2025/04/07；2024/12/20", "結束日期": "2026/05/31", "標示": "紅字", "group": "ipad", "groupTitle": "iPad 主機", "statusKind": "normal", "statusLabel": "期間活動", "summary": "• 送 AR 科學實驗室入⾨組 or Starter Kit 任選兩組\n• 送 AR Words\n• 送 Hello Nature", "summaryCompact": "• 送 AR 科學實驗室入⾨組 or Starter Kit 任選兩組\n• 送 AR Words", "codesDisplay": "49600043、49600054、49600055、49600056、49600057、49600058、49600059", "codesCompact": "49600043、49600054、49600055、49600056\n另有 3 個存代", "scopeDisplay": "iPad Pro 系列", "storesDisplay": "全門市 (教育價僅適用 APR+A Store)"}, {"活動序號": "71", "原始列範圍": "303", "大類": "iPad配件活動", "項目": "iPad配件活動", "活動/子項": "iPad 免費贈", "活動內容": "買iPad送e筆硬筆APP", "存代數": "1", "存貨代碼清單": "99200202", "適用範圍": "iPad系列", "適用門市": "全門市", "開始日期": "", "結束日期": "2026/05/31", "標示": "紅字", "group": "ipad", "groupTitle": "iPad 主機", "statusKind": "normal", "statusLabel": "期間活動", "summary": "買iPad送e筆硬筆APP", "summaryCompact": "買iPad送e筆硬筆APP", "codesDisplay": "99200202", "codesCompact": "99200202", "scopeDisplay": "iPad系列", "storesDisplay": "全門市"}, {"活動序號": "72", "原始列範圍": "304", "大類": "iPad配件活動", "項目": "iPad配件活動", "活動/子項": "iPad主機加購優惠\n（可不同品項複選加購）\n(可與其他活動並行)", "活動內容": "+3,090元 Apple Pencil一代", "存代數": "1", "存貨代碼清單": "07309062", "適用範圍": "iPad系列", "適用門市": "全門市", "開始日期": "", "結束日期": "2026/05/31", "標示": "紅字", "group": "ipad", "groupTitle": "iPad 主機", "statusKind": "normal", "statusLabel": "期間活動", "summary": "+3,090元 Apple Pencil一代", "summaryCompact": "+3,090元 Apple Pencil一代", "codesDisplay": "07309062", "codesCompact": "07309062", "scopeDisplay": "iPad系列", "storesDisplay": "全門市"}, {"活動序號": "73", "原始列範圍": "305", "大類": "iPad配件活動", "項目": "iPad配件活動", "活動/子項": "iPad主機加購優惠\n（可不同品項複選加購）\n(可與其他活動並行)", "活動內容": "+4,190元 Apple Pencil二代", "存代數": "1", "存貨代碼清單": "07304973", "適用範圍": "iPad系列", "適用門市": "全門市", "開始日期": "", "結束日期": "2026/05/31", "標示": "紅字", "group": "ipad", "groupTitle": "iPad 主機", "statusKind": "normal", "statusLabel": "期間活動", "summary": "+4,190元 Apple Pencil二代", "summaryCompact": "+4,190元 Apple Pencil二代", "codesDisplay": "07304973", "codesCompact": "07304973", "scopeDisplay": "iPad系列", "storesDisplay": "全門市"}, {"活動序號": "74", "原始列範圍": "306", "大類": "iPad配件活動", "項目": "iPad配件活動", "活動/子項": "iPad主機加購優惠\n（可不同品項複選加購）\n(可與其他活動並行)", "活動內容": "+4,190元 Apple Pencil Pro", "存代數": "1", "存貨代碼清單": "07310512", "適用範圍": "iPad系列", "適用門市": "全門市", "開始日期": "2018/09/01", "結束日期": "持續進行", "標示": "紅字", "group": "ipad", "groupTitle": "iPad 主機", "statusKind": "long", "statusLabel": "長期", "summary": "+4,190元 Apple Pencil Pro", "summaryCompact": "+4,190元 Apple Pencil Pro", "codesDisplay": "07310512", "codesCompact": "07310512", "scopeDisplay": "iPad系列", "storesDisplay": "全門市"}, {"活動序號": "75", "原始列範圍": "307", "大類": "iPad配件活動", "項目": "iPad配件活動", "活動/子項": "iPad主機加購優惠\n（可不同品項複選加購）\n(可與其他活動並行)\"", "活動內容": "加購Office 365二套 ＄5,690(原價＄6,180)", "存代數": "1", "存貨代碼清單": "02900341", "適用範圍": "iPad系列", "適用門市": "全門市", "開始日期": "2022/10/19", "結束日期": "2026/05/31", "標示": "紅字", "group": "ipad", "groupTitle": "iPad 主機", "statusKind": "normal", "statusLabel": "期間活動", "summary": "加購Office 365二套 ＄5,690(原價＄6,180)", "summaryCompact": "加購Office 365二套 ＄5,690(原價＄6,180)", "codesDisplay": "02900341", "codesCompact": "02900341", "scopeDisplay": "iPad系列", "storesDisplay": "全門市"}, {"活動序號": "76", "原始列範圍": "308", "大類": "iPad配件活動", "項目": "iPad配件活動", "活動/子項": "iPad主機加購優惠\n（可不同品項複選加購）\n(可與其他活動並行)\"", "活動內容": "加購Office 2024 ＄5,090(原價＄5690)", "存代數": "1", "存貨代碼清單": "02900396", "適用範圍": "iPad系列", "適用門市": "全門市", "開始日期": "", "結束日期": "2026/05/31", "標示": "紅字+黃底", "group": "ipad", "groupTitle": "iPad 主機", "statusKind": "changed", "statusLabel": "異動重點", "summary": "加購Office 2024 ＄5,090(原價＄5690)", "summaryCompact": "加購Office 2024 ＄5,090(原價＄5690)", "codesDisplay": "02900396", "codesCompact": "02900396", "scopeDisplay": "iPad系列", "storesDisplay": "全門市"}, {"活動序號": "77", "原始列範圍": "309-310", "大類": "iPad配件活動", "項目": "iPad配件活動", "活動/子項": "iPad主機加購優惠\n（可不同品項複選加購）\n(可與其他活動並行)\"", "活動內容": "+ 炫輝Lycander Combo Lite iPad 藍牙觸控鍵盤\n加購價 9 折 $2,412 (原價＄2,680)", "存代數": "7", "存貨代碼清單": "35300029、35300030、35300031、35300032、35300033、35300034、35300057", "適用範圍": "iPad系列", "適用門市": "全門市", "開始日期": "2022/10/19；2020/10/01", "結束日期": "2026/05/31", "標示": "紅字", "group": "ipad", "groupTitle": "iPad 主機", "statusKind": "normal", "statusLabel": "期間活動", "summary": "加購價 9 折 $2,412 (原價＄2,680)", "summaryCompact": "加購價 9 折 $2,412 (原價＄2,680)", "codesDisplay": "35300029、35300030、35300031、35300032、35300033、35300034、35300057", "codesCompact": "35300029、35300030、35300031、35300032\n另有 3 個存代", "scopeDisplay": "iPad系列", "storesDisplay": "全門市"}, {"活動序號": "78", "原始列範圍": "311", "大類": "iPad配件活動", "項目": "iPad配件活動", "活動/子項": "iPad主機加購優惠\n（可不同品項複選加購）\n(可與其他活動並行)\"", "活動內容": "+聯名款 iPad 觸控筆尖 4入\n加購價 $299 (原價＄550)", "存代數": "1", "存貨代碼清單": "54600003", "適用範圍": "iPad系列", "適用門市": "全門市", "開始日期": "2022/08/15", "結束日期": "2026/05/31", "標示": "紅字", "group": "ipad", "groupTitle": "iPad 主機", "statusKind": "normal", "statusLabel": "期間活動", "summary": "加購價 $299 (原價＄550)", "summaryCompact": "加購價 $299 (原價＄550)", "codesDisplay": "54600003", "codesCompact": "54600003", "scopeDisplay": "iPad系列", "storesDisplay": "全門市"}, {"活動序號": "79", "原始列範圍": "312-315", "大類": "iPad 套餐", "項目": "iPad 套餐", "活動/子項": "$3,988 套餐", "活動內容": "炫輝 Lycander Combo Lite iPad 藍牙觸控鍵盤(iPad A16、iPad Air 11吋、iPad Pro 11吋) + PQI/VAP 螢幕保護貼 + 聯名款觸控筆 價值$5,027", "存代數": "23", "存貨代碼清單": "46200190、46200191、46200192、46200193、46200214、46200215、46200216、46200123、46200194、46200195、46200196、46200197、46200217、46200218、46200219、51800035、51800036、51800037、51800038、51800039、51800040、51800041、54600001", "適用範圍": "iPad系列", "適用門市": "全門市", "開始日期": "2025/06/01；～", "結束日期": "2026/05/31", "標示": "紅字", "group": "ipad", "groupTitle": "iPad 主機", "statusKind": "normal", "statusLabel": "期間活動", "summary": "炫輝 Lycander Combo Lite iPad 藍牙觸控鍵盤(iPad A16、iPad Air 11吋、…", "summaryCompact": "炫輝 Lycander Combo Lite iPad 藍牙觸控鍵盤(iPad A16、iPad Air 11吋、…", "codesDisplay": "46200190、46200191、46200192、46200193、46200214、46200215、46200216、46200123\n另有 15 個存代", "codesCompact": "46200190、46200191、46200192、46200193\n另有 19 個存代", "scopeDisplay": "iPad系列", "storesDisplay": "全門市"}, {"活動序號": "80", "原始列範圍": "316", "大類": "iPad 套餐", "項目": "iPad 套餐", "活動/子項": "$2,988 套餐", "活動內容": "pqi-折疊支架藍芽鍵盤帶觸控板+ PQI / VAP 螢幕保護貼 + 聯名款觸控筆 價值$3,637", "存代數": "2", "存貨代碼清單": "05901981、54600001", "適用範圍": "iPad系列", "適用門市": "全門市", "開始日期": "2025/06/01", "結束日期": "2026/05/31", "標示": "紅字", "group": "ipad", "groupTitle": "iPad 主機", "statusKind": "normal", "statusLabel": "期間活動", "summary": "pqi-折疊支架藍芽鍵盤帶觸控板+ PQI / VAP 螢幕保護貼 + 聯名款觸控筆 價值$3,637", "summaryCompact": "pqi-折疊支架藍芽鍵盤帶觸控板+ PQI / VAP 螢幕保護貼 + 聯名款觸控筆 價值$3,637", "codesDisplay": "05901981、54600001", "codesCompact": "05901981、54600001", "scopeDisplay": "iPad系列", "storesDisplay": "全門市"}, {"活動序號": "81", "原始列範圍": "317", "大類": "iPad 套餐", "項目": "iPad 套餐", "活動/子項": "$2,988 套餐", "活動內容": "副廠週邊指定保護殼(任一品牌) + PQI / VAP 螢幕保護貼 +聯名款觸控筆 價值$3,489", "存代數": "1", "存貨代碼清單": "54600001", "適用範圍": "iPad系列", "適用門市": "全門市", "開始日期": "2025/06/01", "結束日期": "2026/05/31", "標示": "紅字", "group": "ipad", "groupTitle": "iPad 主機", "statusKind": "normal", "statusLabel": "期間活動", "summary": "副廠週邊指定保護殼(任一品牌) + PQI / VAP 螢幕保護貼 +聯名款觸控筆 價值$3,489", "summaryCompact": "副廠週邊指定保護殼(任一品牌) + PQI / VAP 螢幕保護貼 +聯名款觸控筆 價值$3,489", "codesDisplay": "54600001", "codesCompact": "54600001", "scopeDisplay": "iPad系列", "storesDisplay": "全門市"}, {"活動序號": "82", "原始列範圍": "318-328", "大類": "iPhone 16系列", "項目": "iPhone 16系列\n+SA Care/ACCP+活動", "活動/子項": "保固活動", "活動內容": "iPhone 16/16/16 Pro/16 Pro Max\n加購 SA Care (二年期)/AC+\nVAP / PQI 三合一磁吸無線充電器\n＋組合套餐（A、B 二選一）", "存代數": "10", "存貨代碼清單": "99902985、26500132、26500133、10600474、99902983、99902981、26500107、26500108、26500130、26500131", "適用範圍": "iPhone 16全系列", "適用門市": "全門市", "開始日期": "2025/06/01；2025/10/02", "結束日期": "2026/05/31", "標示": "紅字", "group": "iphone", "groupTitle": "iPhone 主機", "statusKind": "normal", "statusLabel": "期間活動", "summary": "• 加購 SA Care (二年期)/AC+\n• +組合套餐（A、B 二選一）", "summaryCompact": "• 加購 SA Care (二年期)/AC+\n• +組合套餐（A、B 二選一）", "codesDisplay": "99902985、26500132、26500133、10600474、99902983、99902981、26500107、26500108\n另有 2 個存代", "codesCompact": "99902985、26500132、26500133、10600474\n另有 6 個存代", "scopeDisplay": "iPhone 16全系列", "storesDisplay": "全門市"}, {"活動序號": "83", "原始列範圍": "329-330", "大類": "iPhone 16系列", "項目": "iPhone 16系列\n+SA Care/ACCP+活動", "活動/子項": "保固活動", "活動內容": "A組合套餐（二選一）\nPQI 45W 充電器+pqi USB 3.2 10Gbps 100W 高速傳輸充電線", "存代數": "2", "存貨代碼清單": "05901971、05901979", "適用範圍": "iPhone 16全系列", "適用門市": "全門市", "開始日期": "2025/10/02", "結束日期": "2026/05/31", "標示": "", "group": "iphone", "groupTitle": "iPhone 主機", "statusKind": "normal", "statusLabel": "期間活動", "summary": "A組合套餐（二選一）", "summaryCompact": "A組合套餐（二選一）", "codesDisplay": "05901971、05901979", "codesCompact": "05901971、05901979", "scopeDisplay": "iPhone 16全系列", "storesDisplay": "全門市"}, {"活動序號": "84", "原始列範圍": "331-333", "大類": "iPhone 16系列", "項目": "iPhone 16系列\n+SA Care/ACCP+活動", "活動/子項": "保固活動", "活動內容": "B組合套餐（二選一）\nVAP 玻璃保貼+VAP/PureGear 鏡頭貼", "存代數": "0", "存貨代碼清單": "", "適用範圍": "iPhone 16全系列", "適用門市": "全門市", "開始日期": "2025/10/02", "結束日期": "2026/05/31", "標示": "", "group": "iphone", "groupTitle": "iPhone 主機", "statusKind": "normal", "statusLabel": "期間活動", "summary": "B組合套餐（二選一）", "summaryCompact": "B組合套餐（二選一）", "codesDisplay": "未填", "codesCompact": "未填", "scopeDisplay": "iPhone 16全系列", "storesDisplay": "全門市"}, {"活動序號": "85", "原始列範圍": "334", "大類": "iPhone加購", "項目": "", "活動/子項": "iPhone加購\n（可不同品項複選加購）\n(可與其他活動並行)", "活動內容": "+3,090元 Apple Pencil", "存代數": "1", "存貨代碼清單": "07309062", "適用範圍": "", "適用門市": "全門市", "開始日期": "2025/10/02", "結束日期": "2026/05/31", "標示": "", "group": "iphone", "groupTitle": "iPhone 主機", "statusKind": "normal", "statusLabel": "期間活動", "summary": "+3,090元 Apple Pencil", "summaryCompact": "+3,090元 Apple Pencil", "codesDisplay": "07309062", "codesCompact": "07309062", "scopeDisplay": "未填", "storesDisplay": "全門市"}, {"活動序號": "86", "原始列範圍": "335", "大類": "AirPods系列加購", "項目": "AirPods系列加購\nACPP+/SA Care活動\n（二年期）", "活動/子項": "AirPods 系列活動", "活動內容": "SA Care2.0全方位保障計劃，for AirPods全系列", "存代數": "1", "存貨代碼清單": "99903018", "適用範圍": "AirPods全系列", "適用門市": "全門市\n活動有分指定門市", "開始日期": "", "結束日期": "2026/05/31", "標示": "紅字", "group": "airpods", "groupTitle": "AirPods", "statusKind": "normal", "statusLabel": "期間活動", "summary": "SA Care2.0全方位保障計劃，for AirPods全系列", "summaryCompact": "SA Care2.0全方位保障計劃，for AirPods全系列", "codesDisplay": "99903018", "codesCompact": "99903018", "scopeDisplay": "AirPods全系列", "storesDisplay": "全門市 活動有分指定門市"}, {"活動序號": "87", "原始列範圍": "336-337", "大類": "AirPods系列加購", "項目": "AirPods系列加購\nACPP+/SA Care活動\n（二年期）", "活動/子項": "AirPods 系列活動", "活動內容": "ACCP+。 For Headphones", "存代數": "2", "存貨代碼清單": "26500080、26500081", "適用範圍": "AirPods全系列", "適用門市": "全門市\n活動有分指定門市", "開始日期": "", "結束日期": "2026/05/31", "標示": "紅字", "group": "airpods", "groupTitle": "AirPods", "statusKind": "normal", "statusLabel": "期間活動", "summary": "ACCP+。 For Headphones", "summaryCompact": "ACCP+。 For Headphones", "codesDisplay": "26500080、26500081", "codesCompact": "26500080、26500081", "scopeDisplay": "AirPods全系列", "storesDisplay": "全門市 活動有分指定門市"}, {"活動序號": "88", "原始列範圍": "338-360", "大類": "AirPods系列加購", "項目": "AirPods系列加購\nACPP+/SA Care活動\n（二年期）", "活動/子項": "AirPods 系列活動", "活動內容": "AirPods Pro 第3代 加購ACPP+/SA Care ：\n送PQI AirPods Pro 3任一保護套＋PQI 耳塞＋200元購物金/ BON TON TOYS吊飾娃娃（限定⾨市：美麗華、夢時代、新竹遠百、阿波羅、中壢大江、新竹中正、新西門、桃園台茂、大葉高島屋、苗栗尚順、桃園統領、板橋遠百、新莊宏匯、竹北遠百、台中麗寶、岡山秀泰、新店裕隆城）", "存代數": "15", "存貨代碼清單": "46200237、46200238、46200239、46200240、05901988、05901989、54200001、54200002、54200003、54200004、54200005、54200006、54200007、54200008、54200009", "適用範圍": "AirPods全系列", "適用門市": "全門市\n活動有分指定門市", "開始日期": "", "結束日期": "2026/05/31", "標示": "紅字", "group": "airpods", "groupTitle": "AirPods", "statusKind": "normal", "statusLabel": "期間活動", "summary": "• AirPods Pro 第3代 加購ACPP+/SA Care\n• 送PQI AirPods Pro 3任一保護套+PQI 耳塞+200元購物金/ BON TON TOYS吊飾娃娃（…", "summaryCompact": "• AirPods Pro 第3代 加購ACPP+/SA Care\n• 送PQI AirPods Pro 3任一保護套+PQI 耳塞+200元購物金/ BON TON TOYS吊飾娃娃（…", "codesDisplay": "46200237、46200238、46200239、46200240、05901988、05901989、54200001、54200002\n另有 7 個存代", "codesCompact": "46200237、46200238、46200239、46200240\n另有 11 個存代", "scopeDisplay": "AirPods全系列", "storesDisplay": "全門市 活動有分指定門市"}, {"活動序號": "89", "原始列範圍": "361-370", "大類": "AirPods系列加購", "項目": "AirPods系列加購\nACPP+/SA Care活動\n（二年期）", "活動/子項": "AirPods 系列活動", "活動內容": "AirPods 4 加購ACPP+/SA Care：\n送VAP AirPods 保護套 +200購物金 / BON TON TOYS吊飾娃娃（限定⾨市：美麗華、夢時代、新竹遠百、阿波羅、中壢大江、新竹中正、新西門、桃園台茂、大葉高島屋、苗栗尚順、桃園統領、板橋遠百、新莊宏匯、竹北遠百、台中麗寶、岡山秀泰、新店裕隆城）", "存代數": "12", "存貨代碼清單": "52900062、05901942、05901943、54200001、54200002、54200003、54200004、54200005、54200006、54200007、54200008、54200009", "適用範圍": "AirPods全系列", "適用門市": "全門市\n活動有分指定門市", "開始日期": "", "結束日期": "2026/05/31", "標示": "紅字", "group": "airpods", "groupTitle": "AirPods", "statusKind": "normal", "statusLabel": "期間活動", "summary": "• AirPods 4 加購ACPP+/SA Care\n• 送VAP AirPods 保護套 +200購物金 / BON TON TOYS吊飾娃娃（限定⾨市：美麗華、夢時代、…", "summaryCompact": "• AirPods 4 加購ACPP+/SA Care\n• 送VAP AirPods 保護套 +200購物金 / BON TON TOYS吊飾娃娃（限定⾨市：美麗華、夢時代、…", "codesDisplay": "52900062、05901942、05901943、54200001、54200002、54200003、54200004、54200005\n另有 4 個存代", "codesCompact": "52900062、05901942、05901943、54200001\n另有 8 個存代", "scopeDisplay": "AirPods全系列", "storesDisplay": "全門市 活動有分指定門市"}, {"活動序號": "90", "原始列範圍": "371-372", "大類": "SA Care", "項目": "SA Care\n檢測新機/續保機活動", "活動/子項": "SA Care2.0 續保機\n加購活動", "活動內容": "Mac、iPhone：享有1,000元購物金\niPad、Watch ：享有 500元購物金\n-----------「 POS結帳方式 」--------------\n輸入活動商品存代及99901781 系統自動變價\n- 99901781 續保SA Care購物金（Mac＆iPhone享有1,000元、iPad＆Watch享有500元）\n- 購物金僅可以折抵副廠配件購物，不包含硬碟、耳機、喇叭、軟體\n- 提醒：有投保過新機一年期。無出險紀錄、檢測及外觀正常，保單到期前一個月才可投保，續保機僅可加保一次。", "存代數": "2", "存貨代碼清單": "99902982、99902984", "適用範圍": "續保機 SACare", "適用門市": "", "開始日期": "", "結束日期": "", "標示": "紅字", "group": "care", "groupTitle": "SA Care 與保固", "statusKind": "normal", "statusLabel": "期間活動", "summary": "• Mac、iPhone：享有1,000元購物金\n• iPad、Watch ：享有 500元購物金\n• 99901781 續保SA Care購物金（Mac＆iPhone享有1,000元、iPad＆Watch享有500元）", "summaryCompact": "• Mac、iPhone：享有1,000元購物金\n• iPad、Watch ：享有 500元購物金", "codesDisplay": "99902982、99902984", "codesCompact": "99902982、99902984", "scopeDisplay": "續保機 SACare", "storesDisplay": "未填"}, {"活動序號": "91", "原始列範圍": "373-376", "大類": "SA Care", "項目": "SA Care\n檢測新機/續保機活動", "活動/子項": "CPU 檢測新機\nSA Care 60日內加購檢測新機活動\n（2024/08/19～持續進行）", "活動內容": "一年期：享有500元購物金\n三年期： 享有1,500元購物金\n-----------「 POS結帳方式 」--------------\n輸入活動商品存代及99901780 系統自動變價", "存代數": "4", "存貨代碼清單": "99902986、99902666、99903311、99902940", "適用範圍": "檢測新機 SACare", "適用門市": "", "開始日期": "", "結束日期": "2026/05/31", "標示": "紅字", "group": "care", "groupTitle": "SA Care 與保固", "statusKind": "normal", "statusLabel": "期間活動", "summary": "• 一年期：享有500元購物金\n• 三年期： 享有1,500元購物金", "summaryCompact": "• 一年期：享有500元購物金\n• 三年期： 享有1,500元購物金", "codesDisplay": "99902986、99902666、99903311、99902940", "codesCompact": "99902986、99902666、99903311、99902940", "scopeDisplay": "檢測新機 SACare", "storesDisplay": "未填"}, {"活動序號": "92", "原始列範圍": "377-382", "大類": "SA Care", "項目": "SA Care\n檢測新機/續保機活動", "活動/子項": "iPhone 檢測新機\nSA Care 60日內加購檢測新機活動\n（2024/08/19～持續進行）", "活動內容": "iPhone 系列\n一年期：享有500元購物金\n二年期：享有 1,500元購物金\niPhone 17e\n一年期：享有500元購物金\n二年期：享有1,000元購物金\n-----------「 POS結帳方式 」--------------\n輸入活動商品存代及99901780 系統自動變價", "存代數": "6", "存貨代碼清單": "99902945、99902938、99902662、99902647、99902648、99901781", "適用範圍": "檢測新機 SACare", "適用門市": "", "開始日期": "", "結束日期": "2026/05/31", "標示": "紅字", "group": "care", "groupTitle": "SA Care 與保固", "statusKind": "normal", "statusLabel": "期間活動", "summary": "• 一年期：享有500元購物金\n• 二年期：享有 1,500元購物金\n• 二年期：享有1,000元購物金", "summaryCompact": "• 一年期：享有500元購物金\n• 二年期：享有 1,500元購物金", "codesDisplay": "99902945、99902938、99902662、99902647、99902648、99901781", "codesCompact": "99902945、99902938、99902662、99902647\n另有 2 個存代", "scopeDisplay": "檢測新機 SACare", "storesDisplay": "未填"}, {"活動序號": "93", "原始列範圍": "383-385", "大類": "SA Care", "項目": "SA Care\n檢測新機/續保機活動", "活動/子項": "iPad 檢測新機\nSA Care 60日內加購檢測新機活動\n（2024/08/19～持續進行）", "活動內容": "一年期：享有300元購物金\n二年期：享有 700元購物金\n-----------「 POS結帳方式 」--------------\n輸入活動商品存代及99901780 系統自動變價\n* 體醒：iPad 搭配KeyBoard及Apple Pencil 這兩樣配件僅能於投保當日在SA購買，才可同時將配件序號加入保單，業務員需把關確認，若出險發現開通日異常將自行負責。", "存代數": "3", "存貨代碼清單": "99902664、99902930、99902644", "適用範圍": "檢測新機 SACare", "適用門市": "", "開始日期": "", "結束日期": "2026/05/31", "標示": "紅字", "group": "care", "groupTitle": "SA Care 與保固", "statusKind": "normal", "statusLabel": "期間活動", "summary": "• 一年期：享有300元購物金\n• 二年期：享有 700元購物金", "summaryCompact": "• 一年期：享有300元購物金\n• 二年期：享有 700元購物金", "codesDisplay": "99902664、99902930、99902644", "codesCompact": "99902664、99902930、99902644", "scopeDisplay": "檢測新機 SACare", "storesDisplay": "未填"}, {"活動序號": "94", "原始列範圍": "386-389", "大類": "SA Care", "項目": "SA Care\n檢測新機/續保機活動", "活動/子項": "Watch 檢測新機\nSA Care 60日內加購檢測新機活動\n（2024/08/19～持續進行）", "活動內容": "一年期：享有 200元購物金\n二年期：享有 500元購物金\n-----------「 POS結帳方式 」--------------\n輸入活動商品存代及99901780 系統自動變價", "存代數": "4", "存貨代碼清單": "99902978、99902980、99902943、99902988", "適用範圍": "檢測新機 SACare", "適用門市": "", "開始日期": "", "結束日期": "2026/05/31", "標示": "紅字", "group": "care", "groupTitle": "SA Care 與保固", "statusKind": "normal", "statusLabel": "期間活動", "summary": "• 一年期：享有 200元購物金\n• 二年期：享有 500元購物金", "summaryCompact": "• 一年期：享有 200元購物金\n• 二年期：享有 500元購物金", "codesDisplay": "99902978、99902980、99902943、99902988", "codesCompact": "99902978、99902980、99902943、99902988", "scopeDisplay": "檢測新機 SACare", "storesDisplay": "未填"}, {"活動序號": "95", "原始列範圍": "390", "大類": "AirTag 配件優惠", "項目": "", "活動/子項": "AirTag 配件優惠", "活動內容": "原廠皮革鑰匙圈優惠價9折優惠", "存代數": "0", "存貨代碼清單": "", "適用範圍": "原廠配件", "適用門市": "", "開始日期": "", "結束日期": "2026/05/31", "標示": "紅字", "group": "accessory", "groupTitle": "週邊配件與套組", "statusKind": "normal", "statusLabel": "期間活動", "summary": "原廠皮革鑰匙圈優惠價9折優惠", "summaryCompact": "原廠皮革鑰匙圈優惠價9折優惠", "codesDisplay": "未填", "codesCompact": "未填", "scopeDisplay": "原廠配件", "storesDisplay": "未填"}, {"活動序號": "96", "原始列範圍": "391", "大類": "軟體優惠", "項目": "軟體優惠", "活動/子項": "軟體組合", "活動內容": "Office 2024 版本加購價 $5,090", "存代數": "1", "存貨代碼清單": "02900396", "適用範圍": "Windows & Office", "適用門市": "", "開始日期": "", "結束日期": "2026/05/31", "標示": "紅字", "group": "software", "groupTitle": "軟體與系統", "statusKind": "normal", "statusLabel": "期間活動", "summary": "Office 2024 版本加購價 $5,090", "summaryCompact": "Office 2024 版本加購價 $5,090", "codesDisplay": "02900396", "codesCompact": "02900396", "scopeDisplay": "Windows & Office", "storesDisplay": "未填"}, {"活動序號": "97", "原始列範圍": "392", "大類": "軟體優惠", "項目": "軟體優惠", "活動/子項": "軟體組合", "活動內容": "Office 365 個人版兩套 $5,690", "存代數": "1", "存貨代碼清單": "02900341", "適用範圍": "Windows & Office", "適用門市": "", "開始日期": "", "結束日期": "2026/05/31", "標示": "紅字", "group": "software", "groupTitle": "軟體與系統", "statusKind": "normal", "statusLabel": "期間活動", "summary": "Office 365 個人版兩套 $5,690", "summaryCompact": "Office 365 個人版兩套 $5,690", "codesDisplay": "02900341", "codesCompact": "02900341", "scopeDisplay": "Windows & Office", "storesDisplay": "未填"}, {"活動序號": "98", "原始列範圍": "393-394", "大類": "軟體優惠", "項目": "軟體優惠", "活動/子項": "軟體組合", "活動內容": "超值軟體組合 Windows+Parallels+Office 2024 $12,990", "存代數": "3", "存貨代碼清單": "02900379、03100052、02900396", "適用範圍": "Windows & Office", "適用門市": "", "開始日期": "", "結束日期": "2026/05/31", "標示": "紅字", "group": "software", "groupTitle": "軟體與系統", "statusKind": "normal", "statusLabel": "期間活動", "summary": "超值軟體組合 Windows+Parallels+Office 2024 $12,990", "summaryCompact": "超值軟體組合 Windows+Parallels+Office 2024 $12,990", "codesDisplay": "02900379、03100052、02900396", "codesCompact": "02900379、03100052、02900396", "scopeDisplay": "Windows & Office", "storesDisplay": "未填"}, {"活動序號": "99", "原始列範圍": "395", "大類": "軟體優惠", "項目": "軟體優惠", "活動/子項": "軟體組合", "活動內容": "超值軟體組合 Windows+Parallels $7,690", "存代數": "2", "存貨代碼清單": "02900379、03100052", "適用範圍": "Windows & Office", "適用門市": "", "開始日期": "", "結束日期": "2026/05/31", "標示": "紅字", "group": "software", "groupTitle": "軟體與系統", "statusKind": "normal", "statusLabel": "期間活動", "summary": "超值軟體組合 Windows+Parallels $7,690", "summaryCompact": "超值軟體組合 Windows+Parallels $7,690", "codesDisplay": "02900379、03100052", "codesCompact": "02900379、03100052", "scopeDisplay": "Windows & Office", "storesDisplay": "未填"}, {"活動序號": "100", "原始列範圍": "396-399", "大類": "軟體優惠", "項目": "軟體優惠", "活動/子項": "軟體組合", "活動內容": "Office 2024 版本＋PQI 電腦螢幕保護貼\nMB Neo/MBA $6,090\nMBP $6,290", "存代數": "6", "存貨代碼清單": "02900396、46200167、46200168、46200169、46200172、46200246", "適用範圍": "Windows & Office", "適用門市": "", "開始日期": "", "結束日期": "2026/05/31", "標示": "紅字", "group": "software", "groupTitle": "軟體與系統", "statusKind": "normal", "statusLabel": "期間活動", "summary": "• Office 2024 版本+PQI 電腦螢幕保護貼\n• MB Neo/MBA $6,090", "summaryCompact": "• Office 2024 版本+PQI 電腦螢幕保護貼\n• MB Neo/MBA $6,090", "codesDisplay": "02900396、46200167、46200168、46200169、46200172、46200246", "codesCompact": "02900396、46200167、46200168、46200169\n另有 2 個存代", "scopeDisplay": "Windows & Office", "storesDisplay": "未填"}, {"活動序號": "101", "原始列範圍": "400", "大類": "舊換新", "項目": "舊換新", "活動/子項": "iPhone舊換新", "活動內容": "iPhone舊機換新機 每半個月更新，依系統價格為準，", "存代數": "0", "存貨代碼清單": "", "適用範圍": "SA 舊換新", "適用門市": "", "開始日期": "", "結束日期": "2026/05/31", "標示": "紅字", "group": "tradein", "groupTitle": "舊換新", "statusKind": "normal", "statusLabel": "期間活動", "summary": "iPhone舊機換新機 每半個月更新，依系統價格為準", "summaryCompact": "iPhone舊機換新機 每半個月更新，依系統價格為準", "codesDisplay": "未填", "codesCompact": "未填", "scopeDisplay": "SA 舊換新", "storesDisplay": "未填"}, {"活動序號": "102", "原始列範圍": "401", "大類": "舊換新", "項目": "舊換新", "活動/子項": "Apple watch舊換新", "活動內容": "watch舊機換新機 每半個月更新，依系統價格為準，", "存代數": "0", "存貨代碼清單": "", "適用範圍": "SA 舊換新", "適用門市": "", "開始日期": "", "結束日期": "2026/05/31", "標示": "紅字", "group": "tradein", "groupTitle": "舊換新", "statusKind": "normal", "statusLabel": "期間活動", "summary": "watch舊機換新機 每半個月更新，依系統價格為準", "summaryCompact": "watch舊機換新機 每半個月更新，依系統價格為準", "codesDisplay": "未填", "codesCompact": "未填", "scopeDisplay": "SA 舊換新", "storesDisplay": "未填"}, {"活動序號": "103", "原始列範圍": "402", "大類": "舊換新", "項目": "舊換新", "活動/子項": "Airpods舊換新", "活動內容": "AirPods舊機換新機 每半個月更新，依系統價格為準，", "存代數": "0", "存貨代碼清單": "", "適用範圍": "SA 舊換新", "適用門市": "", "開始日期": "", "結束日期": "2026/05/31", "標示": "紅字", "group": "tradein", "groupTitle": "舊換新", "statusKind": "normal", "statusLabel": "期間活動", "summary": "AirPods舊機換新機 每半個月更新，依系統價格為準", "summaryCompact": "AirPods舊機換新機 每半個月更新，依系統價格為準", "codesDisplay": "未填", "codesCompact": "未填", "scopeDisplay": "SA 舊換新", "storesDisplay": "未填"}, {"活動序號": "104", "原始列範圍": "403", "大類": "舊換新", "項目": "舊換新", "活動/子項": "Mac、iPad/聰穎鍵、\nApple TV盤舊換新", "活動內容": "Mac、iPad/聰穎鍵盤、Apple TV舊機換新機 ，每月更新一次", "存代數": "0", "存貨代碼清單": "", "適用範圍": "SA 舊換新", "適用門市": "", "開始日期": "", "結束日期": "", "標示": "紅字", "group": "tradein", "groupTitle": "舊換新", "statusKind": "normal", "statusLabel": "期間活動", "summary": "Mac、iPad/聰穎鍵盤、Apple TV舊機換新機 ，每月更新一次", "summaryCompact": "Mac、iPad/聰穎鍵盤、Apple TV舊機換新機 ，每月更新一次", "codesDisplay": "未填", "codesCompact": "未填", "scopeDisplay": "SA 舊換新", "storesDisplay": "未填"}, {"活動序號": "105", "原始列範圍": "404", "大類": "舊換新", "項目": "舊換新", "活動/子項": "iPad\n舊換新加碼", "活動內容": "會員／企業客戶攜帶 iPad 五台以上舊換新，舊機估價為A級當月最高回收價，每台再享3PP配件加碼金1,000元 。\n（不與原 iPad A級舊換新加碼500元折抵金並行）", "存代數": "1", "存貨代碼清單": "99902863", "適用範圍": "", "適用門市": "", "開始日期": "", "結束日期": "", "標示": "紅字", "group": "tradein", "groupTitle": "舊換新", "statusKind": "normal", "statusLabel": "期間活動", "summary": "• 會員／企業客戶攜帶 iPad 五台以上舊換新，舊機估價為A級當月最高回收價，每台再享3PP配件加碼金1,000元\n• （不與原 iPad A級舊換新加碼500元折抵金並行）", "summaryCompact": "• 會員／企業客戶攜帶 iPad 五台以上舊換新，舊機估價為A級當月最高回收價，每台再享3PP配件加碼金1,000元\n• （不與原 iPad A級舊換新加碼500元折抵金並行）", "codesDisplay": "99902863", "codesCompact": "99902863", "scopeDisplay": "未填", "storesDisplay": "未填"}, {"活動序號": "106", "原始列範圍": "405-407", "大類": "環保限塑政策", "項目": "環保限塑政策", "活動/子項": "塑膠袋收費", "活動內容": "塑膠袋都要收費＋開發票，不得用購物金折抵(贈送就是違法）", "存代數": "3", "存貨代碼清單": "99901018、99901019、99901020", "適用範圍": "塑膠袋都要收費＋開發票", "適用門市": "全門市", "開始日期": "2018/01/01", "結束日期": "永久", "標示": "紅字", "group": "policy", "groupTitle": "門市政策與耗材", "statusKind": "long", "statusLabel": "長期", "summary": "塑膠袋都要收費+開發票，不得用購物金折抵(贈送就是違法）", "summaryCompact": "塑膠袋都要收費+開發票，不得用購物金折抵(贈送就是違法）", "codesDisplay": "99901018、99901019、99901020", "codesCompact": "99901018、99901019、99901020", "scopeDisplay": "塑膠袋都要收費+開發票", "storesDisplay": "全門市"}, {"活動序號": "107", "原始列範圍": "408-410", "大類": "紙袋開賣", "項目": "紙袋開賣", "活動/子項": "紙袋收費", "活動內容": "如客人要購買紙袋可付費購買，統一收費 3 元或是點數 6 點折抵（集點卡也可以）", "存代數": "3", "存貨代碼清單": "99902083、99902084、99902728", "適用範圍": "收費＋開發票", "適用門市": "全門市", "開始日期": "", "結束日期": "永久", "標示": "紅字", "group": "policy", "groupTitle": "門市政策與耗材", "statusKind": "long", "statusLabel": "長期", "summary": "如客人要購買紙袋可付費購買，統一收費 3 元或是點數 6 點折抵（集點卡也可以）", "summaryCompact": "如客人要購買紙袋可付費購買，統一收費 3 元或是點數 6 點折抵（集點卡也可以）", "codesDisplay": "99902083、99902084、99902728", "codesCompact": "99902083、99902084、99902728", "scopeDisplay": "收費+開發票", "storesDisplay": "全門市"}, {"活動序號": "108", "原始列範圍": "412", "大類": "星宇航空", "項目": "星宇航空\n員工優惠", "活動/子項": "門市優惠", "活動內容": "須出示星宇航空員工識別證\n‧ Mac（電腦）：建議售價 95 折\n‧ iPad（平板）：建議售價 97 折\n‧ Apple 原廠配件：95 折\n‧ 第三方配件（3PP）：9 折\n‧ 手機貼膜：購買保貼享免費代貼服務（1對1）/ Apple 產品：專人諮詢與教學 / 購機服務：協助設定與基本操作導入", "存代數": "1", "存貨代碼清單": "99200267", "適用範圍": "", "適用門市": "SA街邊門市", "開始日期": "2026/03/20", "結束日期": "2027/03/20", "標示": "紅字", "group": "enterprise", "groupTitle": "企業與員工優惠", "statusKind": "normal", "statusLabel": "期間活動", "summary": "• ‧ Mac（電腦）：建議售價 95 折\n• ‧ iPad（平板）：建議售價 97 折\n• ‧ Apple 原廠配件：95 折", "summaryCompact": "• ‧ Mac（電腦）：建議售價 95 折\n• ‧ iPad（平板）：建議售價 97 折", "codesDisplay": "99200267", "codesCompact": "99200267", "scopeDisplay": "未填", "storesDisplay": "SA街邊門市"}, {"活動序號": "109", "原始列範圍": "413", "大類": "星宇航空", "項目": "星宇航空\n員工優惠", "活動/子項": "iPhone 電池更換優惠", "活動內容": "須出示星宇航空員工識別證\n‧ iPhone 12 / 13：$2,990 → $2,290\n‧ iPhone 14 / 15：$3,350 → $2,650\n‧ iPhone 16 / 16 Plus / 16e / 17：$3,350 → $2,950\n‧ iPhone 16 Pro / Pro Max：$4,150 → $3,850\n‧ iPhone 17 Pro / Pro Max / Air：$4,150 → $3,850", "存代數": "5", "存貨代碼清單": "99500308、99500309、995003010、995003011、995003015", "適用範圍": "", "適用門市": "SA街邊門市", "開始日期": "2026/03/20", "結束日期": "2027/03/20", "標示": "紅字", "group": "enterprise", "groupTitle": "企業與員工優惠", "statusKind": "normal", "statusLabel": "期間活動", "summary": "• 須出示星宇航空員工識別證\n• ‧ iPhone 12 / 13：$2,990 → $2,290", "summaryCompact": "• 須出示星宇航空員工識別證\n• ‧ iPhone 12 / 13：$2,990 → $2,290", "codesDisplay": "99500308、99500309、995003010、995003011、995003015", "codesCompact": "99500308、99500309、995003010、995003011\n另有 1 個存代", "scopeDisplay": "未填", "storesDisplay": "SA街邊門市"}, {"活動序號": "110", "原始列範圍": "414", "大類": "星宇航空", "項目": "星宇航空\n員工優惠", "活動/子項": "Apple 產品維修", "活動內容": "須出示星宇航空員工識別證\nApple 產品維修將提供比照標準會員之維修優惠服務，相關維修建議售價、服務內容及優惠活動說明，依官網公告為準", "存代數": "0", "存貨代碼清單": "", "適用範圍": "", "適用門市": "SA街邊門市", "開始日期": "2026/03/20", "結束日期": "2027/03/20", "標示": "紅字", "group": "enterprise", "groupTitle": "企業與員工優惠", "statusKind": "normal", "statusLabel": "期間活動", "summary": "須出示星宇航空員工識別證", "summaryCompact": "須出示星宇航空員工識別證", "codesDisplay": "未填", "codesCompact": "未填", "scopeDisplay": "未填", "storesDisplay": "SA街邊門市"}, {"活動序號": "111", "原始列範圍": "415", "大類": "工研院 員工優惠", "項目": "工研院 員工優惠", "活動/子項": "工研院 員工優惠", "活動內容": "須出示工研院員工識別證\n‧ Mac（電腦）：建議售價 95 折\n‧ iPad（平板）：建議售價 97 折\n‧ Apple 原廠配件：95 折\n‧ 第三方配件（3PP）：9 折\n*以上優惠不包含時價商品、硬碟、軟體、記憶體、特價商品及每月促銷之活動商品", "存代數": "2", "存貨代碼清單": "99200259、99200260", "適用範圍": "", "適用門市": "SA街邊門市", "開始日期": "2025/11/01", "結束日期": "2026/10/31", "標示": "紅字", "group": "enterprise", "groupTitle": "企業與員工優惠", "statusKind": "normal", "statusLabel": "期間活動", "summary": "• ‧ Mac（電腦）：建議售價 95 折\n• ‧ iPad（平板）：建議售價 97 折\n• ‧ Apple 原廠配件：95 折", "summaryCompact": "• ‧ Mac（電腦）：建議售價 95 折\n• ‧ iPad（平板）：建議售價 97 折", "codesDisplay": "99200259、99200260", "codesCompact": "99200259、99200260", "scopeDisplay": "未填", "storesDisplay": "SA街邊門市"}, {"活動序號": "112", "原始列範圍": "416", "大類": "正崴 員工優惠", "項目": "正崴 員工優惠", "活動/子項": "正崴 員工優惠", "活動內容": "須出示正崴員工識別證\n‧ Mac（電腦）：建議售價 95 折\n‧ iPad（平板）：建議售價 97 折\n‧ Apple 原廠配件：95 折\n‧ 第三方配件（3PP）：9 折\n*以上優惠不包含時價商品、硬碟、軟體、記憶體、特價商品及每月促銷之活動商品", "存代數": "1", "存貨代碼清單": "99900930", "適用範圍": "", "適用門市": "SA街邊門市", "開始日期": "2017/1/17起", "結束日期": "～", "標示": "紅字", "group": "enterprise", "groupTitle": "企業與員工優惠", "statusKind": "long", "statusLabel": "長期", "summary": "• ‧ Mac（電腦）：建議售價 95 折\n• ‧ iPad（平板）：建議售價 97 折\n• ‧ Apple 原廠配件：95 折", "summaryCompact": "• ‧ Mac（電腦）：建議售價 95 折\n• ‧ iPad（平板）：建議售價 97 折", "codesDisplay": "99900930", "codesCompact": "99900930", "scopeDisplay": "未填", "storesDisplay": "SA街邊門市"}, {"活動序號": "113", "原始列範圍": "418", "大類": "中信LINE Pay 卡", "項目": "中信LINE Pay 卡", "活動/子項": "2026年度活動", "活動內容": "STUDIO A 2026既有活動 LINE POINTS 2%\n【活動期間】2026/1/1~2026/12/31\n持中國信託LINE Pay卡於全臺STUDIO A指定門市(部分百貨店內門市除外)/官網、Straight A門市/官網刷卡消費(不限實體卡消費，含以LINE Pay、行動支付及第三方支付等綁定消費)，單筆刷滿12,000元(含)以上，最高即享LINE POINTS 2%回饋(含國內外一般消費1%回饋)，回饋資格將以消費帳單明細認定，如無STUDIO A/Straight A等相關描述恕不符合回饋資格。加碼1%每人每月上限1,000點，分期交易恕不提供回饋。", "存代數": "0", "存貨代碼清單": "", "適用範圍": "全系列商品", "適用門市": "SA街邊門市", "開始日期": "2026/01/01", "結束日期": "2026/12/31", "標示": "紅字+黃底", "group": "payment", "groupTitle": "付款與信用卡", "statusKind": "changed", "statusLabel": "異動重點", "summary": "中信 LINE Pay 卡：單筆滿 $12,000 最高享 LINE POINTS 2%；加碼回饋每人每月上限 1,000 點。", "summaryCompact": "中信 LINE Pay 卡：單筆滿 $12,000 最高享 LINE POINTS 2%；加碼回饋每人每月上限 1,000 點。", "codesDisplay": "未填", "codesCompact": "未填", "scopeDisplay": "全系列商品", "storesDisplay": "SA街邊門市"}, {"活動序號": "114", "原始列範圍": "419", "大類": "中信LINE Pay 卡", "項目": "中信LINE Pay 卡", "活動/子項": "2026母親節加碼活動", "活動內容": "【活動期間】2026/4/25~2026/5/17\n持中國信託LINE Pay卡於STUDIO A指定門市（部分百貨店內門市除外）/官網、Straight A門市/官網刷卡消費，\n單筆刷滿30,000元以上再加碼LINE POINTS 3％回饋（含原活動合計最高5%回饋）；\n單筆刷滿60,000元以上再加碼LINE POINTS 8％回饋（含原活動合計最高10%回饋）\n﻿﻿﻿加碼3%活動期間每戶最高上限1,500點（合併原活動最高2,000點）。\n加碼8%活動期間每戶最高上限6,000點（合併原活動最高7,000點）。\n活動期間加碼回饋每戶限回饋乙次。", "存代數": "0", "存貨代碼清單": "", "適用範圍": "全系列商品", "適用門市": "SA街邊門市", "開始日期": "2026/04/25", "結束日期": "2026/05/17", "標示": "紅字+黃底", "group": "payment", "groupTitle": "付款與信用卡", "statusKind": "changed", "statusLabel": "異動重點", "summary": "中信 LINE Pay 母親節加碼：單筆滿 $30,000 再加碼 LINE POINTS 3%，活動至 5/17。", "summaryCompact": "中信 LINE Pay 母親節加碼：單筆滿 $30,000 再加碼 LINE POINTS 3%，活動至 5/17。", "codesDisplay": "未填", "codesCompact": "未填", "scopeDisplay": "全系列商品", "storesDisplay": "SA街邊門市"}, {"活動序號": "115", "原始列範圍": "420", "大類": "電子支付", "項目": "電子支付", "活動/子項": "LINE Pay/ icash Pay / 台灣Pay / 全支付/", "活動內容": "使用久昌串接 LINE Pay/ icash Pay / 台灣Pay / 全支付／ 街口支付（2025/10/1起重啟）", "存代數": "0", "存貨代碼清單": "", "適用範圍": "全系列商品", "適用門市": "獨立門市", "開始日期": "2025/10/01", "結束日期": "～", "標示": "紅字", "group": "payment", "groupTitle": "付款與信用卡", "statusKind": "long", "statusLabel": "長期", "summary": "使用久昌串接 LINE Pay/ icash Pay / 台灣Pay / 全支付／ 街口支付（2025/10/1起…", "summaryCompact": "使用久昌串接 LINE Pay/ icash Pay / 台灣Pay / 全支付／ 街口支付（2025/10/1起…", "codesDisplay": "未填", "codesCompact": "未填", "scopeDisplay": "全系列商品", "storesDisplay": "獨立門市"}, {"活動序號": "116", "原始列範圍": "421", "大類": "中租零卡分期", "項目": "中租零卡分期", "活動/子項": "使用中租零卡分期 APP\n結帳方式選 ”仲信無卡分期“", "活動內容": "都要收手續費 3期 2.25%、6期 3%、12期 4.5%\n1. POS 輸入正貨品項 ，商品金額需同 【APP消費金額】，獨立門市直接 開，百貨門市回總公司開。 承作金額 6,000~250,000，(可以是多項產品湊 到 6,000元，但結帳需為同一筆消費)\n2. 服務費 發票:另外開一張發票，POS 輸入服務費99500001，輸入服務費 金額，並須註明主機序號，一律收” 現金”，獨立與百貨門市一律自行開服務費發票。\n3. 交機作業需請客戶 簽認 “售出聲明書”。", "存代數": "0", "存貨代碼清單": "", "適用範圍": "6,000~250,000", "適用門市": "全門市", "開始日期": "～", "結束日期": "～", "標示": "", "group": "payment", "groupTitle": "付款與信用卡", "statusKind": "long", "statusLabel": "長期", "summary": "中租零卡分期：承作 $6,000-$250,000，3/6/12 期需收手續費。", "summaryCompact": "中租零卡分期：承作 $6,000-$250,000，3/6/12 期需收手續費。", "codesDisplay": "未填", "codesCompact": "未填", "scopeDisplay": "6,000~250,000", "storesDisplay": "全門市"}, {"活動序號": "117", "原始列範圍": "422", "大類": "信用卡活動", "項目": "信用卡活動", "活動/子項": "收單卡機原則", "活動內容": "台新卡機：非國泰卡一筆刷清、銀聯卡、台新卡分期\nNCCC卡機：非台新的分期、AE卡、非台灣發行的國外卡 ( 2025/４/7起 ~)\n* 2025/４/7起 禁用國泰卡機", "存代數": "0", "存貨代碼清單": "", "適用範圍": "信用卡", "適用門市": "獨立門市", "開始日期": "2025/04/07", "結束日期": "~", "標示": "紅字", "group": "payment", "groupTitle": "付款與信用卡", "statusKind": "long", "statusLabel": "長期", "summary": "刷卡機分工：台新處理一筆刷清、銀聯與台新分期；NCCC 處理其他分期、AE 與國外卡。", "summaryCompact": "刷卡機分工：台新處理一筆刷清、銀聯與台新分期；NCCC 處理其他分期、AE 與國外卡。", "codesDisplay": "未填", "codesCompact": "未填", "scopeDisplay": "信用卡", "storesDisplay": "獨立門市"}, {"活動序號": "118", "原始列範圍": "423", "大類": "信用卡活動", "項目": "信用卡活動", "活動/子項": "Mac電腦", "活動內容": "國泰世華、玉山銀行、聯邦銀行、兆豐銀行、遠東商銀、中國信託。 卡友獨享 30 期0利率。電腦以原價計算，不得與其他優惠方案併行 *", "存代數": "0", "存貨代碼清單": "", "適用範圍": "Mac電腦", "適用門市": "獨立門市", "開始日期": "2025/09/01", "結束日期": "2026/03/31", "標示": "紅字", "group": "payment", "groupTitle": "付款與信用卡", "statusKind": "normal", "statusLabel": "期間活動", "summary": "Mac 電腦指定銀行卡友享 30 期 0 利率；以原價計算，不與其他優惠併用。", "summaryCompact": "Mac 電腦指定銀行卡友享 30 期 0 利率；以原價計算，不與其他優惠併用。", "codesDisplay": "未填", "codesCompact": "未填", "scopeDisplay": "Mac電腦", "storesDisplay": "獨立門市"}, {"活動序號": "119", "原始列範圍": "424", "大類": "信用卡活動", "項目": "信用卡活動", "活動/子項": "iOS產品", "活動內容": "12 期 0 利率：玉山銀行、聯邦銀行、兆豐銀行、遠東商銀、星展銀行(含花旗銀行)、第一銀行、中國信託\n6 期 0 利率：永豐銀行、台北富邦銀行、華南銀行、凱基銀行、國泰世華銀行。\n3 期 0 利率：台新銀行、新光銀行、匯豐銀行。", "存代數": "0", "存貨代碼清單": "", "適用範圍": "iOS產品", "適用門市": "獨立門市", "開始日期": "2025/09/01", "結束日期": "2026/03/31", "標示": "紅字", "group": "payment", "groupTitle": "付款與信用卡", "statusKind": "normal", "statusLabel": "期間活動", "summary": "iOS 產品可用指定銀行 12/6/3 期 0 利率，依銀行別適用。", "summaryCompact": "iOS 產品可用指定銀行 12/6/3 期 0 利率，依銀行別適用。", "codesDisplay": "未填", "codesCompact": "未填", "scopeDisplay": "iOS產品", "storesDisplay": "獨立門市"}, {"活動序號": "120", "原始列範圍": "425", "大類": "信用卡活動", "項目": "信用卡活動", "活動/子項": "每月刷卡分期 滿額贈活動", "活動內容": "每月刷卡滿額贈 請參閱STUDIO A門市信用卡官網公告 >>https://studioavip.com/Cj5ws", "存代數": "0", "存貨代碼清單": "", "適用範圍": "", "適用門市": "獨立門市", "開始日期": "~", "結束日期": "~", "標示": "紅字", "group": "payment", "groupTitle": "付款與信用卡", "statusKind": "long", "statusLabel": "長期", "summary": "刷卡分期滿額贈依 STUDIO A 官網當月公告。", "summaryCompact": "刷卡分期滿額贈依 STUDIO A 官網當月公告。", "codesDisplay": "未填", "codesCompact": "未填", "scopeDisplay": "未填", "storesDisplay": "獨立門市"}];
+    const GROUPS = [{"id": "iphone", "title": "iPhone 主機", "accent": "#c43c2f", "keywords": ["iphone", "iPhone Air", "iPhone 17e", "iPhone 16"]}, {"id": "ipad", "title": "iPad 主機", "accent": "#39796b", "keywords": ["ipad", "iPad"]}, {"id": "mac", "title": "Mac 主機", "accent": "#4147a3", "keywords": ["mac", "Mac", "MacBook", "iMac", "Mac mini", "Mac Studio", "Studio Display", "電腦配件活動", "Mac 配件套餐"]}, {"id": "watch", "title": "Apple Watch", "accent": "#7b5b2b", "keywords": ["watch", "Watch", "Apple Watch"]}, {"id": "airpods", "title": "AirPods", "accent": "#2d6a9f", "keywords": ["airpods", "AirPods", "Headphones"]}, {"id": "accessory", "title": "週邊配件與套組", "accent": "#b24573", "keywords": ["週邊", "配件", "Momax", "PQI", "VAP", "BON TON", "AirTag", "eSIM", "原廠周邊"]}, {"id": "software", "title": "軟體與系統", "accent": "#5b6b21", "keywords": ["軟體", "Office", "Windows", "Parallels"]}, {"id": "payment", "title": "付款與信用卡", "accent": "#8f4c18", "keywords": ["信用卡", "LINE Pay", "電子支付", "中租", "分期", "收單"]}, {"id": "tradein", "title": "舊換新", "accent": "#4d6f7a", "keywords": ["舊換新", "盤舊換新"]}, {"id": "policy", "title": "門市政策與耗材", "accent": "#636363", "keywords": ["塑膠袋", "紙袋", "環保限塑", "收費"]}, {"id": "enterprise", "title": "企業與員工優惠", "accent": "#6b4b8a", "keywords": ["員工優惠", "星宇", "工研院", "正崴", "異業結盟"]}, {"id": "care", "title": "SA Care 與保固", "accent": "#9d3748", "keywords": ["SA Care", "SACare", "保固", "檢測新機", "續保"]}, {"id": "other", "title": "其他活動", "accent": "#5a6270", "keywords": []}];
+
+    const state = {
+      query: '',
+      status: 'all',
+      density: 'normal'
+    };
+
+    const groupById = Object.fromEntries(GROUPS.map(group => [group.id, group]));
+    const fields = ['大類', '項目', '活動/子項', '活動內容', '存貨代碼清單', '適用範圍', '適用門市', '開始日期', '結束日期', '標示', '原始列範圍'];
+
+    function textFor(item) {
+      return fields.map(field => item[field] || '').join(' ').toLowerCase();
+    }
+
+    function matches(item) {
+      const queryOk = !state.query || textFor(item).includes(state.query);
+      const statusOk = state.status === 'all' || item.statusKind === state.status;
+      return queryOk && statusOk;
+    }
+
+    function countsFor(items) {
+      const changed = items.filter(item => item.statusKind === 'changed').length;
+      const long = items.filter(item => item.statusKind === 'long').length;
+      const stock = items.filter(item => item.statusKind === 'stock').length;
+      return { total: items.length, changed, long, stock };
+    }
+
+    function renderOverview(items) {
+      const counts = countsFor(items);
+      document.getElementById('overview').innerHTML = `
+        <div class="metric"><strong>${counts.total}</strong><span>目前顯示活動</span></div>
+        <div class="metric"><strong>${counts.changed}</strong><span>紅字+黃底異動重點</span></div>
+        <div class="metric"><strong>${counts.long}</strong><span>長期 / 持續活動</span></div>
+        <div class="metric"><strong>${counts.stock}</strong><span>售完或賣完為止</span></div>
+      `;
+    }
+
+    function renderNav(items) {
+      const html = GROUPS
+        .map(group => {
+          const count = items.filter(item => item.group === group.id).length;
+          if (!count) return '';
+          return `<a class="group-chip" href="#group-${group.id}" style="--chip-color:${group.accent}">${group.title} <b>${count}</b></a>`;
+        })
+        .join('');
+      document.getElementById('groupNav').innerHTML = html;
+    }
+
+    function esc(value) {
+      return String(value || '')
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;');
+    }
+
+    function card(item) {
+      const group = groupById[item.group];
+      const badgeClass = item.statusKind === 'normal' ? '' : item.statusKind;
+      const title = item['活動/子項'] || item['項目'] || item['大類'];
+      const itemLabel = item['項目'] && item['項目'] !== title ? item['項目'] : item['大類'];
+      const compact = state.density === 'compact';
+      return `
+        <article class="activity-card" style="--group-color:${group.accent}">
+          <div class="card-head">
+            <h3 class="card-title">${esc(title)}</h3>
+            <span class="badge ${badgeClass}">${esc(item.statusLabel)}</span>
+          </div>
+          <div class="subline">${esc(itemLabel)} · 原始列 ${esc(item['原始列範圍'])}</div>
+          <p class="content">${esc(compact ? item.summaryCompact : item.summary)}</p>
+          <div class="fields">
+            <div class="field"><span class="label">期間</span><span class="value">${esc(item['開始日期'] || '未填')} → ${esc(item['結束日期'] || '未填')}</span></div>
+            <div class="field"><span class="label">門市</span><span class="value">${esc(item.storesDisplay)}</span></div>
+            <div class="field wide"><span class="label">適用範圍</span><span class="value">${esc(item.scopeDisplay)}</span></div>
+            <div class="field wide"><span class="label">存貨代碼</span><span class="value">${esc(compact ? item.codesCompact : item.codesDisplay)}</span></div>
+          </div>
+        </article>
+      `;
+    }
+
+    function renderGroups(items) {
+      const html = GROUPS.map(group => {
+        const groupItems = items.filter(item => item.group === group.id);
+        if (!groupItems.length) return '';
+        return `
+          <section class="group" id="group-${group.id}" style="--group-color:${group.accent}">
+            <div class="group-head">
+              <div class="group-title">
+                <h2>${group.title}</h2>
+                <span>${groupItems.length} 筆活動</span>
+              </div>
+            </div>
+            <div class="cards">${groupItems.map(card).join('')}</div>
+          </section>
+        `;
+      }).join('');
+      document.getElementById('groups').innerHTML = html;
+      document.getElementById('emptyState').classList.toggle('hidden', items.length > 0);
+    }
+
+    function render() {
+      const items = ACTIVITIES.filter(matches);
+      renderOverview(items);
+      renderNav(items);
+      renderGroups(items);
+    }
+
+    document.getElementById('searchInput').addEventListener('input', event => {
+      state.query = event.target.value.trim().toLowerCase();
+      render();
+    });
+
+    document.getElementById('statusFilters').addEventListener('click', event => {
+      const button = event.target.closest('button[data-status]');
+      if (!button) return;
+      state.status = button.dataset.status;
+      document.querySelectorAll('#statusFilters .segment').forEach(btn => btn.classList.toggle('active', btn === button));
+      render();
+    });
+
+    document.getElementById('densityFilters').addEventListener('click', event => {
+      const button = event.target.closest('button[data-density]');
+      if (!button) return;
+      state.density = button.dataset.density;
+      document.querySelectorAll('#densityFilters .segment').forEach(btn => btn.classList.toggle('active', btn === button));
+      render();
+    });
+
+    render();
+  </script>
+</body>
+</html>

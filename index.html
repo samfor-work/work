@@ -14,6 +14,7 @@
       --label: #d8f000;
       --transfer: #1f5f99;
       --setup: #2f7d72;
+      --marketing: #b65f00;
       --shadow: 0 20px 60px rgba(21, 25, 31, .12);
     }
 
@@ -70,7 +71,7 @@
 
     .tools {
       display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-template-columns: repeat(4, minmax(0, 1fr));
       gap: 16px;
       margin-top: 24px;
     }
@@ -138,6 +139,11 @@
       background: var(--setup);
     }
 
+    .tool-card.marketing strong {
+      color: #fff;
+      background: var(--marketing);
+    }
+
     .tool-card.label {
       background:
         linear-gradient(135deg, rgba(216, 240, 0, .22), transparent 44%),
@@ -153,6 +159,12 @@
     .tool-card.setup {
       background:
         linear-gradient(135deg, rgba(47, 125, 114, .18), transparent 44%),
+        var(--panel);
+    }
+
+    .tool-card.marketing {
+      background:
+        linear-gradient(135deg, rgba(182, 95, 0, .18), transparent 44%),
         var(--panel);
     }
 
@@ -209,6 +221,14 @@
         <div>
           <h2>Personal Setup 統計</h2>
           <p>上傳 Personal Setup 匯出檔，統計各裝置與員工完成數。</p>
+        </div>
+      </a>
+
+      <a class="tool-card marketing" href="marketing.html">
+        <strong>Marketing</strong>
+        <div>
+          <h2>行銷活動</h2>
+          <p>查詢本月活動、主機優惠、付款方案與存貨代碼。</p>
         </div>
       </a>
     </section>
