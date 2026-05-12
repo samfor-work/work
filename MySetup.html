@@ -55,12 +55,35 @@
     -webkit-tap-highlight-color: transparent;
   }
 
+  .home-link {
+    position: fixed;
+    top: 14px;
+    left: 14px;
+    z-index: 30;
+    display: inline-flex;
+    align-items: center;
+    min-height: 34px;
+    padding: 7px 11px;
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    color: var(--ink);
+    background: rgba(255, 255, 255, .92);
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 800;
+    box-shadow: 0 8px 24px rgba(24, 39, 56, .10);
+  }
+
+  .home-link:hover {
+    border-color: var(--ink);
+  }
+
   #upload-screen {
     display: flex;
     min-height: 100vh;
-    align-items: center;
+    align-items: flex-start;
     justify-content: center;
-    padding: 32px 16px;
+    padding: 76px 16px 32px;
   }
 
   .upload-shell {
@@ -308,7 +331,7 @@
   .dashboard-shell {
     width: min(1180px, calc(100vw - 32px));
     margin: 0 auto;
-    padding: 42px 0;
+    padding: 76px 0 42px;
   }
 
   .dashboard-shell .tool-header {
@@ -716,12 +739,12 @@
   @media (max-width: 640px) {
     #upload-screen {
       align-items: flex-start;
-      padding: 28px 16px;
+      padding: 76px 16px 28px;
     }
 
     .dashboard-shell {
       width: min(100vw - 24px, 1180px);
-      padding: 28px 0;
+      padding: 76px 0 28px;
     }
 
     .upload-grid,
@@ -773,6 +796,7 @@
 </style>
 </head>
 <body>
+<a class="home-link" href="index.html">← 回工具首頁</a>
 
 <!-- Upload -->
 <div id="upload-screen">
