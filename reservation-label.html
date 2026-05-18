@@ -1,0 +1,1276 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>便條紙標籤工坊</title>
+<script src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "PingFang TC", "Hiragino Sans GB", "Microsoft JhengHei", sans-serif;
+  background: #ECE6D8;
+  min-height: 100vh;
+  color: #1F1B16;
+}
+
+/* ── Top Bar ── */
+#top-bar {
+  background: #1F2937;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+  gap: 14px;
+}
+#top-bar .logo {
+  width: 36px; height: 36px;
+  background: #FFE055;
+  border-radius: 6px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; flex-shrink: 0;
+}
+#top-bar .title-wrap h1 { font-size: 16px; font-weight: 700; color: #fff; }
+#top-bar .title-wrap p  { font-size: 11px; color: #9CA3AF; margin-top: 1px; }
+#top-bar .meta { margin-left: auto; font-size: 11px; color: #6B7280; }
+#settings-btn {
+  display: flex; align-items: center; gap: 6px;
+  padding: 7px 14px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 6px;
+  color: #D1D5DB;
+  font-size: 12px; font-weight: 600;
+  cursor: pointer;
+  transition: background .15s, color .15s;
+  white-space: nowrap;
+}
+#settings-btn:hover { background: rgba(255,255,255,0.15); color: #fff; }
+#settings-btn .gear { font-size: 14px; }
+
+/* ── Tab Bar ── */
+#tab-bar {
+  background: #E0D9C5;
+  padding: 14px 24px 0;
+  display: flex; gap: 4px;
+}
+@media print { #top-bar, #tab-bar { display: none !important; } }
+.tab-btn {
+  padding: 10px 22px;
+  border: none; border-radius: 8px 8px 0 0;
+  background: #D4CEBA; color: #6B6455;
+  font-size: 13px; font-weight: 600;
+  cursor: pointer;
+  display: flex; align-items: center; gap: 8px;
+  transition: background .15s, color .15s;
+  position: relative;
+}
+.tab-btn:hover { background: #C9C3AD; color: #1F1B16; }
+.tab-btn.active { background: #fff; color: #1F1B16; box-shadow: 0 -2px 6px rgba(0,0,0,0.06); }
+.tab-btn .clip { display: none; position: absolute; top: -10px; left: 50%; transform: translateX(-50%); font-size: 18px; opacity: 0.55; }
+.tab-btn.active .clip { display: block; }
+
+/* ── Panel / Desk ── */
+.panel { display: none; }
+.panel.active { display: block; }
+.desk-body { max-width: 720px; margin: 0 auto; padding: 24px 28px 48px; }
+.card { background: #fff; border-radius: 0 12px 12px 12px; box-shadow: 0 2px 12px rgba(0,0,0,0.08); padding: 28px 32px; }
+
+/* ── Steps ── */
+.step { margin-bottom: 28px; }
+.step:last-child { margin-bottom: 0; }
+.step-hdr { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+.step-num { width: 28px; height: 28px; background: #FFE055; border-radius: 4px; font-size: 13px; font-weight: 800; color: #1F1B16; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.step-title { font-size: 15px; font-weight: 700; color: #1F1B16; }
+.step-sub { margin-left: auto; font-size: 11px; color: #9CA3AF; }
+
+/* ── Drop zone ── */
+.drop-zone { border: 1.5px dashed #D1C9B8; border-radius: 8px; background: #FDFBF6; padding: 20px 20px 20px 16px; display: flex; align-items: center; gap: 14px; cursor: pointer; transition: border-color .2s, background .2s; }
+.drop-zone input { display: none; }
+.drop-zone:hover, .drop-zone.drag-over { border-color: #B8925A; background: #FFF8EE; }
+.drop-zone.has-file { border-color: #4ABA7A; background: #F0FDF4; }
+.drop-zone .dz-file-icon { width: 44px; height: 52px; background: #E8F0FE; border: 1.5px solid #C5D3F0; border-radius: 4px; display: flex; flex-direction: column; align-items: center; justify-content: center; flex-shrink: 0; }
+.drop-zone .dz-file-icon span { font-size: 9px; font-weight: 800; color: #4367C0; letter-spacing: .5px; }
+.drop-zone .dz-texts { flex: 1; }
+.drop-zone .dz-main { font-size: 14px; font-weight: 600; color: #374151; }
+.drop-zone .dz-main em { font-style: normal; font-weight: 400; font-size: 12px; color: #9CA3AF; margin-left: 6px; }
+.drop-zone.has-file .dz-main { color: #15803D; }
+.drop-zone .dz-sub { font-size: 11px; color: #9CA3AF; margin-top: 3px; }
+.drop-zone .dz-btn { padding: 9px 16px; background: #1F2937; color: #fff; border: none; border-radius: 6px; font-size: 12px; font-weight: 600; cursor: pointer; white-space: nowrap; flex-shrink: 0; }
+
+/* ── Column grid ── */
+.col-grid { display: grid; grid-template-columns: repeat(3, 1fr); }
+.col-item { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid #F3EDE3; }
+.col-item:nth-last-child(-n+3) { border-bottom: none; }
+.col-check { width: 16px; height: 16px; border: 1.5px solid #D1C9B8; border-radius: 3px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 10px; }
+.col-item.found .col-check   { border-color: #22C55E; background: #22C55E; color: #fff; }
+.col-item.missing .col-check { border-color: #EF4444; }
+.col-item.found .col-name    { font-weight: 600; color: #1F1B16; }
+.col-item.missing .col-name  { color: #EF4444; }
+.col-name { font-size: 12px; color: #9CA3AF; }
+
+/* ── Date chips ── */
+.date-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.date-chip { padding: 7px 14px; border: 1.5px solid #E5DDD0; border-radius: 20px; background: #FDFBF6; color: #4B4437; font-size: 12px; font-weight: 500; cursor: pointer; transition: background .15s, border-color .15s, color .15s; }
+.date-chip:hover { border-color: #B8925A; color: #1F1B16; }
+.date-chip.selected { background: #1F2937; color: #FFE055; border-color: #1F2937; font-weight: 700; }
+
+/* ── Misc ── */
+.divider { height: 1px; background: #F0E9DC; margin: 24px 0; }
+.status-row { display: flex; align-items: center; gap: 8px; font-size: 12px; color: #9CA3AF; margin-bottom: 10px; }
+.status-row.ok  { color: #22C55E; }
+.status-row.err { color: #EF4444; }
+.progress-wrap { height: 5px; background: #EDE8DF; border-radius: 3px; overflow: hidden; margin-bottom: 16px; }
+.progress-bar  { height: 100%; width: 0; background: #1F2937; border-radius: 3px; transition: width .1s; }
+progress.mac-prog { display: block; width: 100%; height: 5px; border: none; border-radius: 3px; background: #EDE8DF; margin-bottom: 16px; appearance: none; }
+progress.mac-prog::-webkit-progress-bar   { background: #EDE8DF; border-radius: 3px; }
+progress.mac-prog::-webkit-progress-value { background: #1F2937; border-radius: 3px; }
+progress.mac-prog::-moz-progress-bar      { background: #1F2937; border-radius: 3px; }
+.btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.action-btn { padding: 13px; font-size: 14px; font-weight: 700; border: none; border-radius: 8px; cursor: pointer; transition: background .15s; }
+.action-btn:disabled { opacity: .4; cursor: not-allowed; }
+.btn-preview { background: #1F2937; color: #F9FAFB; }
+.btn-preview:hover:not(:disabled) { background: #111827; }
+.btn-print   { background: #0F766E; color: #F0FDFA; }
+.btn-print:hover:not(:disabled)   { background: #0D5E58; }
+.btn-pdf     { background: #7C3AED; color: #FAF5FF; }
+.btn-pdf:hover:not(:disabled)     { background: #6D28D9; }
+.ver-badge { display: inline-flex; align-items: center; gap: 6px; background: #FFF8E7; border: 1px solid #FFE055; border-radius: 4px; padding: 4px 10px; font-size: 10px; font-weight: 700; color: #92650A; letter-spacing: .04em; }
+.panel-meta { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 24px; }
+.panel-meta h2 { font-size: 22px; font-weight: 800; color: #1F1B16; margin-top: 4px; }
+.panel-meta p  { font-size: 12px; color: #9CA3AF; margin-top: 4px; }
+
+/* ════════════════════════════════════════════
+   Settings Panel
+════════════════════════════════════════════ */
+#settings-overlay {
+  display: none;
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.3);
+  z-index: 900;
+}
+#settings-overlay.open { display: block; }
+#settings-panel {
+  position: fixed;
+  top: 0; right: -360px;
+  width: 340px; height: 100vh;
+  background: #FDFBF7;
+  overflow-y: auto;
+  z-index: 901;
+  transition: right .25s cubic-bezier(.4,0,.2,1);
+  box-shadow: -6px 0 32px rgba(0,0,0,0.14);
+  display: flex; flex-direction: column;
+}
+#settings-panel.open { right: 0; }
+
+#settings-panel .sp-hdr {
+  background: #1F2937;
+  padding: 16px 20px;
+  display: flex; align-items: center; gap: 10px;
+  flex-shrink: 0;
+}
+#settings-panel .sp-hdr h2 { color: #fff; font-size: 15px; font-weight: 700; flex: 1; }
+#settings-panel .sp-close {
+  background: none; border: none; color: #9CA3AF;
+  font-size: 20px; cursor: pointer; line-height: 1;
+  padding: 0 4px;
+  transition: color .15s;
+}
+#settings-panel .sp-close:hover { color: #fff; }
+
+#settings-panel .sp-body { padding: 0 0 40px; flex: 1; overflow-y: auto; }
+
+.sp-section {
+  padding: 16px 20px 4px;
+}
+.sp-section-hdr {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 11px; font-weight: 800; color: #6B7280;
+  letter-spacing: .08em; text-transform: uppercase;
+  margin-bottom: 14px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #E5DDD0;
+}
+.sp-section-hdr .sp-icon { font-size: 14px; }
+
+.cfg-row { margin-bottom: 14px; }
+.cfg-label {
+  display: flex; justify-content: space-between; align-items: center;
+  font-size: 12px; color: #374151;
+  margin-bottom: 5px;
+}
+.cfg-label .cfg-name { font-weight: 600; }
+.cfg-label .cfg-hint { font-size: 10px; color: #9CA3AF; }
+.cfg-val-row {
+  display: flex; align-items: center; gap: 8px;
+}
+.cfg-val-row input[type=range] {
+  flex: 1; height: 4px;
+  -webkit-appearance: none; appearance: none;
+  background: #E5DDD0; border-radius: 2px;
+  outline: none; cursor: pointer;
+}
+.cfg-val-row input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 16px; height: 16px;
+  border-radius: 50%;
+  background: #1F2937;
+  cursor: pointer;
+  border: 2px solid #fff;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+}
+.cfg-val-row input[type=range]::-moz-range-thumb {
+  width: 14px; height: 14px;
+  border-radius: 50%; background: #1F2937;
+  border: 2px solid #fff; cursor: pointer;
+}
+.cfg-val-badge {
+  min-width: 44px; text-align: right;
+  font-size: 12px; font-weight: 700; color: #1F2937;
+}
+.cfg-select {
+  width: 100%; padding: 7px 10px;
+  border: 1px solid #E5DDD0; border-radius: 6px;
+  background: #fff; font-size: 12px; color: #1F2937;
+  cursor: pointer;
+}
+
+.sp-reset-btn {
+  display: block; width: calc(100% - 40px); margin: 16px 20px 0;
+  padding: 10px;
+  background: none; border: 1.5px solid #E5DDD0;
+  border-radius: 6px;
+  font-size: 12px; font-weight: 600; color: #6B7280;
+  cursor: pointer; text-align: center;
+  transition: border-color .15s, color .15s;
+}
+.sp-reset-btn:hover { border-color: #B8925A; color: #92650A; }
+
+@media print { #settings-overlay, #settings-panel { display: none !important; } }
+
+/* ════════════════════════════════════════════
+   iOS label print styles
+════════════════════════════════════════════ */
+/* dynamic overrides injected via #iph-dynamic-css */
+.label-grid { display: grid; grid-template-columns: 72mm 72mm; gap: 0; }
+.label { width: 72mm; height: 12mm; display: flex; overflow: hidden; border: 0.3px solid #BBBBBB; }
+.label .blue-bar { width: 2mm; flex-shrink: 0; background: #3C7BC6; }
+.label .bc-area { width: 40mm; flex-shrink: 0; display: flex; flex-direction: column; justify-content: space-around; padding: 0.3mm 0 1.7mm 0.5mm; gap: 0.3mm; overflow: hidden; }
+.label .bc-area svg { display: block !important; width: 39mm !important; height: 4.75mm !important; flex-shrink: 0; }
+.label .txt-area { flex: 1; min-width: 0; display: flex; flex-direction: column; justify-content: center; padding: 0.4mm 1.2mm 0.4mm 1.5mm; overflow: hidden; }
+.line-tc { font-size: 1.45mm; color: #000; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.line-nm { display: flex; justify-content: space-between; white-space: nowrap; overflow: hidden; }
+.nm { font-size: 1.75mm; font-weight: bold; color: #000; overflow: hidden; text-overflow: ellipsis; }
+.ph { font-size: 1.75mm; font-weight: bold; color: #000; flex-shrink: 0; }
+.line-pv { font-size: 1.15mm; color: #000; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.line-ex { font-size: 1.15mm; color: #000; white-space: nowrap; overflow: hidden; }
+
+@media screen {
+  #iph-print-area { margin-top: 24px; }
+  .print-page { background: #fff; border: 1px solid #E5E7EB; border-radius: 8px; padding: 12px; margin-bottom: 16px; }
+  .print-page-num { font-size: 11px; color: #9CA3AF; margin-bottom: 8px; }
+}
+@media print {
+  #top-bar, #tab-bar,
+  #panel-mac,
+  #panel-iphone .card { display: none !important; }
+  #panel-iphone { display: block !important; }
+  #iph-print-area { margin: 0 !important; }
+  .print-page { background: none !important; border: none !important; border-radius: 0 !important; padding: 0 !important; margin: 0 !important; }
+  .print-page-num { display: none !important; }
+  .page-break { page-break-after: always; break-after: page; }
+  body { background: none !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+}
+
+/* ── Mac preview ── */
+#mac-preview-area { margin-top: 20px; }
+.mac-preview-page { background: #fff; border: 1px solid #E5E7EB; border-radius: 8px; padding: 12px; margin-bottom: 16px; }
+.mac-preview-page-num { font-size: 11px; color: #9CA3AF; margin-bottom: 8px; }
+.mac-cell-grid { display: grid; grid-template-columns: repeat(5,1fr); gap: 2px; }
+.mac-cell-grid canvas { width: 100%; display: block; }
+</style>
+</head>
+<body>
+
+<!-- ── Top Bar ── -->
+<div id="top-bar">
+  <div class="logo">☰</div>
+  <div class="title-wrap">
+    <h1>便條紙標籤工坊</h1>
+    <p>Excel 名單 · 條碼便條 · 一鍵列印</p>
+  </div>
+  <button id="settings-btn" onclick="toggleSettings()">
+    <span class="gear">⚙</span> 版型設定
+  </button>
+  <div class="meta" id="top-meta">共 2 種版型</div>
+</div>
+
+<!-- ── Tab Bar ── -->
+<div id="tab-bar">
+  <button class="tab-btn active" data-tab="iphone" onclick="switchTab('iphone')">
+    <span class="clip">📎</span><span>📱</span> iOS · 雙欄條碼版
+  </button>
+  <button class="tab-btn" data-tab="mac" onclick="switchTab('mac')">
+    <span class="clip">📎</span><span>🖥</span> Mac · 5×6 格 PDF
+  </button>
+</div>
+
+<!-- ════════════════════════════════════════════
+     iOS 面板
+════════════════════════════════════════════ -->
+<div id="panel-iphone" class="panel active">
+  <div class="desk-body">
+    <div class="card">
+      <div class="panel-meta">
+        <div>
+          <div style="font-size:10px;font-weight:700;color:#9CA3AF;letter-spacing:.08em;margin-bottom:4px;">VERSION 01 · IOS</div>
+          <h2>雙欄條碼便條紙</h2>
+          <p>A4 縱向 · 每頁 48 張 · 72 × 12mm · HTML 列印輸出</p>
+        </div>
+        <div class="ver-badge">72×12MM<br><span style="font-weight:400;letter-spacing:0">CODE 128 條碼</span></div>
+      </div>
+      <div class="step">
+        <div class="step-hdr"><div class="step-num">1</div><div class="step-title">匯入 Excel 名單</div><div class="step-sub">.xlsx 或 .xls</div></div>
+        <div class="drop-zone" id="iph-drop-zone">
+          <input type="file" id="iph-file-input" accept=".xlsx,.xls">
+          <div class="dz-file-icon"><span>XLS</span></div>
+          <div class="dz-texts">
+            <div class="dz-main" id="iph-dz-main">拖曳檔案至此，或點擊選擇 <em>第一列必須為欄位名稱</em></div>
+            <div class="dz-sub">.xlsx / .xls</div>
+          </div>
+          <button class="dz-btn" onclick="document.getElementById('iph-file-input').click()">選擇檔案</button>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-hdr"><div class="step-num">2</div><div class="step-title">確認欄位對應</div><div class="step-sub">系統自動辨識</div></div>
+        <div class="col-grid" id="iph-col-grid">
+          <div class="col-item" data-field="預約單號"><div class="col-check"></div><span class="col-name">預約單號</span></div>
+          <div class="col-item" data-field="梯次">    <div class="col-check"></div><span class="col-name">梯次</span></div>
+          <div class="col-item" data-field="姓名">    <div class="col-check"></div><span class="col-name">姓名</span></div>
+          <div class="col-item" data-field="會員代碼"><div class="col-check"></div><span class="col-name">會員代碼</span></div>
+          <div class="col-item" data-field="手機號碼"><div class="col-check"></div><span class="col-name">手機號碼</span></div>
+          <div class="col-item" data-field="預約產品"><div class="col-check"></div><span class="col-name">預約產品</span></div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-hdr"><div class="step-num">3</div><div class="step-title">選擇到期日期</div><div class="step-sub">選填，再次點擊取消</div></div>
+        <div class="date-chips" id="iph-date-chips"></div>
+      </div>
+      <div class="divider"></div>
+      <div class="status-row" id="iph-status-row">
+        <span id="iph-status-icon">○</span>
+        <span id="iph-status-txt">請先選擇 Excel 檔案</span>
+      </div>
+      <div class="progress-wrap"><div class="progress-bar" id="iph-progress-bar"></div></div>
+      <div class="btn-row">
+        <button class="action-btn btn-preview" id="iph-btn-preview" disabled>▶ 預覽標籤</button>
+        <button class="action-btn btn-print"   id="iph-btn-print"   disabled>🖨 列印 / 另存 PDF</button>
+      </div>
+    </div>
+    <div id="iph-print-area"></div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════
+     Mac 面板
+════════════════════════════════════════════ -->
+<div id="panel-mac" class="panel">
+  <div class="desk-body">
+    <div class="card">
+      <div class="panel-meta">
+        <div>
+          <div style="font-size:10px;font-weight:700;color:#9CA3AF;letter-spacing:.08em;margin-bottom:4px;">VERSION 02 · MAC</div>
+          <h2>5×6 格 PDF 便條紙</h2>
+          <p>A4 縱向 · 每頁 30 張 · Canvas 渲染 · jsPDF 輸出</p>
+        </div>
+        <div class="ver-badge">5×6 格<br><span style="font-weight:400;letter-spacing:0">CODE 128 條碼</span></div>
+      </div>
+      <div class="step">
+        <div class="step-hdr"><div class="step-num">1</div><div class="step-title">匯入 Excel 名單</div><div class="step-sub">.xlsx 或 .xls</div></div>
+        <div class="drop-zone" id="mac-drop-zone">
+          <input type="file" id="mac-file-input" accept=".xlsx,.xls">
+          <div class="dz-file-icon"><span>XLS</span></div>
+          <div class="dz-texts">
+            <div class="dz-main" id="mac-dz-main">拖曳檔案至此，或點擊選擇 <em>第一列必須為欄位名稱</em></div>
+            <div class="dz-sub">.xlsx / .xls</div>
+          </div>
+          <button class="dz-btn" onclick="document.getElementById('mac-file-input').click()">選擇檔案</button>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-hdr"><div class="step-num">2</div><div class="step-title">確認欄位對應</div><div class="step-sub">系統自動辨識</div></div>
+        <div class="col-grid" id="mac-col-grid"></div>
+      </div>
+      <div class="step">
+        <div class="step-hdr"><div class="step-num">3</div><div class="step-title">選擇到期日期</div><div class="step-sub">選填，再次點擊取消</div></div>
+        <div class="date-chips" id="mac-date-chips"></div>
+      </div>
+      <div class="divider"></div>
+      <div class="status-row" id="mac-status-row">
+        <span id="mac-status-icon">○</span>
+        <span id="mac-status-text"> 請先選擇 Excel 檔案</span>
+      </div>
+      <progress class="mac-prog" id="mac-progress" value="0" max="100"></progress>
+      <div class="btn-row">
+        <button class="action-btn btn-preview" id="mac-preview-btn" disabled onclick="macDoPreview()">▶ 預覽便條紙</button>
+        <button class="action-btn btn-pdf"     id="mac-convert-btn" disabled onclick="macDoConvert()">📥 下載 PDF</button>
+      </div>
+      <div id="mac-preview-area"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════════════
+     Settings Panel
+════════════════════════════════════════════ -->
+<div id="settings-overlay" onclick="toggleSettings()"></div>
+<div id="settings-panel">
+  <div class="sp-hdr">
+    <h2>⚙ 版型設定</h2>
+    <button class="sp-close" onclick="toggleSettings()">✕</button>
+  </div>
+  <div class="sp-body">
+
+    <!-- iOS Settings -->
+    <div class="sp-section">
+      <div class="sp-section-hdr"><span class="sp-icon">📱</span> iOS 雙欄條碼版</div>
+
+      <div class="cfg-row">
+        <div class="cfg-label"><span class="cfg-name">頁面邊界（上下）</span><span class="cfg-hint">影響列印起始位置</span></div>
+        <div class="cfg-val-row">
+          <input type="range" id="iph_marginTB" min="0" max="20" step="0.5" value="4.5">
+          <span class="cfg-val-badge" id="iph_marginTB_v">4.5 mm</span>
+        </div>
+      </div>
+
+      <div class="cfg-row">
+        <div class="cfg-label"><span class="cfg-name">頁面邊界（左右）</span><span class="cfg-hint">標籤左右留白</span></div>
+        <div class="cfg-val-row">
+          <input type="range" id="iph_marginLR" min="0" max="50" step="0.5" value="33">
+          <span class="cfg-val-badge" id="iph_marginLR_v">33 mm</span>
+        </div>
+      </div>
+
+      <div class="cfg-row">
+        <div class="cfg-label"><span class="cfg-name">垂直位移</span><span class="cfg-hint">整體上下偏移</span></div>
+        <div class="cfg-val-row">
+          <input type="range" id="iph_offsetY" min="-15" max="15" step="0.5" value="0">
+          <span class="cfg-val-badge" id="iph_offsetY_v">0 mm</span>
+        </div>
+      </div>
+
+      <div class="cfg-row">
+        <div class="cfg-label"><span class="cfg-name">每頁欄數</span><span class="cfg-hint">預設 2 欄</span></div>
+        <select class="cfg-select" id="iph_cols" onchange="onIphChange()">
+          <option value="1">1 欄</option>
+          <option value="2" selected>2 欄（預設）</option>
+          <option value="3">3 欄</option>
+        </select>
+      </div>
+
+      <div class="cfg-row">
+        <div class="cfg-label"><span class="cfg-name">標籤寬度</span><span class="cfg-hint">單張標籤的寬度</span></div>
+        <div class="cfg-val-row">
+          <input type="range" id="iph_labelW" min="50" max="100" step="1" value="72">
+          <span class="cfg-val-badge" id="iph_labelW_v">72 mm</span>
+        </div>
+      </div>
+
+      <div class="cfg-row">
+        <div class="cfg-label"><span class="cfg-name">標籤高度</span><span class="cfg-hint">單張標籤的高度</span></div>
+        <div class="cfg-val-row">
+          <input type="range" id="iph_labelH" min="8" max="25" step="0.5" value="12">
+          <span class="cfg-val-badge" id="iph_labelH_v">12 mm</span>
+        </div>
+      </div>
+
+      <div class="cfg-row">
+        <div class="cfg-label"><span class="cfg-name">文字縮放</span><span class="cfg-hint">標籤內文字大小</span></div>
+        <div class="cfg-val-row">
+          <input type="range" id="iph_textScale" min="0.6" max="1.5" step="0.05" value="1">
+          <span class="cfg-val-badge" id="iph_textScale_v">100 %</span>
+        </div>
+      </div>
+
+      <div class="cfg-row">
+        <div class="cfg-label"><span class="cfg-name">條碼高度</span><span class="cfg-hint">影響掃描辨識率</span></div>
+        <div class="cfg-val-row">
+          <input type="range" id="iph_bcH" min="12" max="40" step="1" value="22">
+          <span class="cfg-val-badge" id="iph_bcH_v">22 px</span>
+        </div>
+      </div>
+
+      <div class="cfg-row">
+        <div class="cfg-label"><span class="cfg-name">條碼線寬</span><span class="cfg-hint">越粗越易掃，但越寬</span></div>
+        <div class="cfg-val-row">
+          <input type="range" id="iph_bcW" min="0.8" max="2.5" step="0.1" value="1.4">
+          <span class="cfg-val-badge" id="iph_bcW_v">1.4</span>
+        </div>
+      </div>
+
+      <button class="sp-reset-btn" onclick="resetIph()">↺ 重置 iOS 預設值</button>
+    </div>
+
+    <!-- Mac Settings -->
+    <div class="sp-section" style="margin-top:8px;">
+      <div class="sp-section-hdr"><span class="sp-icon">🖥</span> Mac 5×6 格 PDF</div>
+
+      <div class="cfg-row">
+        <div class="cfg-label"><span class="cfg-name">頁面邊界</span><span class="cfg-hint">四邊留白</span></div>
+        <div class="cfg-val-row">
+          <input type="range" id="mac_margin" min="0" max="20" step="0.5" value="5">
+          <span class="cfg-val-badge" id="mac_margin_v">5 mm</span>
+        </div>
+      </div>
+
+      <div class="cfg-row">
+        <div class="cfg-label"><span class="cfg-name">欄數</span><span class="cfg-hint">每頁橫向格數</span></div>
+        <div class="cfg-val-row">
+          <input type="range" id="mac_cols" min="2" max="8" step="1" value="5">
+          <span class="cfg-val-badge" id="mac_cols_v">5 欄</span>
+        </div>
+      </div>
+
+      <div class="cfg-row">
+        <div class="cfg-label"><span class="cfg-name">列數</span><span class="cfg-hint">每頁縱向格數</span></div>
+        <div class="cfg-val-row">
+          <input type="range" id="mac_rows" min="2" max="10" step="1" value="6">
+          <span class="cfg-val-badge" id="mac_rows_v">6 列</span>
+        </div>
+      </div>
+
+      <div class="cfg-row">
+        <div class="cfg-label"><span class="cfg-name">格子水平間距</span><span class="cfg-hint">格子之間的橫向空隙</span></div>
+        <div class="cfg-val-row">
+          <input type="range" id="mac_gapX" min="0" max="5" step="0.5" value="0">
+          <span class="cfg-val-badge" id="mac_gapX_v">0 mm</span>
+        </div>
+      </div>
+
+      <div class="cfg-row">
+        <div class="cfg-label"><span class="cfg-name">格子垂直間距</span><span class="cfg-hint">格子之間的縱向空隙</span></div>
+        <div class="cfg-val-row">
+          <input type="range" id="mac_gapY" min="0" max="5" step="0.5" value="0">
+          <span class="cfg-val-badge" id="mac_gapY_v">0 mm</span>
+        </div>
+      </div>
+
+      <div class="cfg-row">
+        <div class="cfg-label"><span class="cfg-name">水平位移</span><span class="cfg-hint">整體左右偏移</span></div>
+        <div class="cfg-val-row">
+          <input type="range" id="mac_offsetX" min="-10" max="10" step="0.5" value="0">
+          <span class="cfg-val-badge" id="mac_offsetX_v">0 mm</span>
+        </div>
+      </div>
+
+      <div class="cfg-row">
+        <div class="cfg-label"><span class="cfg-name">垂直位移</span><span class="cfg-hint">整體上下偏移</span></div>
+        <div class="cfg-val-row">
+          <input type="range" id="mac_offsetY" min="-10" max="10" step="0.5" value="0">
+          <span class="cfg-val-badge" id="mac_offsetY_v">0 mm</span>
+        </div>
+      </div>
+
+      <div class="cfg-row">
+        <div class="cfg-label"><span class="cfg-name">文字大小</span><span class="cfg-hint">標籤內容字體</span></div>
+        <div class="cfg-val-row">
+          <input type="range" id="mac_fontSize" min="4" max="12" step="0.5" value="6.5">
+          <span class="cfg-val-badge" id="mac_fontSize_v">6.5 pt</span>
+        </div>
+      </div>
+
+      <div class="cfg-row">
+        <div class="cfg-label"><span class="cfg-name">主條碼高度（單號）</span><span class="cfg-hint">預約單號條碼</span></div>
+        <div class="cfg-val-row">
+          <input type="range" id="mac_bcH1" min="4" max="18" step="0.5" value="9">
+          <span class="cfg-val-badge" id="mac_bcH1_v">9 mm</span>
+        </div>
+      </div>
+
+      <div class="cfg-row">
+        <div class="cfg-label"><span class="cfg-name">副條碼高度（會員）</span><span class="cfg-hint">會員代碼條碼</span></div>
+        <div class="cfg-val-row">
+          <input type="range" id="mac_bcH2" min="3" max="15" step="0.5" value="7">
+          <span class="cfg-val-badge" id="mac_bcH2_v">7 mm</span>
+        </div>
+      </div>
+
+      <div class="cfg-row">
+        <div class="cfg-label"><span class="cfg-name">條碼線寬</span><span class="cfg-hint">影響掃描辨識率</span></div>
+        <div class="cfg-val-row">
+          <input type="range" id="mac_bcW" min="0.15" max="0.7" step="0.05" value="0.35">
+          <span class="cfg-val-badge" id="mac_bcW_v">0.35</span>
+        </div>
+      </div>
+
+      <button class="sp-reset-btn" onclick="resetMac()">↺ 重置 Mac 預設值</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── Tab switch ── -->
+<script>
+function switchTab(name) {
+  document.querySelectorAll('.tab-btn').forEach(function(b) {
+    b.classList.toggle('active', b.dataset.tab === name);
+  });
+  document.querySelectorAll('.panel').forEach(function(p) {
+    p.classList.toggle('active', p.id === 'panel-' + name);
+  });
+}
+
+// ── Settings toggle ──
+function toggleSettings() {
+  var overlay = document.getElementById('settings-overlay');
+  var panel   = document.getElementById('settings-panel');
+  var isOpen  = panel.classList.contains('open');
+  overlay.classList.toggle('open', !isOpen);
+  panel.classList.toggle('open', !isOpen);
+}
+</script>
+
+<!-- ════════════════════════════════════════════
+     Settings Logic
+════════════════════════════════════════════ -->
+<script>
+var IPH_DEFAULTS = { marginTB:4.5, marginLR:33, offsetY:0, cols:2, labelW:72, labelH:12, textScale:1.0, bcH:22, bcW:1.4 };
+var MAC_DEFAULTS = { margin:5, cols:5, rows:6, gapX:0, gapY:0, offsetX:0, offsetY:0, fontSize:6.5, bcH1:9, bcH2:7, bcW:0.35 };
+
+var iphCfg = Object.assign({}, IPH_DEFAULTS);
+var macCfg = Object.assign({}, MAC_DEFAULTS);
+
+// Debounce helpers
+var iphTimer = null, macTimer = null;
+function debouncedIph() {
+  clearTimeout(iphTimer);
+  iphTimer = setTimeout(function() {
+    applyIphCSS();
+    if (document.getElementById('iph-print-area').innerHTML) {
+      document.getElementById('iph-btn-preview').click();
+    }
+  }, 400);
+}
+function debouncedMac() {
+  clearTimeout(macTimer);
+  macTimer = setTimeout(function() {
+    if (document.getElementById('mac-preview-area').innerHTML) {
+      macDoPreview();
+    }
+  }, 400);
+}
+
+// Wire up iOS sliders
+(function() {
+  var sliders = [
+    { id:'iph_marginTB',  key:'marginTB',  suffix:' mm',  fmt:function(v){return parseFloat(v).toFixed(1)+' mm';} },
+    { id:'iph_marginLR',  key:'marginLR',  suffix:' mm',  fmt:function(v){return parseFloat(v).toFixed(1)+' mm';} },
+    { id:'iph_offsetY',   key:'offsetY',   suffix:' mm',  fmt:function(v){return parseFloat(v).toFixed(1)+' mm';} },
+    { id:'iph_labelW',    key:'labelW',    suffix:' mm',  fmt:function(v){return parseFloat(v).toFixed(0)+' mm';} },
+    { id:'iph_labelH',    key:'labelH',    suffix:' mm',  fmt:function(v){return parseFloat(v).toFixed(1)+' mm';} },
+    { id:'iph_textScale', key:'textScale', suffix:' %',   fmt:function(v){return Math.round(parseFloat(v)*100)+' %';} },
+    { id:'iph_bcH',       key:'bcH',       suffix:' px',  fmt:function(v){return parseFloat(v).toFixed(0)+' px';} },
+    { id:'iph_bcW',       key:'bcW',       suffix:'',     fmt:function(v){return parseFloat(v).toFixed(1);} },
+  ];
+  sliders.forEach(function(s) {
+    var el = document.getElementById(s.id);
+    var badge = document.getElementById(s.id + '_v');
+    if (!el) return;
+    el.addEventListener('input', function() {
+      iphCfg[s.key] = parseFloat(el.value);
+      badge.textContent = s.fmt(el.value);
+      debouncedIph();
+    });
+  });
+})();
+
+// iOS cols select
+function onIphChange() {
+  iphCfg.cols = parseInt(document.getElementById('iph_cols').value);
+  debouncedIph();
+}
+
+// Wire up Mac sliders
+(function() {
+  var sliders = [
+    { id:'mac_margin',   key:'margin',   fmt:function(v){return parseFloat(v).toFixed(1)+' mm';} },
+    { id:'mac_cols',     key:'cols',     fmt:function(v){return parseFloat(v).toFixed(0)+' 欄';} },
+    { id:'mac_rows',     key:'rows',     fmt:function(v){return parseFloat(v).toFixed(0)+' 列';} },
+    { id:'mac_gapX',     key:'gapX',     fmt:function(v){return parseFloat(v).toFixed(1)+' mm';} },
+    { id:'mac_gapY',     key:'gapY',     fmt:function(v){return parseFloat(v).toFixed(1)+' mm';} },
+    { id:'mac_offsetX',  key:'offsetX',  fmt:function(v){return parseFloat(v).toFixed(1)+' mm';} },
+    { id:'mac_offsetY',  key:'offsetY',  fmt:function(v){return parseFloat(v).toFixed(1)+' mm';} },
+    { id:'mac_fontSize', key:'fontSize', fmt:function(v){return parseFloat(v).toFixed(1)+' pt';} },
+    { id:'mac_bcH1',     key:'bcH1',     fmt:function(v){return parseFloat(v).toFixed(1)+' mm';} },
+    { id:'mac_bcH2',     key:'bcH2',     fmt:function(v){return parseFloat(v).toFixed(1)+' mm';} },
+    { id:'mac_bcW',      key:'bcW',      fmt:function(v){return parseFloat(v).toFixed(2);} },
+  ];
+  sliders.forEach(function(s) {
+    var el = document.getElementById(s.id);
+    var badge = document.getElementById(s.id + '_v');
+    if (!el) return;
+    el.addEventListener('input', function() {
+      macCfg[s.key] = parseFloat(el.value);
+      badge.textContent = s.fmt(el.value);
+      debouncedMac();
+    });
+  });
+})();
+
+// Reset functions
+function resetIph() {
+  Object.assign(iphCfg, IPH_DEFAULTS);
+  var map = { iph_marginTB:'4.5', iph_marginLR:'33', iph_offsetY:'0', iph_labelW:'72', iph_labelH:'12', iph_textScale:'1', iph_bcH:'22', iph_bcW:'1.4' };
+  Object.keys(map).forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) { el.value = map[id]; el.dispatchEvent(new Event('input')); }
+  });
+  document.getElementById('iph_cols').value = '2';
+  applyIphCSS();
+  if (document.getElementById('iph-print-area').innerHTML) document.getElementById('iph-btn-preview').click();
+}
+function resetMac() {
+  Object.assign(macCfg, MAC_DEFAULTS);
+  var map = { mac_margin:'5', mac_cols:'5', mac_rows:'6', mac_gapX:'0', mac_gapY:'0', mac_offsetX:'0', mac_offsetY:'0', mac_fontSize:'6.5', mac_bcH1:'9', mac_bcH2:'7', mac_bcW:'0.35' };
+  Object.keys(map).forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) { el.value = map[id]; el.dispatchEvent(new Event('input')); }
+  });
+  if (document.getElementById('mac-preview-area').innerHTML) macDoPreview();
+}
+
+// Apply iOS dynamic CSS
+function applyIphCSS() {
+  var s = document.getElementById('iph-dynamic-css');
+  if (!s) { s = document.createElement('style'); s.id = 'iph-dynamic-css'; document.head.appendChild(s); }
+  var lw  = iphCfg.labelW + 'mm';
+  var lh  = iphCfg.labelH + 'mm';
+  var ts  = iphCfg.textScale;
+  var bcAreaW = (iphCfg.labelW * 0.556).toFixed(1) + 'mm';
+  var bcSvgW  = (iphCfg.labelW * 0.542).toFixed(1) + 'mm';
+  var bcSvgH  = (iphCfg.labelH * 0.396).toFixed(2) + 'mm';
+  s.textContent = [
+    '@page { size: A4 portrait; margin: ' + iphCfg.marginTB + 'mm ' + iphCfg.marginLR + 'mm; }',
+    '.label-grid { grid-template-columns: repeat(' + iphCfg.cols + ', ' + lw + '); margin-top: ' + iphCfg.offsetY + 'mm; }',
+    '.label { width: ' + lw + '; height: ' + lh + '; }',
+    '.label .bc-area { width: ' + bcAreaW + '; }',
+    '.label .bc-area svg { width: ' + bcSvgW + ' !important; height: ' + bcSvgH + ' !important; }',
+    '.line-tc { font-size: ' + (1.45 * ts).toFixed(3) + 'mm; }',
+    '.nm, .ph { font-size: ' + (1.75 * ts).toFixed(3) + 'mm; }',
+    '.line-pv, .line-ex { font-size: ' + (1.15 * ts).toFixed(3) + 'mm; }',
+  ].join('\n');
+}
+applyIphCSS();
+</script>
+
+<!-- ════════════════════════════════════════════
+     iOS Tool
+════════════════════════════════════════════ -->
+<script>
+(function() {
+  var REQUIRED_FIELDS = ["預約單號","梯次","姓名","會員代碼","手機號碼","預約產品"];
+  var gRecords = [], gReady = false, gExpiryDate = "";
+
+  function esc(s) {
+    return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+  }
+  function normStr(s) { return String(s).normalize("NFKC").trim(); }
+  function safeStr(v) {
+    if (v === null || v === undefined) return "";
+    var s = String(v).trim();
+    return (s === "" || s === "undefined" || s === "null" || s === "NaN") ? "" : s;
+  }
+
+  function findColumns(headers) {
+    var map = {};
+    for (var i = 0; i < REQUIRED_FIELDS.length; i++) {
+      var f = REQUIRED_FIELDS[i], fn = normStr(f);
+      map[f] = null;
+      for (var j = 0; j < headers.length; j++) {
+        var hn = normStr(headers[j]);
+        if (fn === hn || fn.includes(hn) || hn.includes(fn)) { map[f] = headers[j]; break; }
+      }
+    }
+    return map;
+  }
+
+  function setStatus(icon, txt, cls) {
+    document.getElementById("iph-status-icon").textContent = icon;
+    document.getElementById("iph-status-txt").textContent = txt;
+    document.getElementById("iph-status-row").className = "status-row" + (cls ? " " + cls : "");
+  }
+  function setProgress(pct) { document.getElementById("iph-progress-bar").style.width = pct + "%"; }
+
+  function updateColGrid(colMap) {
+    REQUIRED_FIELDS.forEach(function(f) {
+      var item = document.querySelector('#iph-col-grid [data-field="' + f + '"]');
+      if (!item) return;
+      var check = item.querySelector(".col-check");
+      item.classList.remove("found","missing");
+      if (colMap[f]) { item.classList.add("found"); check.textContent = "✓"; }
+      else           { item.classList.add("missing"); check.textContent = ""; }
+    });
+  }
+
+  // Date chips
+  (function() {
+    var DAYS = ["日","一","二","三","四","五","六"];
+    var container = document.getElementById("iph-date-chips");
+    var today = new Date();
+    for (var i = 0; i < 8; i++) {
+      var d = new Date(today); d.setDate(today.getDate() + i);
+      var m = d.getMonth()+1, dd = d.getDate(), day = DAYS[d.getDay()];
+      var btn = document.createElement("button");
+      btn.className = "date-chip";
+      btn.textContent = m + "/" + dd + " (" + day + ")";
+      btn.dataset.value = m + "/" + dd;
+      btn.addEventListener("click", (function(b) {
+        return function() {
+          if (b.classList.contains("selected")) { b.classList.remove("selected"); gExpiryDate = ""; }
+          else { container.querySelectorAll(".date-chip").forEach(function(x){x.classList.remove("selected");}); b.classList.add("selected"); gExpiryDate = b.dataset.value; }
+        };
+      })(btn));
+      container.appendChild(btn);
+    }
+  })();
+
+  function processFile(file) {
+    if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      try {
+        var wb   = XLSX.read(new Uint8Array(e.target.result), {type:"array"});
+        var rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], {defval:""});
+        if (!rows.length) { setStatus("✗","Excel 為空","err"); return; }
+        var headers = Object.keys(rows[0]);
+        var colMap  = findColumns(headers);
+        updateColGrid(colMap);
+        var missing = REQUIRED_FIELDS.filter(function(f){return !colMap[f];});
+        gRecords = rows.map(function(row) {
+          var rec = {};
+          REQUIRED_FIELDS.forEach(function(f){rec[f] = colMap[f] ? safeStr(row[colMap[f]]) : "";});
+          return rec;
+        });
+        document.getElementById("iph-drop-zone").classList.add("has-file");
+        document.getElementById("iph-dz-main").textContent = "✓ " + file.name;
+        if (missing.length) {
+          setStatus("✗","找不到欄位：" + missing.join("、"),"err");
+        } else {
+          gReady = true;
+          setStatus("✓","讀取成功，共 " + rows.length + " 筆資料","ok");
+          document.getElementById("iph-btn-preview").disabled = false;
+          document.getElementById("iph-btn-print").disabled   = false;
+        }
+      } catch(err) { setStatus("✗","讀取失敗：" + err.message,"err"); }
+    };
+    reader.readAsArrayBuffer(file);
+  }
+
+  var dz = document.getElementById("iph-drop-zone");
+  dz.addEventListener("click",    function(e){if(e.target.tagName==="BUTTON")return; document.getElementById("iph-file-input").click();});
+  dz.addEventListener("dragover",  function(e){e.preventDefault();dz.classList.add("drag-over");});
+  dz.addEventListener("dragleave", function(){dz.classList.remove("drag-over");});
+  dz.addEventListener("drop",      function(e){e.preventDefault();dz.classList.remove("drag-over");processFile(e.dataTransfer.files[0]);});
+  document.getElementById("iph-file-input").addEventListener("change", function(e){processFile(e.target.files[0]);});
+
+  function renderLabel(record, expiryDate) {
+    var ono = safeStr(record["預約單號"]);
+    var mno = safeStr(record["會員代碼"]);
+    var nm  = safeStr(record["姓名"]);
+    var ph  = safeStr(record["手機號碼"]);
+    var ph3 = ph.length >= 3 ? ph.slice(-3) : ph;
+    var tc  = safeStr(record["梯次"]);
+    var pv  = safeStr(record["預約產品"]);
+    if (pv.startsWith("預約｜")) pv = pv.slice(3);
+    var bcOrder  = ono ? '<svg data-bc="' + esc(ono) + '"></svg>' : "";
+    var bcMember = mno ? '<svg data-bc="' + esc(mno) + '"></svg>' : "";
+    var lineTc = tc         ? '<div class="line-tc">' + esc(tc) + '</div>' : "";
+    var lineNm = '<div class="line-nm"><span class="nm">' + esc(nm) + '</span><span class="ph">*' + esc(ph3) + '</span></div>';
+    var linePv = pv         ? '<div class="line-pv">' + esc(pv) + '</div>' : "";
+    var lineEx = expiryDate ? '<div class="line-ex">到期:' + esc(expiryDate) + '</div>' : "";
+    return '<div class="label"><div class="blue-bar"></div><div class="bc-area">' + bcOrder + bcMember + '</div><div class="txt-area">' + lineTc + lineNm + linePv + lineEx + '</div></div>';
+  }
+
+  function initBarcodes(container) {
+    container.querySelectorAll("svg[data-bc]").forEach(function(el) {
+      var val = el.dataset.bc;
+      try {
+        JsBarcode(el, val, {
+          format:"CODE128", displayValue:true,
+          fontSize:18, textMargin:1, margin:1,
+          width:  iphCfg.bcW,
+          height: iphCfg.bcH,
+          lineColor:"#000000", background:"#ffffff"
+        });
+        var bcSvgW = (iphCfg.labelW * 0.542).toFixed(1) + 'mm';
+        var bcSvgH = (iphCfg.labelH * 0.396).toFixed(2) + 'mm';
+        el.style.cssText = 'display:block!important;width:' + bcSvgW + '!important;height:' + bcSvgH + '!important;flex-shrink:0;';
+      } catch(e) { el.textContent = val; }
+    });
+  }
+
+  function doPreview() {
+    if (!gReady) return;
+    var expiry = gExpiryDate;
+    var area   = document.getElementById("iph-print-area");
+    area.innerHTML = "";
+    setProgress(0);
+    setStatus("…","產生標籤中…","");
+    document.getElementById("iph-btn-preview").disabled = true;
+    document.getElementById("iph-btn-print").disabled   = true;
+
+    setTimeout(function() {
+      var total = gRecords.length;
+      var PER_PAGE = Math.max(1, Math.round((297 - 2*iphCfg.marginTB) / iphCfg.labelH)) * iphCfg.cols;
+      var totalPages = Math.ceil(total / PER_PAGE);
+      var pageHtml = "", html = "", pageIdx = 1;
+      for (var i = 0; i < total; i++) {
+        if (i > 0 && i % PER_PAGE === 0) {
+          pageHtml += '<div class="print-page"><div class="print-page-num">第 ' + pageIdx + ' 頁（共 ' + totalPages + ' 頁）</div><div class="label-grid">' + html + '</div></div>';
+          html = ""; pageIdx++;
+        }
+        html += renderLabel(gRecords[i], expiry);
+        if (i % 20 === 0) setProgress(Math.round((i+1)/total*80));
+      }
+      if (html) pageHtml += '<div class="print-page"><div class="print-page-num">第 ' + pageIdx + ' 頁（共 ' + totalPages + ' 頁）</div><div class="label-grid">' + html + '</div></div>';
+      area.innerHTML = pageHtml;
+      initBarcodes(area);
+      setStatus("✓","完成！共 " + total + " 筆，" + totalPages + " 頁","ok");
+      setProgress(100);
+      document.getElementById("iph-btn-preview").disabled = false;
+      document.getElementById("iph-btn-print").disabled   = false;
+      area.scrollIntoView({behavior:"smooth", block:"start"});
+    }, 50);
+  }
+
+  document.getElementById("iph-btn-preview").addEventListener("click", doPreview);
+  document.getElementById("iph-btn-print").addEventListener("click", function() {
+    if (!gReady) return;
+    if (!document.getElementById("iph-print-area").innerHTML) {
+      doPreview();
+      setTimeout(function(){window.print();}, 1200);
+    } else { window.print(); }
+  });
+})();
+</script>
+
+<!-- ════════════════════════════════════════════
+     Mac Tool
+════════════════════════════════════════════ -->
+<script>
+(function() {
+  var REQUIRED = ["預約單號","梯次","姓名","會員代碼","手機號碼","預約產品"];
+  var OPTIONAL = ["預計取機時間"];
+  var FIELDS   = REQUIRED.concat(OPTIONAL);
+  var SCALE    = 10;
+
+  var excelRows = null, colMap = {};
+
+  // Date buttons
+  (function() {
+    var DAY = ['日','一','二','三','四','五','六'];
+    var wrap = document.getElementById('mac-date-chips');
+    var base = new Date();
+    for (var i = 0; i < 8; i++) {
+      var d = new Date(base); d.setDate(base.getDate() + i);
+      var val   = d.getFullYear() + '/' + String(d.getMonth()+1).padStart(2,'0') + '/' + String(d.getDate()).padStart(2,'0');
+      var label = (d.getMonth()+1) + '/' + d.getDate() + ' (' + DAY[d.getDay()] + ')';
+      var btn = document.createElement('button');
+      btn.className = 'date-chip'; btn.textContent = label; btn.dataset.value = val;
+      btn.onclick = (function(b) {
+        return function() {
+          var already = b.classList.contains('selected');
+          wrap.querySelectorAll('.date-chip').forEach(function(x){x.classList.remove('selected');});
+          if (!already) b.classList.add('selected');
+        };
+      })(btn);
+      wrap.appendChild(btn);
+    }
+  })();
+
+  // Column grid
+  (function() {
+    var g = document.getElementById('mac-col-grid');
+    FIELDS.forEach(function(f) {
+      var d = document.createElement('div');
+      d.className = 'col-item'; d.id = 'mac-cf-' + f;
+      d.innerHTML = '<div class="col-check"></div><span class="col-name">' + f + '</span>';
+      g.appendChild(d);
+    });
+  })();
+
+  function norm(s) { return String(s).trim().normalize('NFKC'); }
+  function safeStr(v) {
+    var s = String(v === null || v === undefined ? '' : v).trim();
+    return (s === '' || s === 'null' || s === 'undefined' || s === 'NaN') ? '' : s;
+  }
+  function macSetStatus(icon, text, cls) {
+    document.getElementById('mac-status-icon').textContent = icon;
+    document.getElementById('mac-status-text').textContent = ' ' + text;
+    document.getElementById('mac-status-row').className = 'status-row' + (cls ? ' ' + cls : '');
+  }
+  function macSetProgress(p) { document.getElementById('mac-progress').value = p; }
+  function todayStr() {
+    var d = new Date();
+    return d.getFullYear() + String(d.getMonth()+1).padStart(2,'0') + String(d.getDate()).padStart(2,'0');
+  }
+  function findColumns(headers) {
+    var map = {};
+    FIELDS.forEach(function(f) {
+      var fn = norm(f); map[f] = null;
+      for (var i = 0; i < headers.length; i++) {
+        var hn = norm(headers[i]);
+        if (fn===hn || fn.includes(hn) || hn.includes(fn)) { map[f] = headers[i]; break; }
+      }
+    });
+    return map;
+  }
+  function updateColUI(map) {
+    FIELDS.forEach(function(f) {
+      var el = document.getElementById('mac-cf-' + f); if (!el) return;
+      var check = el.querySelector('.col-check');
+      el.classList.remove('found','missing');
+      if (map[f]) { el.classList.add('found'); check.textContent = '✓'; }
+      else if (REQUIRED.indexOf(f) >= 0) { el.classList.add('missing'); check.textContent = ''; }
+    });
+  }
+  function setBothBtns(disabled) {
+    document.getElementById('mac-preview-btn').disabled = disabled;
+    document.getElementById('mac-convert-btn').disabled = disabled;
+  }
+
+  function processFile(file) {
+    if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      try {
+        var wb   = XLSX.read(new Uint8Array(e.target.result), {type:'array', cellDates:true});
+        var data = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], {defval:''});
+        if (!data.length) { macSetStatus('✗','Excel 無資料','err'); return; }
+        excelRows = data; colMap = findColumns(Object.keys(data[0]));
+        updateColUI(colMap);
+        document.getElementById('mac-drop-zone').classList.add('has-file');
+        document.getElementById('mac-dz-main').textContent = '✓ ' + file.name;
+        var missing = REQUIRED.filter(function(f){return !colMap[f];});
+        if (missing.length) { macSetStatus('✗','找不到欄位：'+missing.join('、'),'err'); setBothBtns(true); }
+        else { macSetStatus('✓','讀取成功，共 '+data.length+' 筆資料','ok'); setBothBtns(false); }
+      } catch(err) { macSetStatus('✗','無法開啟 Excel：'+err.message,'err'); }
+    };
+    reader.readAsArrayBuffer(file);
+  }
+
+  var mdz = document.getElementById('mac-drop-zone');
+  mdz.addEventListener('click',    function(e){if(e.target.tagName==='BUTTON')return; document.getElementById('mac-file-input').click();});
+  mdz.addEventListener('dragover',  function(e){e.preventDefault();mdz.classList.add('drag-over');});
+  mdz.addEventListener('dragleave', function(){mdz.classList.remove('drag-over');});
+  mdz.addEventListener('drop',      function(e){e.preventDefault();mdz.classList.remove('drag-over');processFile(e.dataTransfer.files[0]);});
+  document.getElementById('mac-file-input').addEventListener('change', function(e){processFile(e.target.files[0]);});
+
+  function getMacDims() {
+    var MG = macCfg.margin, C = macCfg.cols, R = macCfg.rows;
+    var GX = macCfg.gapX, GY = macCfg.gapY;
+    var cw = (210 - 2*MG - (C-1)*GX) / C;
+    var ch = (297 - 2*MG - (R-1)*GY) / R;
+    var CW = Math.round(cw * SCALE), CH = Math.round(ch * SCALE);
+    var PAD  = Math.round(1.8 * SCALE);
+    var BARH = Math.round(3   * SCALE);
+    var FS   = Math.round(macCfg.fontSize / 72 * 25.4 * SCALE);
+    var LH   = Math.round((macCfg.fontSize + 2) / 72 * 25.4 * SCALE);
+    var FONT   = FS + 'px "PingFang TC","Hiragino Sans GB","Microsoft JhengHei",sans-serif';
+    var FONT_B = 'bold ' + (FS+4) + 'px "PingFang TC","Hiragino Sans GB","Microsoft JhengHei",sans-serif';
+    return { cw:cw, ch:ch, CW:CW, CH:CH, PAD:PAD, BARH:BARH, FS:FS, LH:LH, FONT:FONT, FONT_B:FONT_B };
+  }
+
+  function makeBarcode(value, barH_mm, fontPt) {
+    var c = document.createElement('canvas');
+    try {
+      JsBarcode(c, value, {
+        format:'CODE128',
+        width: Math.max(1, Math.round(SCALE * macCfg.bcW)),
+        height: Math.round(barH_mm * SCALE),
+        displayValue: true,
+        fontSize: Math.round(fontPt / 72 * 25.4 * SCALE),
+        margin: Math.round(0.5 * SCALE),
+        background: '#FFFEF2'
+      });
+      return c;
+    } catch(_) { return null; }
+  }
+
+  function wrapText(ctx, text, maxW, maxLines) {
+    var lines = [], cur = '', i = 0;
+    while (i < text.length) {
+      var ch = text[i];
+      if (ctx.measureText(cur+ch).width <= maxW) { cur += ch; i++; }
+      else {
+        if (cur) {
+          lines.push(cur);
+          if (lines.length >= maxLines-1) {
+            cur = ch; i++;
+            while (i < text.length && ctx.measureText(cur+text[i]).width <= maxW) cur += text[i++];
+            while (cur.length > 1 && ctx.measureText(cur+'…').width > maxW) cur = cur.slice(0,-1);
+            cur += '…'; break;
+          }
+          cur = ch; i++;
+        } else { lines.push(ch); i++; cur = ''; if (lines.length >= maxLines) break; }
+      }
+    }
+    if (cur && lines.length < maxLines) lines.push(cur);
+    return lines;
+  }
+
+  function truncate(ctx, text, maxW) {
+    while (text.length > 5 && ctx.measureText(text).width > maxW) text = text.slice(0,-2) + '…';
+    return text;
+  }
+
+  function drawCell(rec, expiry) {
+    var d = getMacDims();
+    var cv = document.createElement('canvas');
+    cv.width = d.CW; cv.height = d.CH;
+    var ctx = cv.getContext('2d');
+    var iX = d.PAD, iW = d.CW - 2*d.PAD;
+
+    ctx.fillStyle = '#FFFEF2'; ctx.fillRect(0, 0, d.CW, d.CH);
+    ctx.fillStyle = '#3C7BC6'; ctx.fillRect(0, 0, d.CW, d.BARH);
+    ctx.strokeStyle = '#AAAAAA';
+    ctx.lineWidth = Math.max(1, Math.round(0.4*SCALE));
+    ctx.strokeRect(0.5, 0.5, d.CW-1, d.CH-1);
+
+    var y = d.BARH + d.PAD, bottom = d.CH - d.PAD;
+
+    var drawBC = function(value, barH_mm) {
+      if (!value) return;
+      var bc = makeBarcode(value, barH_mm, 4);
+      if (!bc) return;
+      var sc = Math.min(iW / bc.width, 1);
+      ctx.drawImage(bc, iX + (iW - bc.width*sc)/2, y, bc.width*sc, bc.height*sc);
+      y += bc.height*sc + Math.round(0.8*SCALE);
+    };
+
+    drawBC(safeStr(rec['預約單號']), macCfg.bcH1);
+    drawBC(safeStr(rec['會員代碼']), macCfg.bcH2);
+
+    ctx.textBaseline = 'top';
+    var line = function(text, font) {
+      if (y + d.LH > bottom) return false;
+      ctx.font = font || d.FONT; ctx.fillStyle = '#000000';
+      ctx.fillText(truncate(ctx, text, iW), iX, y);
+      y += d.LH; ctx.font = d.FONT;
+      return true;
+    };
+
+    line('姓名：' + (safeStr(rec['姓名']) || '—'));
+    line('手機：' + (safeStr(rec['手機號碼']) || '—'));
+    line('梯次：' + (safeStr(rec['梯次']) || '—'));
+
+    var pv = safeStr(rec['預約產品']);
+    if (pv.startsWith('預約｜')) pv = pv.slice(3);
+    ctx.font = d.FONT;
+    wrapText(ctx, '產品：' + (pv || '—'), iW, 4).forEach(function(ln){line(ln);});
+
+    if (expiry) line('到期：' + expiry);
+    var pickup = safeStr(rec['預計取機時間']);
+    if (pickup) line('取機：' + pickup, d.FONT_B);
+
+    return cv;
+  }
+
+  function buildRecs() {
+    var activeBtn = document.querySelector('#mac-date-chips .date-chip.selected');
+    var expiry = activeBtn ? activeBtn.dataset.value : '';
+    var recs = excelRows.map(function(row) {
+      var r = {};
+      FIELDS.forEach(function(f){r[f] = colMap[f] ? row[colMap[f]] : '';});
+      return r;
+    });
+    recs.sort(function(a,b) {
+      var ka = safeStr(a['預計取機時間']), kb = safeStr(b['預計取機時間']);
+      if (!ka && !kb) return 0; if (!ka) return 1; if (!kb) return -1;
+      return ka<kb?-1:ka>kb?1:0;
+    });
+    return { recs:recs, expiry:expiry };
+  }
+
+  // Update grid preview CSS when cols changes
+  function updatePreviewGridCols() {
+    var grids = document.querySelectorAll('.mac-cell-grid');
+    grids.forEach(function(g){
+      g.style.gridTemplateColumns = 'repeat(' + macCfg.cols + ',1fr)';
+    });
+  }
+
+  window.macDoPreview = function() {
+    if (!excelRows) return;
+    var built = buildRecs(), recs = built.recs, expiry = built.expiry;
+    var total = recs.length, PER_PAGE = macCfg.cols * macCfg.rows;
+    var pages = Math.ceil(total / PER_PAGE);
+
+    setBothBtns(true);
+    macSetProgress(0);
+    macSetStatus('○','產生預覽中…','');
+    var area = document.getElementById('mac-preview-area');
+    area.innerHTML = '';
+
+    setTimeout(function() {
+      var pageIdx = 1;
+      for (var i = 0; i < total; i++) {
+        var pos = i % PER_PAGE;
+        if (pos === 0) {
+          var pg = document.createElement('div'); pg.className = 'mac-preview-page';
+          var pgNum = document.createElement('div'); pgNum.className = 'mac-preview-page-num';
+          pgNum.textContent = '第 ' + pageIdx + ' 頁（共 ' + pages + ' 頁）';
+          var grid = document.createElement('div'); grid.className = 'mac-cell-grid';
+          grid.style.gridTemplateColumns = 'repeat(' + macCfg.cols + ',1fr)';
+          pg.appendChild(pgNum); pg.appendChild(grid);
+          area.appendChild(pg); pageIdx++;
+        }
+        area.lastElementChild.querySelector('.mac-cell-grid').appendChild(drawCell(recs[i], expiry));
+        if (i % 10 === 0) macSetProgress(Math.round((i+1)/total*100));
+      }
+      macSetProgress(100);
+      macSetStatus('✓','預覽完成！共 '+total+' 筆，'+pages+' 頁','ok');
+      setBothBtns(false);
+      area.scrollIntoView({behavior:'smooth', block:'start'});
+    }, 30);
+  };
+
+  window.macDoConvert = async function() {
+    if (!excelRows) return;
+    var built = buildRecs(), recs = built.recs, expiry = built.expiry;
+    var total = recs.length;
+    var C = macCfg.cols, R = macCfg.rows, PER_PAGE = C * R;
+    var MG = macCfg.margin, GX = macCfg.gapX, GY = macCfg.gapY;
+    var OX = macCfg.offsetX, OY = macCfg.offsetY;
+    var cw = (210 - 2*MG - (C-1)*GX) / C;
+    var ch = (297 - 2*MG - (R-1)*GY) / R;
+
+    setBothBtns(true); macSetProgress(0); macSetStatus('○','準備中…','');
+
+    var jsPDF = window.jspdf.jsPDF;
+    var doc   = new jsPDF({unit:'mm', format:'a4', orientation:'portrait'});
+
+    for (var i = 0; i < total; i++) {
+      if (i % 5 === 0) {
+        macSetProgress(Math.round(i/total*100));
+        macSetStatus('○','轉換中… '+i+' / '+total,'');
+        await new Promise(function(r){setTimeout(r,0);});
+      }
+      var pos = i % PER_PAGE;
+      if (pos === 0 && i > 0) doc.addPage();
+      var col = pos % C, row = Math.floor(pos / C);
+      var cx = MG + OX + col * (cw + GX);
+      var cy = MG + OY + row * (ch + GY);
+      doc.addImage(drawCell(recs[i], expiry).toDataURL('image/png'), 'PNG', cx, cy, cw, ch);
+    }
+
+    macSetProgress(100);
+    doc.save('便條紙_' + todayStr() + '.pdf');
+    macSetStatus('✓','完成！共 '+total+' 筆，'+Math.ceil(total/PER_PAGE)+' 頁','ok');
+    setBothBtns(false);
+  };
+})();
+</script>
+</body>
+</html>

@@ -15,6 +15,7 @@
       --transfer: #1f5f99;
       --setup: #2f7d72;
       --marketing: #b65f00;
+      --reservation: #8c4f86;
       --shadow: 0 20px 60px rgba(21, 25, 31, .12);
     }
 
@@ -71,7 +72,7 @@
 
     .tools {
       display: grid;
-      grid-template-columns: repeat(4, minmax(0, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
       gap: 16px;
       margin-top: 24px;
     }
@@ -144,6 +145,11 @@
       background: var(--marketing);
     }
 
+    .tool-card.reservation strong {
+      color: #fff;
+      background: var(--reservation);
+    }
+
     .tool-card.label {
       background:
         linear-gradient(135deg, rgba(216, 240, 0, .22), transparent 44%),
@@ -165,6 +171,12 @@
     .tool-card.marketing {
       background:
         linear-gradient(135deg, rgba(182, 95, 0, .18), transparent 44%),
+        var(--panel);
+    }
+
+    .tool-card.reservation {
+      background:
+        linear-gradient(135deg, rgba(140, 79, 134, .18), transparent 44%),
         var(--panel);
     }
 
@@ -229,6 +241,14 @@
         <div>
           <h2>行銷活動</h2>
           <p>查詢本月活動、主機優惠、付款方案與存貨代碼。</p>
+        </div>
+      </a>
+
+      <a class="tool-card reservation" href="reservation-label.html">
+        <strong>Reservation</strong>
+        <div>
+          <h2>預約標籤</h2>
+          <p>製作預約取貨與便條紙標籤，支援條碼與 PDF 輸出。</p>
         </div>
       </a>
     </section>
